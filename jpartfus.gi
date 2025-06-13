@@ -269,8 +269,11 @@ function(iter)
                     continue;
                 fi;
                 nH:=StabilizerOfCanonicalRepresentative(gsorb);
-                xnorbits:=Filtered(state.orbits, x->Length(Representative(x))>=Length(gs));
-                norbits:=Union(List(xnorbits, x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, y->IsJCompatibleWithPart(npfus,y))));
+                xnorbits:=Filtered(state.orbits, 
+                                   x->Length(Representative(x))>=Length(gs));
+                norbits:=Union(List(xnorbits, 
+                   x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, 
+                      y->IsJCompatibleWithPart(npfus,y))));
 #                Assert(1,norbits=Union(List(xnorbits, x->Filtered(SubOrbitsOfCocoOrbit(nH,x),y->IsCompatibleWithPart(npfus,Representative(y))))));
                 
                 norbits:=Filtered(norbits, x->Representative(x)>gs);
@@ -296,8 +299,11 @@ function(iter)
                     continue;
                 fi;
                 nH:=StabilizerOfCanonicalRepresentative(gsorb);
-                xnorbits:=Filtered(state.orbits, x->Length(Representative(x))>=Length(gs));
-                norbits:=Union(List(xnorbits, x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, y->IsJCompatibleWithPart(npfus,y))));
+                xnorbits:=Filtered(state.orbits, 
+                                   x->Length(Representative(x))>=Length(gs));
+                norbits:=Union(List(xnorbits, 
+                   x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, 
+                      y->IsJCompatibleWithPart(npfus,y))));
 #                Assert(1, norbits=Union(List(xnorbits, x->Filtered(SubOrbitsOfCocoOrbit(nH,x), y->IsCompatibleWithPart(npfus,Representative(y))))));
                 
                 norbits:=Filtered(norbits, x->Representative(x)>gs);                
@@ -330,7 +336,9 @@ function(iter)
                 if IsPerm(nH) then
                     continue;
                 fi;
-                norbits:=Union(List(state.orbits, x->SubOrbitsWithInvariantPropertyOfCocoOrbit(StabilizerOfCanonicalRepresentative(gsorb), x, y->IsJCompatibleWithPart(npfus,y))));
+                norbits:=Union(List(state.orbits, 
+                   x->SubOrbitsWithInvariantPropertyOfCocoOrbit(StabilizerOfCanonicalRepresentative(gsorb), x, 
+                        y->IsJCompatibleWithPart(npfus,y))));
 #                Assert(1,norbits=Union(List(state.orbits, x->Filtered(SubOrbitsOfCocoOrbit(StabilizerOfCanonicalRepresentative(gsorb),x),y->IsCompatibleWithPart(npfus,Representative(y))))));
 
                 norbits:=Set(norbits, x->JGoodSetOrbit(nH, CanonicalRepresentativeOfCocoOrbit(x),

@@ -343,30 +343,30 @@ function(iter)
                 nH:=();
                 continue;
             fi;
-            nH:=StabilizerOfCanonicalRepresentative(setorb);
-            xnorbits:=Filtered(state.orbits, 
-                               x->Length(Representative(x))>=Length(set));
             
-            norbits:=List(xnorbits, 
-                          x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, 
-                                                                       y->IsCompatibleWithPartialPartition(nppart,y)));
-            for i in [1..Length(xnorbits)] do
-                Perform(norbits[i], function(x) x!.type:=xnorbits[i]!.type;end);
-            od;
-            norbits:=Concatenation(norbits);
+            if state.slice=[] then
+                nH:=StabilizerOfCanonicalRepresentative(setorb);
+                xnorbits:=Filtered(state.orbits, 
+                                   x->Length(Representative(x))>=Length(set));
             
-            norbits:=Filtered(norbits, x->(Length(Representative(x))>Length(set)) or
-                                       (Length(Representative(x))=Length(set) and 
-                                        Representative(x)>set));
+                norbits:=List(xnorbits, 
+                              x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, 
+                                y->IsCompatibleWithPartialPartition(nppart,y)));
+                for i in [1..Length(xnorbits)] do
+                    Perform(norbits[i], function(x) x!.type:=xnorbits[i]!.type;end);
+                od;
+                norbits:=Concatenation(norbits);
             
-            if state.noLargeClass and not ForAny(norbits, x->Representative(x)[1] in DomainOfPartialPartition(nppart)) then
-                nH:=();
-                Info(InfoCOCO,1,"!");
+                norbits:=Filtered(norbits, x->(Length(Representative(x))>Length(set)) or
+                                           (Length(Representative(x))=Length(set) and 
+                                            Representative(x)>set));
+            
+                if state.noLargeClass and not ForAny(norbits, x->Representative(x)[1] in DomainOfPartialPartition(nppart)) then
+                    nH:=();
+                    Info(InfoCOCO,1,"!");
                 
-                continue;
-            fi;
-            
-            if state.slice=[] or Length(state.slice[1])<Length(set) then
+                    continue;
+                fi;
                 nextstate:=rec( allsorb:=state.allsorb,
                                 ppart:=nppart,
                                 maxrank:=state.maxrank,
@@ -379,7 +379,70 @@ function(iter)
                                 orbidx:=1,
                                 noLargeClass:=state.noLargeClass,
                                 linkback:=state);
+            elif Length(state.slice[1])<Length(set) then
+                nH:=StabilizerOfCanonicalRepresentative(setorb);
+                xnorbits:=Filtered(state.orbits, 
+                                   x->Length(Representative(x))>=Length(set));
+            
+                norbits:=List(xnorbits, 
+                              x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, 
+                                y->IsCompatibleWithPartialPartition(nppart,y)));
+                for i in [1..Length(xnorbits)] do
+                    Perform(norbits[i], function(x) x!.type:=xnorbits[i]!.type;end);
+                od;
+                norbits:=Concatenation(norbits);
+            
+                norbits:=Filtered(norbits, x->(Length(Representative(x))>Length(set)) or
+                                           (Length(Representative(x))=Length(set) and 
+                                            Representative(x)>set));
+            
+                if state.noLargeClass and not ForAny(norbits, x->Representative(x)[1] in DomainOfPartialPartition(nppart)) then
+                    nH:=();
+                    Info(InfoCOCO,1,"!");
+                
+                    continue;
+                fi;
+                nextstate:=rec( allsorb:=state.allsorb,
+                                ppart:=nppart,
+                                maxrank:=state.maxrank,
+                                orbitBounds:=ShallowCopy(state.orbitBounds),
+                                G:=state.G,
+                                GS:=state.H,
+                                H:=nH,
+                                slice:=[set],
+                                orbits:=Set(norbits),
+                                orbidx:=1,
+                                noLargeClass:=state.noLargeClass,
+                                linkback:=state);
             else
+                nH:=SetsSetsReducibilityTestOneCard(state.GS, StabilizerOfCanonicalRepresentative(setorb),state.slice,set);
+                if IsPerm(nH) then
+                    continue;
+                fi;
+                
+                xnorbits:=Filtered(state.orbits, 
+                                   x->Length(Representative(x))>=Length(set));
+                
+                norbits:=List(xnorbits, 
+                              x->SubOrbitsWithInvariantPropertyOfCocoOrbit(StabilizerOfCanonicalRepresentative(setorb), x, 
+                                y->IsCompatibleWithPartialPartition(nppart,y)));
+                Assert(1,IsSubgroup(nH, StabilizerOfCanonicalRepresentative(setorb)));
+                
+                for i in [1..Length(xnorbits)] do
+                    Perform(norbits[i], function(x) x!.type:=xnorbits[i]!.type;end);
+                od;
+                norbits:=Concatenation(norbits);
+            
+                norbits:=Filtered(norbits, x->(Length(Representative(x))>Length(set)) or
+                                           (Length(Representative(x))=Length(set) and 
+                                            Representative(x)>set));
+            
+                if state.noLargeClass and not ForAny(norbits, x->Representative(x)[1] in DomainOfPartialPartition(nppart)) then
+                    nH:=();
+                    Info(InfoCOCO,1,"!");
+                
+                    continue;
+                fi;
                 nextstate:=rec( allsorb:=state.allsorb,
                                 ppart:=nppart,
                                 maxrank:=state.maxrank,
@@ -393,6 +456,7 @@ function(iter)
                                 noLargeClass:=state.noLargeClass,
                                 linkback:=state);
             fi;
+            
             
             nextstate.orbitBounds[setorb!.type]:=nextstate.orbitBounds[setorb!.type]-1;
             
