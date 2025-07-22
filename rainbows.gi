@@ -516,7 +516,7 @@ InstallMethod(IsProperJordanScheme,
               [IsColorGraph and IsJStableColorGraph],
 function(cgr)              
     if not IsUndirectedColorGraph(cgr) then
-        return false;
+        return true;
     fi;
     return Rank(cgr) < Rank(ColorGraphBySymmetrization(ColorGraphByWLStabilization(cgr)));
 end);

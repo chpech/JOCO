@@ -1,39 +1,77 @@
+
+# partitions: Let $X$ be a finite set (totally ordered by $<$, and let $P$ be a 
+#      set of partitions of $X$. On $P$ we consider the refinement order: a 
+#      partition $\pi_1$ is said to be \emph{finer} than the partition $\pi_2$ if 
+#      every class of $\pi_2$ is the union o classes of $\pi_1$. We require that 
+#      $P$ is closed with respect to $\land$ of partitions. Here $\pi_1 \land \pi_2$ 
+#      is the finest partition coarser than both, $\pi_1$ and $\pi_2$. Also, let 
+#      $G$, the group of all permutations of $X$ that maps elements of $P$ to elements  
+#      of $P$ (in the canonical action on sets of subsets of $X$).
+#
+# partial partitions: A tuple $M=(M_1,\dots,M_m)$ of pairwise disjoint non-empty 
+#      subsets of $X$ is called a partial partition if 
+#          - for all i<j we have that $M_i<M_j$ in the shortlex ordering, 
+#          - there exists a partition $\pi\in P$ with 
+#            $M^s := \{M_i\mid 1\le i\le m\} \subseteq \pi$, such that all classes 
+#            of $\pi$ not in $M$ are greater than all elements of $M$, with respect 
+#            to the shortlex ordering of subsets of $X$.
+#
+# complete partial partitions: A partial partition $M$ is called \emph{complete} if
+#      there is a partition $\pi\in P$ with M^s\subseteq \pi$ and such that all 
+#      classes of $\pi$ not in $M^s$ have a larger cardinality than all elements of
+#      $M^s$.
+#
+# partitions from partial partitions: By $\Phi(M)$ we denote the coarsest partition 
+#      from $P$ that contains $M^s$ (exists because $P$ is closed with respect to 
+#      $\land$). We also say that $M$ generates $\phi(M)
+# 
+# partial partitions from partitions: every partition $\pi$ from $P$ gives rise to a 
+#      partial partition $\psi(\pi)$ conisting of all classes of $\pi$ ordered 
+#      shortlex.
+#
+# irredundant partial partitions: A partial partition $M$ is called \emph{irredundant}
+#      if for the partial partition $M'$ obtained from $M$ by removing the last element
+#      we have $\varphi(M') \neq \varphi(M)$
+#
+# Observation A: partial partitions are themself ordered by a shortlex ordering, 
+#      where the primery soring criterion is the number of classes, and where partial
+#      partition with the same number of classes are sorded lexicographically,
+#      using the shortlex ordering of subsets of $X$.
+#
+# Observation B: Let $\pi\in P$ and let $M$ be a partial partition with $\varphi(M)=\pi$. 
+#      Then $M$ is a prefix of $\psi(\pi)$. The smallest complete partial partition 
+#      that generates $\pi$ is called the \emph{base} of $\pi$ (exists because 
+#      $\psi(\pi)$ is a complete partial partition).
+#
+# Observation C: Every partition from $P$ has a unique base and a unique irredundant 
+#      generating partial partition.
+# 
+# HasSmallerBase: a partial partition $M$ is said to have a \emph{smaller base} if it 
+#      has a prefix $M'$ that is complete, and such that $\varphi(M)=\varphi(M')$.
+
 PartialPartitionsFamily := NewFamily("PartialPartitionsFam", IsPartialPartition);
 
 DeclareRepresentation( "IsPartialPartitionRep",
         IsAttributeStoringRep,
         [ "ppart",
-          "domain",
-          "maxclasssize",
-          "noLargeClass",
+          "domain"
           ]);
 
 InstallMethod(EmptyPartialPartition,
-        "for a permutation group and an integer",
-        [ IsList, IsInt],
-function(domain,maxclasssize)
-    local obj,part,varpart,noLargeClass;
-    
-    # during their construction the sets in a partition are short-lex sorted
-    # every partial partition may be completed to a partition by adding one large class
-    # this class is always larger than all the other classes with respect to the
-    # short lex ordering. 
-    # if the option NoLargeClass is given, then partial partitons
-    #  are not automatically completed to partitions when 
-    # enumerating partiton orbits. This is desirable when all the partition classes should c
-    # ome from a predefined pool of sets
-
-    noLargeClass:=ValueOption("noLargeClass");
-    if noLargeClass = fail then
-        noLargeClass := false;
-    fi;
-    
+        "for a permutation group",
+        [ IsList ],
+function(domain)
+    local  obj,ppart;
+        
     obj:=rec( ppart:=[],
-              domain:=domain,
-              maxclasssize:=maxclasssize,
-              noLargeClass:=noLargeClass
+              domain:=domain
               );
-    return Objectify(NewType(PartialPartitionsFamily, IsPartialPartition and IsPartialPartitionRep), obj);
+    ppart := Objectify(NewType(PartialPartitionsFamily, IsPartialPartition and IsPartialPartitionRep), obj);
+    SetIsIrredundantPartialPartition(ppart,true);
+    SetIsCompletePartialPartition(ppart,true);
+    SetHasSmallerBase(ppart,false);
+    
+    return ppart;
 end);
 
 InstallMethod( DomainOfPartialPartition,
@@ -43,56 +81,98 @@ function(ppart)
     return ppart!.domain;
 end);
 
-        
+
+# <set> is a class to be added to ppart.
+# it must be greater than any class of <ppart> w.r.t. shortlex,
+# and it must be disjoint from any class of <ppart>.
+# If adding <set> to <ppart> does not result in a partial partition (see above),
+# then the operation should return fail.
 InstallMethod(ExtendedPartialPartition,
         "for a partial partition and a list",
         [IsPartialPartition and IsPartialPartitionRep, IsList],
 function(ppartition,set)
-    local  nppart, ndomain, obj, 
+    local  class, nppart, ndomain, obj, 
            nppartition;
       
-    Assert(1,IsSubset(ppartition!.domain,set));
+    
+    if ppartition!.ppart<>[] then
+        class:=Last(ppartition!.ppart);
+
+        if Length(set) < Length(class) then
+            return fail;
+        fi;
+    
+        if Length(set) = Length(class) and set < class then
+            return fail;
+        fi;    
+    
+        if Length(ppartition!.domain) <> Length(set) then
+            if Length(ppartition!.domain) - Length(set) < Length(class) then
+                return fail;
+            fi;
+            
+            if Length(ppartition!.domain) - Length(set) = Length(class)  and 
+               Difference(ppartition!.domain,set) < class then
+                return fail;
+            fi;
+        fi;
+    fi;
+    
+
+    ndomain:=Difference(ppartition!.domain,set);
+    if Length(set) = Length(ndomain) and set > ndomain then
+        return fail;
+    fi;
     
     nppart:=ShallowCopy(ppartition!.ppart);
     Add(nppart,Set(set));
     ndomain:=Difference(ppartition!.domain,set);
     obj:=rec( ppart:=nppart,
-              domain:=ndomain,
-              maxclasssize:=ppartition!.maxclasssize,
-              noLargeClass:=ppartition!.noLargeClass
+              domain:=ndomain
             );
     
     nppartition:=Objectify(NewType(PartialPartitionsFamily, 
                                    IsPartialPartition and IsPartialPartitionRep), obj);
+    if ndomain <> [] then
+        SetIsIrredundantPartialPartition(nppartition,true);
+        SetHasSmallerBase(nppartition,false);
+        if Length(ndomain) > Length(set) then
+            SetIsCompletePartialPartition(nppartition,true);
+        else
+            SetIsCompletePartialPartition(nppartition,false);
+        fi;
+    else
+        SetIsCompletePartialPartition(nppartition,true);
+        SetIsIrredundantPartialPartition(nppartition,false);
+        SetHasSmallerBase(nppartition, 
+           IsCompletePartialPartition(ppartition) or HasSmallerBase(ppartition));
+    fi;
+                                        
     return nppartition;
     
 end);
 
 
+
+# <set> is is compatible with ppartition if it has at least as many elements
+# as the largest set of ppart and if it is disjoint from any class of ppart
 InstallMethod(IsCompatibleWithPartialPartition,
         "for a partial partition and a list",
         [IsPartialPartition and IsPartialPartitionRep, IsList],
 function(ppartition, set)
-    local class;
     
+    
+    if Length(set) < Length(Last(ppartition!.ppart)) then
+        return false;
+    fi;
     if not IsSubset(ppartition!.domain, set) then
         return false;
     fi;
-    if Length(set)=Length(ppartition!.domain) then
-        return true;
-    fi;
     
-    if 2*Length(set)<Length(ppartition!.domain) then
-        return true;
-    fi;
-    
-    if 2*Length(set)=Length(ppartition!.domain) then
-        if set < Difference(ppartition!.domain,set) then
-            return true;
-        fi;
-    fi;
-    return false;    
+    return true;
 end);
+
+
 
 InstallMethod( ViewString,
         "for a partial partition",
@@ -105,44 +185,12 @@ InstallMethod( AsSetsSet,
         "for a partial partition in PartialPartitionRep",
         [IsPartialPartition and IsPartialPartitionRep],
 function(ppartition)
-    return ShallowCopy(ppartition!.ppart);
-end);
-
-InstallMethod(ViewString,
-        "for partition  orbits",
-        [IsPartitionOrbit],
-function(x)
-    local res;
-    
-    res:="<";
-    if IsMutable(x) then
-        Append(res,"mutable ");
-    fi;
-    Append(res, Concatenation("PartitionOrbit of length ", String(Size(x)),">"));
-    return res;
-end);
-
-InstallImmediateMethod( IsCompletePartialPartition,
-        "for a partial partition",
-       IsPartialPartition and IsPartialPartitionRep,0,
-function(ppart)
-    if ppart!.domain = [] then
-        return true;
-    fi;
-    if ppart!.noLargeClass then 
-        return false;
-    fi;
-    
-    if Length(ppart!.domain) > ppart!.maxclasssize then
-        return true;
-    fi;
-    
-    return false;
+    return Set(ppartition!.ppart);
 end);
 
 InstallMethod( PartitionFromCompletePartialPartition,
         "for a complete partial partition",
-        [IsPartialPartition and IsPartialPartitionRep],
+        [IsPartialPartition and IsCompletePartialPartition and IsPartialPartitionRep],
 function(cppart)
     local part;
     
@@ -203,6 +251,19 @@ function(pporb)
     return Concatenation("<partial partition orbit of length ", String(Size(pporb)), ">");
 end);
 
+InstallMethod(ViewString,
+        "for partition  orbits",
+        [IsPartitionOrbit],
+function(x)
+    local res;
+    
+    res:="<";
+    if IsMutable(x) then
+        Append(res,"mutable ");
+    fi;
+    Append(res, Concatenation("PartitionOrbit of length ", String(Size(x)),">"));
+    return res;
+end);
 
 InstallMethod(PartitionOrbitsFamily,
     "for permutation groups",
@@ -232,7 +293,7 @@ InstallMethod(IteratorOfPPOrbits,
     "for set orbits",
     [IsList,IsList],
 function(domain, setorb)
-    local  state, G, part,maxrank,orbitBounds,i,hasTypes,noLargeClass;
+    local  state, G, part,maxrank,orbitBounds,i,hasTypes;
     
     
     if setorb= [] then
@@ -251,10 +312,6 @@ function(domain, setorb)
         hasTypes:=ValueOption("hasTypes");
         if hasTypes=fail then
             hasTypes:=false;
-        fi;
-        noLargeClass:=ValueOption("noLargeClass");
-        if noLargeClass = fail then
-            noLargeClass := false;
         fi;
         
         
@@ -278,9 +335,9 @@ function(domain, setorb)
         
         
         G:=UnderlyingGroupOfCocoOrbit(setorb[1]);
-        part:=EmptyPartialPartition(domain, Maximum(List(setorb, x->Size(Representative(x)))));
+        part:=EmptyPartialPartition(domain);
         
-        state:=rec( allsorb:=setorb,
+        state:=rec( allsorb:=Set(setorb),
                     ppart:=part,
                     maxrank:=maxrank,
                     orbitBounds:=orbitBounds,
@@ -290,7 +347,6 @@ function(domain, setorb)
                     slice:=[],       # the current slice
                     orbits:=Set(setorb),   # compatible H-orbit representatives of sets
                     orbidx:=1,
-                    noLargeClass:=noLargeClass,
                     linkback:=fail
                     );
     fi;
@@ -300,7 +356,69 @@ function(domain, setorb)
                    rec(state:=state));
 end);
 
+IsConsistentState:=function(tstate)
+    local  tGS, tpart, tH, torbits;
+    if tstate.ppart!.ppart <> ShortLexSorted(tstate.ppart!.ppart) then
+        Info(InfoCOCO,1,"tstate.ppart is not shortLex ordered!");
+        return false;
+    fi;
+    
+    if tstate.slice = [] then
+        tGS:=Stabilizer(tstate.G, Set(tstate.ppart!.ppart), OnSetsSets);
+        if tstate.GS <> tGS then
+            Info(InfoCOCO,1,"tstate.slice = [] but tstate.GS is not the stabilizer of tstate.ppart!");
+            return false;
+        fi;
+        if tstate.H <> tGS then
+            Info(InfoCOCO,1,"tstate.slice = [] but tstate.H is not the stabilizer of tstate.ppart!");
+            return false;
+        fi;
+    else
+        if not IsSet(tstate.slice) then
+            Info(InfoCOCO,1,"tstate.slice must be a set!");
+            return false;
+        fi;
+        tpart:=Difference(Set(tstate.ppart!.ppart), tstate.slice);
+        tGS:=Stabilizer(tstate.G, tpart, OnSetsSets);
+        tH:=Stabilizer(tGS, tstate.slice,OnSetsSets);
+        if tGS <> tstate.GS then
+            Info(InfoCOCO,1,"tstate.slice <> [] but tstate.GS is not the stabilizer of the complete slices of tstate.ppart!");
+            return false;
+        fi;
+        if tH <> tstate.H then
+            Info(InfoCOCO,1,"tstate.slice <> [] but tstate.H is not the stabilizer of tstate.ppart in tstate.GS!");
+            return false;
+        fi;
+    fi;
+    
+    if tstate.H <> Stabilizer(tstate.G, Set(tstate.ppart!.ppart), OnSetsSets) then
+        Info(InfoCOCO,1,"tstate.H is not the stabilizer of tstate.ppart in tstate.G!");
+        return false;
+    fi;
+    if List(tstate.orbits,Representative) <> ShortLexSorted(List(tstate.orbits, Representative)) then
+        Info(InfoCOCO,1,"tstate.orbits mut be shortLexSorted!");
+        return false;
+    fi;
+    torbits:=Union(List(tstate.allsorb, AsSet));
+    torbits:=List(Orbits(tstate.H, torbits,OnSets),Minimum);
+    torbits:=Filtered(torbits, o->IsCompatibleWithPartialPartition(tstate.ppart,o));
+    torbits:=ShortLexSorted(torbits);
+    if torbits <> List(tstate.orbits,Representative) then
+        Info(InfoCOCO,1,"tstate.orbits is not consistent!\n");
+        Info(InfoCOCO,1,torbits,"\n");
+        Info(InfoCOCO,1,List(tstate.orbits,Representative),"\n");
+        
+        return false;
+    fi;
+    if ForAny([1..Length(tstate.orbits)], i->Stabilizer(tstate.H, torbits[i],OnSets)
+                                         <>StabilizerOfCanonicalRepresentative(tstate.orbits[i])) then
+        Info(InfoCOCO,1,"an element tstate.orbits has the wrong stabilizer!");
+        return false;
+    fi;
+    return true;
+end;
 
+    
 InstallMethod( NextIterator,
         "for a mutable iterator of partial partition orbits",
         [IsIteratorOfPPOrbits and IsPPOrbitIterRep and IsMutable],
@@ -349,24 +467,23 @@ function(iter)
                 xnorbits:=Filtered(state.orbits, 
                                    x->Length(Representative(x))>=Length(set));
             
+                Info(InfoCOCO,2,"Computing suborbits...");
                 norbits:=List(xnorbits, 
                               x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, 
-                                y->IsCompatibleWithPartialPartition(nppart,y)));
+                                 y->IsCompatibleWithPartialPartition(nppart,y)));
+                
+                Info(InfoCOCO,2,"done.\n");
+                
                 for i in [1..Length(xnorbits)] do
                     Perform(norbits[i], function(x) x!.type:=xnorbits[i]!.type;end);
                 od;
                 norbits:=Concatenation(norbits);
-            
-                norbits:=Filtered(norbits, x->(Length(Representative(x))>Length(set)) or
-                                           (Length(Representative(x))=Length(set) and 
-                                            Representative(x)>set));
-            
-                if state.noLargeClass and not ForAny(norbits, x->Representative(x)[1] in DomainOfPartialPartition(nppart)) then
-                    nH:=();
-                    Info(InfoCOCO,1,"!");
                 
-                    continue;
-                fi;
+                # norbits:=Filtered(norbits, x->(Length(Representative(x))>Length(set)) or
+                #                            (Length(Representative(x))=Length(set) and 
+                #                             Representative(x)>set));
+            
+
                 nextstate:=rec( allsorb:=state.allsorb,
                                 ppart:=nppart,
                                 maxrank:=state.maxrank,
@@ -377,31 +494,39 @@ function(iter)
                                 slice:=[set],
                                 orbits:=Set(norbits),
                                 orbidx:=1,
-                                noLargeClass:=state.noLargeClass,
                                 linkback:=state);
+                Assert(1, IsConsistentState(nextstate));
+                
+                if nextstate.H <> Stabilizer(nextstate.G, AsSetsSet(nextstate.ppart), OnSetsSets) then
+                    Error("!!!c");
+                fi;
+                Assert(1, 
+                       ForAll(norbits, 
+                              o->StabilizerOfCanonicalRepresentative(o) 
+                              = Stabilizer(nextstate.H, Representative(o),OnSets)));
+                       
+
+                
             elif Length(state.slice[1])<Length(set) then
                 nH:=StabilizerOfCanonicalRepresentative(setorb);
                 xnorbits:=Filtered(state.orbits, 
                                    x->Length(Representative(x))>=Length(set));
             
+                Info(InfoCOCO,2,"Computing suborbits...");
                 norbits:=List(xnorbits, 
                               x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, 
                                 y->IsCompatibleWithPartialPartition(nppart,y)));
+                Info(InfoCOCO,2,"done.\n");
+                
                 for i in [1..Length(xnorbits)] do
                     Perform(norbits[i], function(x) x!.type:=xnorbits[i]!.type;end);
                 od;
                 norbits:=Concatenation(norbits);
             
-                norbits:=Filtered(norbits, x->(Length(Representative(x))>Length(set)) or
-                                           (Length(Representative(x))=Length(set) and 
-                                            Representative(x)>set));
+                # norbits:=Filtered(norbits, x->(Length(Representative(x))>Length(set)) or
+                #                            (Length(Representative(x))=Length(set) and 
+                #                             Representative(x)>set));
             
-                if state.noLargeClass and not ForAny(norbits, x->Representative(x)[1] in DomainOfPartialPartition(nppart)) then
-                    nH:=();
-                    Info(InfoCOCO,1,"!");
-                
-                    continue;
-                fi;
                 nextstate:=rec( allsorb:=state.allsorb,
                                 ppart:=nppart,
                                 maxrank:=state.maxrank,
@@ -412,37 +537,66 @@ function(iter)
                                 slice:=[set],
                                 orbits:=Set(norbits),
                                 orbidx:=1,
-                                noLargeClass:=state.noLargeClass,
                                 linkback:=state);
+                Assert(1, IsConsistentState(nextstate));
+                if nextstate.H <> Stabilizer(nextstate.G, AsSetsSet(nextstate.ppart), OnSetsSets) then
+                    Error("!!!b");
+                fi;
+                Assert(1, ForAll(norbits, o->StabilizerOfCanonicalRepresentative(o) = Stabilizer(nextstate.H, Representative(o),OnSets)));
             else
+                Info(InfoCOCO,2,"Checking irreducibility...");
                 nH:=SetsSetsReducibilityTestOneCard(state.GS, StabilizerOfCanonicalRepresentative(setorb),state.slice,set);
+                Info(InfoCOCO,2,"done.\n");
+                
                 if IsPerm(nH) then
                     continue;
                 fi;
                 
+#                Assert(1,IsSubgroup(nH, StabilizerOfCanonicalRepresentative(setorb)));
+                
                 xnorbits:=Filtered(state.orbits, 
                                    x->Length(Representative(x))>=Length(set));
                 
+                Info(InfoCOCO,2,"Computing suborbits...");
                 norbits:=List(xnorbits, 
-                              x->SubOrbitsWithInvariantPropertyOfCocoOrbit(StabilizerOfCanonicalRepresentative(setorb), x, 
-                                y->IsCompatibleWithPartialPartition(nppart,y)));
-                Assert(1,IsSubgroup(nH, StabilizerOfCanonicalRepresentative(setorb)));
+  x->SubOrbitsWithInvariantPropertyOfCocoOrbit(Intersection(state.H,nH), x, 
+                                 y->IsCompatibleWithPartialPartition(nppart,y)));
+                Info(InfoCOCO,2,"done.\n");
+              
                 
                 for i in [1..Length(xnorbits)] do
                     Perform(norbits[i], function(x) x!.type:=xnorbits[i]!.type;end);
                 od;
-                norbits:=Concatenation(norbits);
-            
-                norbits:=Filtered(norbits, x->(Length(Representative(x))>Length(set)) or
-                                           (Length(Representative(x))=Length(set) and 
-                                            Representative(x)>set));
-            
-                if state.noLargeClass and not ForAny(norbits, x->Representative(x)[1] in DomainOfPartialPartition(nppart)) then
-                    nH:=();
-                    Info(InfoCOCO,1,"!");
                 
-                    continue;
-                fi;
+                
+                
+                norbits:=Concatenation(norbits);
+                
+                                                                                     
+#                norbits:=Filtered(norbits, x->(Length(Representative(x))>Length(set)) or
+#                                           (Length(Representative(x))=Length(set) and 
+#                                            Representative(x)>set));
+                
+                norbits:=List(norbits, x->[x,SetOrbit(nH, 
+                   CanonicalRepresentativeOfCocoOrbit(x),
+                   ClosureGroup(StabilizerOfCanonicalRepresentative(x), 
+                      Stabilizer(nH, AsSet(CanonicalRepresentativeOfCocoOrbit(x)),OnTuples)))]);
+                Perform(norbits, function(x) x[2]!.type:=x[1]!.type;end);
+
+          #       norbits:=List(norbits, o->[IsCanonicalSetOrbitRep(Stbc(nH),
+          # Stbc(StabilizerOfCanonicalRepresentative(o)),Representative(o)),o]);
+          #       norbits:=Filtered(norbits, o->not IsPerm(o[1]));
+          #       norbits:=List(norbits, 
+          #         o->[o[2],SetOrbitNC(nH, Representative(o[2]), StbcGroup(o[1]))]);
+          #       Perform(norbits, function(x) x[2]!.type:=x[1]!.type;end);
+                norbits:=List(norbits, x->x[2]);
+                
+                
+                # norbits:=Filtered(norbits, x->(Length(Representative(x))>Length(set)) or
+                #                            (Length(Representative(x))=Length(set) and 
+                #                             Representative(x)>set));
+                
+                
                 nextstate:=rec( allsorb:=state.allsorb,
                                 ppart:=nppart,
                                 maxrank:=state.maxrank,
@@ -453,11 +607,14 @@ function(iter)
                                 slice:=Concatenation(state.slice,[set]),
                                 orbits:=Set(norbits),
                                 orbidx:=1,
-                                noLargeClass:=state.noLargeClass,
                                 linkback:=state);
+                Assert(1, IsConsistentState(nextstate));
+                if nextstate.H <> Stabilizer(nextstate.G, AsSetsSet(nextstate.ppart), OnSetsSets) then
+                    Error("!!!");
+                fi;
+                Assert(1, ForAll(norbits, o->StabilizerOfCanonicalRepresentative(o) = Stabilizer(nextstate.H, Representative(o),OnSets)));
             fi;
-            
-            
+                        
             nextstate.orbitBounds[setorb!.type]:=nextstate.orbitBounds[setorb!.type]-1;
             
         until not IsPerm(nH) or state.orbidx > Length(state.orbits);
@@ -531,9 +688,9 @@ end);
     
 InstallMethod(AllPartitionOrbits,
         "for an iterator of partial partition orbits",
-        [IsIteratorOfPPOrbits and IsPPOrbitIterRep],
+        [IsIteratorOfPPOrbits],
 function(iter)
-    local  res, ppart, part, lastclass, partorb, flt;
+    local  flt, res, pporb, ppart, part, partorb;
     
     
     flt:=ValueOption("filter");
@@ -548,30 +705,28 @@ function(iter)
     res:=[];
         
     while not IsDoneIterator(iter) do
-        if Length(iter!.state.slice)<=COCOInfoPFUSSize then
-            Info(InfoCOCO,1,iter!.state.slice,"\n");
-        fi;
-        if IsCompletePartialPartition(iter!.state.ppart) then
-#            Info(InfoCOCO,1,"!");
-            ppart:=iter!.state.ppart;
+        pporb := NextIterator(iter);
+
+        ppart := Representative(pporb);
+        
+        if  IsCompletePartialPartition(ppart) and 
+            not HasSmallerBase(ppart) then
+            
+            Info(InfoCOCO,1,"!");
             part:=PartitionFromCompletePartialPartition(ppart);
-#            lastclass:=part[Length(part)];
-#            if SetOrbit(iter!.state.G, lastclass, 
-#                        Stabilizer(iter!.state.G, lastclass,OnSets)) in iter!.state.allsorb then 
-            partorb:=PartitionOrbitNC(iter!.state.G, part, iter!.state.H);
-            Assert(1,iter!.state.H = Stabilizer(iter!.state.G, Set(part),OnSetsSets));
+            
+            partorb:=PartitionOrbitNC(UnderlyingGroupOfCocoOrbit(pporb), part, 
+                                      StabilizerOfCanonicalRepresentative(pporb));
+            Assert(1,StabilizerOfCanonicalRepresentative(pporb) = 
+                     Stabilizer(UnderlyingGroupOfCocoOrbit(pporb), Set(part),OnSetsSets));
             
             if flt(partorb) then
                 Info(InfoCOCO,1,"!");
                 Add(res, partorb);
             fi;
-            
-#           fi;
         fi;
-        
-            
-        NextIterator(iter);
     od;
+    
     return res;
 end);
 

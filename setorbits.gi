@@ -64,6 +64,20 @@ function(sorb,perm)
 end);
 
 
+InstallMethod(\<,
+        "for set orbits",
+        IsIdenticalObj,
+        [IsSetOrbit,IsSetOrbit],
+function(orb1,orb2)
+    local s1,s2;
+    s1:=CanonicalRepresentativeOfCocoOrbit(orb1);
+    s2:=CanonicalRepresentativeOfCocoOrbit(orb2);
+    if Length(s1) <> Length(s2) then
+        return Length(s1) < Length(s2);
+    fi;
+    
+    return s1 < s2;
+end);
 
 DeclareRepresentation( "IsSetOrbitIterRep", IsComponentObjectRep, ["G","domain","sizes","state"]);
 
@@ -357,3 +371,4 @@ function(iter)
     return Sum(iter!.sizes,
                 y -> result[y]/Size(iter!.G));
 end);
+

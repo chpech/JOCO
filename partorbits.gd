@@ -1,17 +1,21 @@
-DeclareCategory( "IsPartialPartition", IsObject );
+DeclareCategory( "IsCOCOPartialPartition", IsObject );
+DeclareCategory( "IsPartialPartition", IsCOCOPartialPartition );
 
+DeclareProperty( "IsIrredundantPartialPartition", IsCOCOPartialPartition );
+DeclareProperty( "IsCompletePartialPartition", IsCOCOPartialPartition );
+DeclareProperty( "HasSmallerBase", IsCOCOPartialPartition );
 
-DeclareOperation( "EmptyPartialPartition", [IsList,IsInt] );
-DeclareOperation( "ExtendedPartialPartition", [IsPartialPartition, IsList] );
-DeclareProperty( "IsExtendiblePartialPartition", IsPartialPartition );
-DeclareOperation( "IsCompatibleWithPartialPartition", [IsPartialPartition, IsList] );
-DeclareAttribute( "IsCompletePartialPartition", IsPartialPartition );
-DeclareOperation( "PartitionFromCompletePartialPartition", [IsPartialPartition ] );
+DeclareOperation( "EmptyPartialPartition", [IsList] );
+DeclareOperation( "ExtendedPartialPartition", [IsCOCOPartialPartition, IsList] );
 
-DeclareAttribute( "RankOfPartialPartition", IsPartialPartition );
+DeclareOperation( "IsCompatibleWithPartialPartition", [IsCOCOPartialPartition, IsList] );
 
-DeclareOperation( "AsSetsSet", [IsPartialPartition] );
-DeclareOperation( "DomainOfPartialPartition" ,[IsPartialPartition] );
+DeclareOperation( "PartitionFromCompletePartialPartition", [IsCOCOPartialPartition ] );
+
+DeclareAttribute( "RankOfPartialPartition", IsCOCOPartialPartition );
+
+DeclareOperation( "AsSetsSet", [IsCOCOPartialPartition] );
+DeclareOperation( "DomainOfPartialPartition" ,[IsCOCOPartialPartition] );
 
 
 DeclareAttribute( "PartialPartitionOrbitsFamily", IsPermGroup );
