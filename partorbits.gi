@@ -205,11 +205,11 @@ InstallMethod(RankOfPartialPartition,
               [IsPartialPartition and IsPartialPartitionRep],
 function(ppart)
     local rnk;
-    rnk:=Length(ppart!.ppart);
-    if ppart!.domain<>[] then
-        rnk:=rnk+1;
-    fi;
-    return rnk;
+    return Length(ppart!.ppart);
+    # if ppart!.domain<>[] then
+    #     rnk:=rnk+1;
+    # fi;
+    # return rnk;
 end);
 
               
@@ -426,7 +426,7 @@ function(iter)
     local NextState, ppart,grp,stab;
         
     NextState:=function(state)
-        local setorb,set,nppart,nH,nextstate,norbits,xnorbits,i;
+        local setorb,set,nppart,nH,nextstate,norbits,xnorbits,i,torbits;
         
         if state=fail then 
             return fail; 
@@ -478,11 +478,6 @@ function(iter)
                     Perform(norbits[i], function(x) x!.type:=xnorbits[i]!.type;end);
                 od;
                 norbits:=Concatenation(norbits);
-                
-                # norbits:=Filtered(norbits, x->(Length(Representative(x))>Length(set)) or
-                #                            (Length(Representative(x))=Length(set) and 
-                #                             Representative(x)>set));
-            
 
                 nextstate:=rec( allsorb:=state.allsorb,
                                 ppart:=nppart,
@@ -497,9 +492,6 @@ function(iter)
                                 linkback:=state);
                 Assert(1, IsConsistentState(nextstate));
                 
-                if nextstate.H <> Stabilizer(nextstate.G, AsSetsSet(nextstate.ppart), OnSetsSets) then
-                    Error("!!!c");
-                fi;
                 Assert(1, 
                        ForAll(norbits, 
                               o->StabilizerOfCanonicalRepresentative(o) 
@@ -523,10 +515,6 @@ function(iter)
                 od;
                 norbits:=Concatenation(norbits);
             
-                # norbits:=Filtered(norbits, x->(Length(Representative(x))>Length(set)) or
-                #                            (Length(Representative(x))=Length(set) and 
-                #                             Representative(x)>set));
-            
                 nextstate:=rec( allsorb:=state.allsorb,
                                 ppart:=nppart,
                                 maxrank:=state.maxrank,
@@ -539,13 +527,14 @@ function(iter)
                                 orbidx:=1,
                                 linkback:=state);
                 Assert(1, IsConsistentState(nextstate));
-                if nextstate.H <> Stabilizer(nextstate.G, AsSetsSet(nextstate.ppart), OnSetsSets) then
-                    Error("!!!b");
-                fi;
                 Assert(1, ForAll(norbits, o->StabilizerOfCanonicalRepresentative(o) = Stabilizer(nextstate.H, Representative(o),OnSets)));
             else
                 Info(InfoCOCO,2,"Checking irreducibility...");
                 nH:=SetsSetsReducibilityTestOneCard(state.GS, StabilizerOfCanonicalRepresentative(setorb),state.slice,set);
+                if not IsPerm(nH) then
+                    Assert(1, IsConsistentStabChain(Stbc(nH)));
+                fi;
+                
                 Info(InfoCOCO,2,"done.\n");
                 
                 if IsPerm(nH) then
@@ -568,33 +557,35 @@ function(iter)
                     Perform(norbits[i], function(x) x!.type:=xnorbits[i]!.type;end);
                 od;
                 
-                
-                
                 norbits:=Concatenation(norbits);
                 
-                                                                                     
-#                norbits:=Filtered(norbits, x->(Length(Representative(x))>Length(set)) or
-#                                           (Length(Representative(x))=Length(set) and 
-#                                            Representative(x)>set));
+                # test
                 
-                norbits:=List(norbits, x->[x,SetOrbit(nH, 
-                   CanonicalRepresentativeOfCocoOrbit(x),
-                   ClosureGroup(StabilizerOfCanonicalRepresentative(x), 
-                      Stabilizer(nH, AsSet(CanonicalRepresentativeOfCocoOrbit(x)),OnTuples)))]);
+                norbits:=List(norbits, o->[
+                   Stbc(ClosureGroup(StabilizerOfCanonicalRepresentative(o), 
+                      Stabilizer(nH, CanonicalRepresentativeOfCocoOrbit(o),
+                                 OnTuples))),o]);
+                norbits:=List(norbits, o->[o[1], SetCanonifiers(Stbc(nH), o[1],Representative(o[2]):failIfNotCanonical),o[2]]);
+                norbits:=Filtered(norbits, o->o[2]<>fail);
+                
+                # Perform(norbits, function(o) 
+                #    StbcAugmentBySiftedGenerators(o[1],Set(o[2], g->SiftedPermutation(o[1],g)));
+                #        end);
+                
+                norbits:=List(norbits, 
+                              o->[o[3],SetOrbitNC(nH, Representative(o[3]), 
+                           Group(Union(o[1].generators,o[2])))]);
                 Perform(norbits, function(x) x[2]!.type:=x[1]!.type;end);
-
-          #       norbits:=List(norbits, o->[IsCanonicalSetOrbitRep(Stbc(nH),
-          # Stbc(StabilizerOfCanonicalRepresentative(o)),Representative(o)),o]);
-          #       norbits:=Filtered(norbits, o->not IsPerm(o[1]));
-          #       norbits:=List(norbits, 
-          #         o->[o[2],SetOrbitNC(nH, Representative(o[2]), StbcGroup(o[1]))]);
-          #       Perform(norbits, function(x) x[2]!.type:=x[1]!.type;end);
                 norbits:=List(norbits, x->x[2]);
+                # test
                 
+                # norbits:=List(norbits, x->[x,SetOrbit(nH, 
+                #    CanonicalRepresentativeOfCocoOrbit(x),
+                #    ClosureGroup(StabilizerOfCanonicalRepresentative(x), 
+                #      Stabilizer(nH, AsSet(CanonicalRepresentativeOfCocoOrbit(x)),OnTuples)))]);
+                # Perform(norbits, function(x) x[2]!.type:=x[1]!.type;end);
+                # norbits:=Set(norbits, x->x[2]);
                 
-                # norbits:=Filtered(norbits, x->(Length(Representative(x))>Length(set)) or
-                #                            (Length(Representative(x))=Length(set) and 
-                #                             Representative(x)>set));
                 
                 
                 nextstate:=rec( allsorb:=state.allsorb,
@@ -609,9 +600,6 @@ function(iter)
                                 orbidx:=1,
                                 linkback:=state);
                 Assert(1, IsConsistentState(nextstate));
-                if nextstate.H <> Stabilizer(nextstate.G, AsSetsSet(nextstate.ppart), OnSetsSets) then
-                    Error("!!!");
-                fi;
                 Assert(1, ForAll(norbits, o->StabilizerOfCanonicalRepresentative(o) = Stabilizer(nextstate.H, Representative(o),OnSets)));
             fi;
                         
@@ -674,6 +662,8 @@ function(iter)
         fi;
     od;
     iter!.state:=state;
+    NextIterator(iter);
+    
     return iter;
 end);
 
