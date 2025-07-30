@@ -330,10 +330,6 @@ function(domain, setorb)
             od;
         fi;
         
-            
-        
-        
-        
         G:=UnderlyingGroupOfCocoOrbit(setorb[1]);
         part:=EmptyPartialPartition(domain);
         
@@ -426,7 +422,7 @@ function(iter)
     local NextState, ppart,grp,stab;
         
     NextState:=function(state)
-        local setorb,set,nppart,nH,nextstate,norbits,xnorbits,i,torbits;
+        local setorb,set,nppart,nH,nextstate,norbits,xnorbits,i,torbits,tsto1,tstnh;
         
         if state=fail then 
             return fail; 
@@ -533,6 +529,7 @@ function(iter)
                 nH:=SetsSetsReducibilityTestOneCard(state.GS, StabilizerOfCanonicalRepresentative(setorb),state.slice,set);
                 if not IsPerm(nH) then
                     Assert(1, IsConsistentStabChain(Stbc(nH)));
+                    Assert(1, IsReducedStabChain(Stbc(nH)));
                 fi;
                 
                 Info(InfoCOCO,2,"done.\n");
@@ -545,13 +542,13 @@ function(iter)
                 
                 xnorbits:=Filtered(state.orbits, 
                                    x->Length(Representative(x))>=Length(set));
-                
                 Info(InfoCOCO,2,"Computing suborbits...");
                 norbits:=List(xnorbits, 
   x->SubOrbitsWithInvariantPropertyOfCocoOrbit(Intersection(state.H,nH), x, 
                                  y->IsCompatibleWithPartialPartition(nppart,y)));
                 Info(InfoCOCO,2,"done.\n");
               
+                Assert(1, IsConsistentStabChain(Stbc(nH)));
                 
                 for i in [1..Length(xnorbits)] do
                     Perform(norbits[i], function(x) x!.type:=xnorbits[i]!.type;end);
@@ -562,19 +559,43 @@ function(iter)
                 # test
                 
                 norbits:=List(norbits, o->[
-                   Stbc(ClosureGroup(StabilizerOfCanonicalRepresentative(o), 
+                   CopyStabChain(Stbc(ClosureGroup(StabilizerOfCanonicalRepresentative(o), 
                       Stabilizer(nH, CanonicalRepresentativeOfCocoOrbit(o),
-                                 OnTuples))),o]);
+                                 OnTuples)))),o]);
                 norbits:=List(norbits, o->[o[1], SetCanonifiers(Stbc(nH), o[1],Representative(o[2]):failIfNotCanonical),o[2]]);
                 norbits:=Filtered(norbits, o->o[2]<>fail);
+                Assert(1, IsConsistentStabChain(Stbc(nH)));
+                Assert(1, not ForAny(norbits, o->IsOverlappingStabChains(Stbc(nH), o[1])));
                 
+                
+                #####################
+                # version with StabChains (problematic)
                 # Perform(norbits, function(o) 
-                #    StbcAugmentBySiftedGenerators(o[1],Set(o[2], g->SiftedPermutation(o[1],g)));
+                #            Assert(1, IsConsistentStabChain(Stbc(nH)));
+                #            Assert(1, IsConsistentStabChain(o[1]));
+                #            Assert(1, IsReducedStabChain(o[1]));
+                #            tsto1:=CopyStabChain(o[1]);
+                #            tstnh:=CopyStabChain(Stbc(nH));
+                #            StbcAugmentByNewGenerators(tsto1,o[2]);
+                #            StbcAugmentByNewGenerators(o[1],o[2]);
+                #            Assert(1, IsConsistentStabChain(Stbc(nH)));
+                #            Assert(1, IsConsistentStabChain(o[1]));
+                #            Assert(1, IsReducedStabChain(o[1]));
                 #        end);
+                # Assert(1, IsConsistentStabChain(Stbc(nH)));
+
+                # norbits:=List(norbits, o->[o[3], 
+                #               SetOrbitNC(nH, Representative(o[3]), Group(o[1].generators,()))]);
+                #####################
                 
+                #####################
+                # alternative (works)    
                 norbits:=List(norbits, 
                               o->[o[3],SetOrbitNC(nH, Representative(o[3]), 
-                           Group(Union(o[1].generators,o[2])))]);
+                                                  Group(Union(o[1].generators,o[2]),()))]);
+                #####################
+                
+                
                 Perform(norbits, function(x) x[2]!.type:=x[1]!.type;end);
                 norbits:=List(norbits, x->x[2]);
                 # test

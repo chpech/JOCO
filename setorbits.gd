@@ -16,4 +16,5 @@ DeclareOperation( "RejectSetOrbit", [IsIteratorOfSetOrbits] );
 DeclareOperation( "NextSetOrbit", [IsIteratorOfSetOrbits] );
 
 DeclareGlobalFunction( "NumberOrbitsPerm@JOCO" );
+DeclareGlobalFunction( "SetOrbits" );
 

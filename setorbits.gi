@@ -172,7 +172,7 @@ function(iter)
         return fail;
     fi;
     
-    res:=SetOrbitNC(iter!.G, iter!.state.M, StbcGroup(iter!.state.SM));
+    res:=SetOrbitNC(iter!.G, iter!.state.M, StbcGroup(CopyStabChain(iter!.state.SM)));
     iter!.state:=NextState(iter!.state);
     
     return res;
@@ -207,6 +207,8 @@ function(iter)
         fi;
     od;
     iter!.state:=state;
+    NextIterator(iter);
+    
     return iter;
 end);
 
@@ -230,7 +232,7 @@ function(iter)
     if iter!.state=fail then
         return fail;
     fi;
-    return SetOrbitNC(iter!.G, iter!.state.M, StbcGroup(iter!.state.SM));
+    return SetOrbitNC(iter!.G, iter!.state.M, StbcGroup(CopyStabChain(iter!.state.SM)));
 end);
 
 
@@ -372,3 +374,19 @@ function(iter)
                 y -> result[y]/Size(iter!.G));
 end);
 
+InstallGlobalFunction( SetOrbits,
+function(arg)
+    local  g, dom, sizes, iter;
+    
+    g:=arg[1];
+    dom:=arg[2];
+    if IsBound(arg[3]) then
+        sizes:=arg[3];
+    else
+        sizes:=[1..Int(Length(dom)/2)];
+    fi;
+    iter:=IteratorOfSetOrbits(g,dom,sizes);
+    return AllSetOrbits(iter);
+end);
+
+                       
