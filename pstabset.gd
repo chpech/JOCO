@@ -1,16 +1,17 @@
 # in COCO2P a set of colors
 DeclareCategory("IsCocoPartialStableSet", IsObject );
 
-DeclareProperty( "IsCompletePartialStableSet", IsPartialStableSet );
+DeclareOperation( "IsEmptyPartialStableSet", [IsPartialStableSet] );
+DeclareOperation( "IMapOfPartialStableSet", [IsPartialGoodSet] );
 
-DeclareOperation( "ExtendedPartialStableSet", [IsPartialStableSet, IsPosInt] );                  # internal
-DeclareProperty( "IsExtendiblePartialStableSet", IsPartialStable );                           # internal
+DeclareProperty( "IsCompletePartialStableSet", IsPartialStableSet );
 DeclareOperation( "DomainOfPartialStableSet", [IsPartialStableSet] );                            # internal
+DeclareProperty( "IsExtendiblePartialStableSet", IsPartialStable );                           # internal
+DeclareOperation( "ExtendedPartialStableSet", [IsPartialStableSet, IsPosInt] );                  # internal
+
 DeclareOperation( "IsCompatiblePoint", [IsPartialStableSet,IsPosInt] );
 
 DeclareOperation( "StableSetFromPartialStableSet", [IsPartialStableSet] );
-DeclareOperation( "IsEmptyPartialStableSet", [IsPartialStableSet] );
-DeclareOperation( "IMapOfPartialStableSet", [IsPartialGoodSet] );
 
 ################################################################################
 

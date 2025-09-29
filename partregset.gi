@@ -59,12 +59,6 @@ function(prs)
 end);
 
 
-InstallMethod(IMapOfPartialGoodSet,
-        "for partial good sets in PartialRegularSetRep",
-        [IsPartialGoodSet and IsPartialRegularSetRep],
-function(cand)
-    return cand!.imap;
-end);
 
 InstallMethod(DomainOfPartialStableSet,
         "for partial regular sets in PartialRegularSetRep",
@@ -111,11 +105,10 @@ end);
 
 InstallMethod(EmptySymPartialRegularSet,
         "for homogeneous WL-stable color graphs",
-        [IsColorGraph and IsWLStableColorGraph and IsHomogeneous],
+        [IsColorGraph and IsRainbow and IsHomogeneous],
 function(cgr)
-    local tensor,aaut,rclr,clr,sclr,aclr,imap,map, i, j,act,cand;
+    local aaut,rclr,clr,sclr,aclr,imap,map, i, j,act,cand;
     
-    tensor:=StructureConstantsOfColorGraph(cgr);
     
     rclr:=ReflexiveColors(tensor);
     clr:=Difference([1..OrderOfTensor(tensor)], rclr);
