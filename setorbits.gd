@@ -1,3 +1,4 @@
+DeclareCategory( "IsSetOrbit", IsCocoSetOrbit );
 
 DeclareGlobalFunction( "SetOrbitNC" );
 DeclareGlobalFunction( "SetOrbit" );

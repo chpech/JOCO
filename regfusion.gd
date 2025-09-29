@@ -31,7 +31,7 @@ DeclareAttribute( "RFusionsFamily", IsColorGraph );
 
 
 
-DeclareCategory( "IsRFusionOrbit", IsPartitionOrbit );
+DeclareCategory( "IsRFusionOrbit", IsCocoPartitionOrbit );
 DeclareGlobalFunction( "RFusionOrbitNC" );
 DeclareGlobalFunction( "RFusionOrbit" );  
 

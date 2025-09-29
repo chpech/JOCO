@@ -2,11 +2,11 @@
 # partitions: Let $X$ be a finite set (totally ordered by $<$, and let $P$ be a 
 #      set of partitions of $X$. On $P$ we consider the refinement order: a 
 #      partition $\pi_1$ is said to be \emph{finer} than the partition $\pi_2$ if 
-#      every class of $\pi_2$ is the union o classes of $\pi_1$. We require that 
+#      every class of $\pi_2$ is the union of classes of $\pi_1$. We require that 
 #      $P$ is closed with respect to $\land$ of partitions. Here $\pi_1 \land \pi_2$ 
 #      is the finest partition coarser than both, $\pi_1$ and $\pi_2$. Also, let 
 #      $G$, the group of all permutations of $X$ that maps elements of $P$ to elements  
-#      of $P$ (in the canonical action on sets of subsets of $X$).
+#      of $P$ (in the natural action on sets of subsets of $X$).
 #
 # partial partitions: A tuple $M=(M_1,\dots,M_m)$ of pairwise disjoint non-empty 
 #      subsets of $X$ is called a partial partition if 
@@ -299,7 +299,7 @@ function(domain, setorb)
     if setorb= [] then
         state:=fail;
     else
-        if not ForAll(setorb, IsSetOrbit) then
+        if not ForAll(setorb, IsCocoSetOrbit) then
             ErrorNoReturn("IteratorOfPartitionOrbits: expecting a list of set orbits");
         fi;
         

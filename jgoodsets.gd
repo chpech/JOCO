@@ -15,7 +15,7 @@ DeclareOperation( "PartitionOfJGoodSet" , [IsJGoodSet] );
 
 ################################################################################
 
-DeclareCategory( "IsJGoodSetOrbit", IsSetOrbit );
+DeclareCategory( "IsJGoodSetOrbit", IsCocoSetOrbit );
 KeyDependentOperation( "JGoodSetOrbitsFamily", IsTensor, IsPermGroup, ReturnTrue );
 
 
