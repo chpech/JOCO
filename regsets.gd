@@ -13,7 +13,7 @@ DeclareOperation( "OnRegularSets", [IsRegularSet, IsPerm] );
 
 ################################################################################
 
-DeclareCategory( "IsRegularSetOrbit", IsSetOrbit );
+DeclareCategory( "IsRegularSetOrbit", IsCocoSetOrbit );
 KeyDependentOperation( "RegularSetOrbitsFamily", IsColorGraph, IsPermGroup, ReturnTrue );
 
 

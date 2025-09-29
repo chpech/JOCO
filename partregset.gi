@@ -1,5 +1,5 @@
 DeclareRepresentation("IsPartialRegularSetRep",
-        IsAttributeStoringRep,
+        IsPartialStableSetRep,
         [ "cgr",
           "map",
           "imap",
@@ -10,8 +10,8 @@ DeclareRepresentation("IsPartialRegularSetRep",
 
 
 InstallMethod(PartialRegularSetsFamily,
-    "for color graphs",
-	[IsColorGraph],
+"for color graphs",
+[IsColorGraph],
 function(cgr)
    local fam;
    fam:=NewFamily("PartialRegularSetsFam", IsPartialRegularSet);
@@ -21,13 +21,13 @@ end);
 
 
 InstallMethod( ViewString,
-        "for partial good sets in PartialRegularSetRep",
-        [IsPartialGoodSet and IsPartialRegularSetRep],
-function(pgs)
+        "for partial regular sets in PartialRegularSetRep",
+        [IsPartialRegularSet and IsPartialRegularSetRep],
+function(prs)
     local cgr,s,res;
     
-    cgr:=pgs!.cgr;
-    s:=pgs!.set;
+    cgr:=prs!.cgr;
+    s:=prs!.set;
 
     res:="<";
     if s<>[] and not s[1]^ColorMates(cgr) in s then
@@ -39,30 +39,25 @@ function(pgs)
     return Concatenation(res,"partial regular set ", String(s), ">");
 end);
 
-InstallMethod(IsCompletePartialGoodSet,
-    "for partial good sets in PartialRegularSetRep",
-    [IsPartialGoodSet and IsPartialRegularSetRep],
-function(pgs)
-    local set,sqr;
+InstallMethod(IsCompletePartialStableSet,
+    "for partial regular sets in PartialRegularSetRep",
+    [IsPartialRegularSet and IsPartialRegularSetRep],
+function(prs)
+    local set;
     
-    set:=pgs!.set;
+    set:=prs!.set;
     
     if set = [] then
         return false;
     fi;
-    if Length(pgs!.set)>pgs!.maxlength then
+    
+    if Length(set) > prs!.maxlength then
       return false;
    fi;
 
     return true;
 end);
 
-InstallMethod(IsEmptyPartialGoodSet,
-        "for partial good sets in PartialRegularSetRep",
-        [IsPartialGoodSet and IsPartialRegularSetRep],
-function(cand)
-    return cand!.set=[];
-end);
 
 InstallMethod(IMapOfPartialGoodSet,
         "for partial good sets in PartialRegularSetRep",
@@ -71,48 +66,32 @@ function(cand)
     return cand!.imap;
 end);
 
-InstallMethod(DomainOfPartialGoodSet,
-        "for partial good sets in PartialRegularSetRep",
-        [IsPartialGoodSet and IsPartialRegularSetRep],
+InstallMethod(DomainOfPartialStableSet,
+        "for partial regular sets in PartialRegularSetRep",
+        [IsPartialRegularSet and IsPartialRegularSetRep],
 function(cand)
     return cand!.domain;
 end);
 
-InstallMethod(TensorOfPartialGoodSet,
-        "for partial good sets in PartialRegularSetRep",
-        [IsPartialGoodSet and IsPartialRegularSetRep],
-function(cand)
-    return StructureConstantsOfColorGraph(cand!.cgr);
-end);
 
-InstallMethod(IsExtendiblePartialGoodSet,
-    "for partial good sets in PartialRegularSetRep",
-    [IsPartialGoodSet and IsPartialRegularSetRep],
+InstallMethod(IsExtendiblePartialStableSet,
+    "for partial regular sets in PartialRegularSetRep",
+    [IsPartialRegularSet and IsPartialRegularSetRep],
 function(cand)
    if cand!.domain=[] then
       return false;
    fi;
 
-   if Length(cand!.set)>=cand!.maxlength then
+   if Length(cand!.set) >= cand!.maxlength then
       return false;
    fi;
 
    return true;
 end);
 
-InstallMethod(RegularSetFromPartialGoodSet,
-    "for partial good sets in PartialRegularSetRep",
-    [IsPartialRegularSet and IsPartialRegularSetRep],
-function(cand)
-    local  part;
-       
-    
-    return BuildRegularSet(cand!.cgr, cand!.set);
-    
-end);
 
-InstallMethod(ExtendedPartialGoodSet,
-    "for symmetric partial good sets in PartialRegularSetRep",
+InstallMethod(ExtendedPartialStableSet,
+    "for symmetric partial regular sets in PartialRegularSetRep",
     [IsSymPartialRegularSet and IsPartialRegularSetRep, IsPosInt],
 function(cand,pt)
     local  ndom, obj;
@@ -807,14 +786,13 @@ InstallMethod(AllRegularSetOrbits,
         "for iterators of regular set candidates",
         [IsIteratorOfPartialGoodSetOrbits and IsPartialGoodSetOrbitIterRep],
 function(iter)
-    local res,T,gens,stab,grp,gs;
+    local res,gens,stab,grp,gs;
     
     if IsDoneIterator(iter) then
         return [];
     fi;
     
     res:=[];
-    T:=TensorOfPartialGoodSet(iter!.state.cand);
     grp:=Source(iter!.state.act);
     
     while not IsDoneIterator(iter) do

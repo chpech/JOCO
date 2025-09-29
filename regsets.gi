@@ -27,6 +27,17 @@ function(arg)
    return Objectify(NewType(RegularSetsFamily(cgr), IsRegularSet and IsRegularSetRep), res);
 end);
 
+InstallMethod(RegularSetFromPartialRegularSet,
+    "for partial regular sets in PartialRegularSetRep",
+    [IsPartialRegularSet and IsPartialRegularSetRep],
+function(cand)
+    local  part;
+       
+    
+    return BuildRegularSet(cand!.cgr, cand!.set);
+    
+end);
+
 
 InstallMethod(RainbowOfRegularSet,
         "for regular sets in RegularSetRep",
@@ -160,108 +171,6 @@ function(gsorb,perm)
     ngs:=OnRegularSets(gs,perm);
     return RegularSetOrbit(grp,ngs,Stabilizer(grp,AsSet(ngs),OnTuples),FamilyObj(gsorb));
 end);
-
-# InstallMethod(SubOrbitsOfCocoOrbit,
-#         "for all regular set orbits",
-#         [IsPermGroup, IsRegularSetOrbit],
-# function(grp,gsorb)
-#     local   ug,  cosreps,  stab,  gs,  ngs;
-
-
-#     ug:=UnderlyingGroupOfCocoOrbit(gsorb);
-
-#     if not IsSubgroup(ug,grp) then
-#         Error("SubOrbitsOfCocoOrbit: The given group is not a subgroup of the underlying group of the orbit!");
-#     fi;
-#     stab:=StabilizerOfCanonicalRepresentative(gsorb);
-#     cosreps:=List(DoubleCosetRepsAndSizes(ug,stab,grp), x->x[1]); 
-#     gs:=CanonicalRepresentativeOfCocoOrbit(gsorb);
-#     ngs:=RegularSetOrbitNC(grp,gs, Intersection(stab,grp));
-
-#     return List(cosreps, x->OnCocoOrbits(ngs,x));
-# end);
-
-
-# InstallMethod(SubOrbitsWithInvariantPropertyOfCocoOrbit,
-#         "for regular set orbits",
-#         [IsPermGroup, IsRegularSetOrbit, IsFunction],
-# function(grp,gsorb,func)
-#     local  ug, stab, gs, cosreps, ngs, res, cr,i,signs;
-
-#     ug:=UnderlyingGroupOfCocoOrbit(gsorb);
-
-#     if not IsSubgroup(ug,grp) then
-#         Error("SubOrbitsWithInvariantPropertyOfCocoOrbit: The given group is not a subgroup of the underlying group of the orbit!");
-#     fi;
-    
-#     stab:=StabilizerOfCanonicalRepresentative(gsorb);
-#     gs:=CanonicalRepresentativeOfCocoOrbit(gsorb);
-#     if not IsTrivial(grp) then  
-#         if Size(grp)>10  then
-#             COCOPrint("***\t",Size(ug),"\t",Size(stab),"\t",Size(grp),"\t\c");
-            
-#             cosreps:=List(DoubleCosetRepsAndSizes(ug,stab,grp), x->x[1]);
-#             COCOPrint(Length(cosreps),"\n");
-                      
-#             ngs:=RegularSetOrbitNC(grp,gs, Intersection(stab,grp));
-#             res:=List(cosreps, x->OnCocoOrbits(ngs,x));
-#             return Filtered(res, x->func(CanonicalRepresentativeOfCocoOrbit(x)));
-#         else
-#             cosreps:=RightTransversal(ug,stab);
-#             ngs:=RegularSetOrbitNC(grp,gs, Intersection(stab,grp));
-#             res:=[];
-# #            COCOPrint(Index(ug,stab),"\n");
-            
-            
-#             i:=0;signs:=["\b-","\b\\","\b|","\b/"];
-#             COCOPrint(" \c");
-
-        
-#             for cr in cosreps do 
-#                 if i mod COCORotorMod = 0 then
-#                     COCOPrint(signs[i/COCORotorMod+1],"\c");
-#                 fi;
-        
-#                 i:=(i+1) mod (4*COCORotorMod);
-                
-#                 if func(OnRegularSets(Representative(ngs), cr)) then 
-#                     AddSet(res, OnCocoOrbits(ngs,cr));
-#                 fi;
-#             od;
-#             COCOPrint("\b");
-#         fi;
-#     else
-#         cosreps:=RightTransversal(ug,stab);
-#         res:=[];
-        
-#         i:=0;signs:=["\b-","\b\\","\b|","\b/"];
-#         COCOPrint(" \c");
-
-        
-#         for cr in cosreps do 
-#             if i mod COCORotorMod = 0 then
-#                 COCOPrint(signs[i/COCORotorMod+1],"\c");
-#             fi;
-        
-#             i:=(i+1) mod (4*COCORotorMod);
-            
-#             ngs:=OnRegularSets(gs,cr);
-#             if func(ngs) then
-#                 ngs:=RegularSetOrbitNC(grp,ngs,Group(()));
-#                 Add(res,ngs);
-#             fi;
-#         od;
-#         COCOPrint("\b");
-#     fi;
-    
-#     if Length(res)>0 then
-#         Info(InfoCOCO,2,Size(gsorb),"\t",Size(grp),"\t",Length(res),"\n");
-#     else
-#         Info(InfoCOCO, 2,"-\c");
-#     fi;
-    
-#     return Set(res);
-# end);
 
 
 InstallMethod(HomogeneousSymRegularSetOrbits,
