@@ -1,14 +1,12 @@
 
 
-DeclareCategory( "IsPartialRegularSet", IsPartialGoodSet );
+DeclareCategory( "IsPartialRegularSet", IsCocoPartialStableSet );
 DeclareCategory( "IsAsymPartialRegularSet", IsPartialRegularSet );
 DeclareCategory( "IsSymPartialRegularSet",  IsPartialRegularSet );
 
-DeclareOperation( "EmptyAsymPartialRegularSet", [IsColorGraph and IsWLStableColorGraph] );
-DeclareOperation( "EmptySymPartialRegularSet", [IsColorGraph and IsWLStableColorGraph] ); 
-
-#DeclareOperation( "RegularSetFromPartialGoodSet", [IsPartialGoodSet] );
+DeclareOperation( "EmptyAsymPartialRegularSet", [IsColorGraph] );
+DeclareOperation( "EmptySymPartialRegularSet", [IsColorGraph] ); 
 
 
-DeclareOperation( "AllRegularSetOrbits", [IsIteratorOfPartialGoodSetOrbits] );                  # internal
 DeclareAttribute( "PartialRegularSetsFamily",  IsColorGraph );
+KeyDependentOperation( "PartialRegularSetOrbitFamily", IsColorGraph, IsPermGroup, ReturnTrue );

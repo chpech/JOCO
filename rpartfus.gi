@@ -10,7 +10,7 @@
 #############################################################################
 
 DeclareRepresentation( "IsPartialRFusionRep",
-        IsAttributeStoringRep,
+        IsPartialStablePartitionRep,
         [ "cgr",
           "ppart",
           "part", 
@@ -18,9 +18,10 @@ DeclareRepresentation( "IsPartialRFusionRep",
           "maxclasssize",
         ]);
 
-InstallMethod(RankOfPartialFusion,
-              "for partilal R-fusions in PartialRFusionRep",
-              [IsPartialRFusion and IsPartialRFusionRep],
+
+InstallMethod(RankOfPartialStablePartition,
+"for partilal R-fusions in PartialRFusionRep",
+[IsPartialRFusion and IsPartialRFusionRep],
 function(ppart)
     return Length(ppart!.part.classes);
 end);
@@ -35,18 +36,43 @@ function(cgr)
    return fam;
 end);
 
+InstallGlobalFunction(WLBuildTrivialPartition,
+function(T)
+    local part;
+
+    part:=rec();
+    part.classes:=[ReflexiveColors(T), Difference([1..OrderOfTensor(T)], ReflexiveColors(T))];
+    part.fixed:=[];
+    part.variable:=[1,2];
+    part.instabilFlags:=[false,false];
+    part.instabil:=FiFoNew();
+    part.totest:=FiFoNew();
+    part.totestFlags:=[false,false];
+    part.colorNames:=List([1..Length(part.classes)], x->[x,1]);
+    part.numberClasses:=ListWithIdenticalEntries(Length(part.classes), 1);
+    return part;
+end);
 
 InstallMethod(EmptyPartialRFusion,
         "for tensors of structure constants",
-        [IsColorGraph and IsWLStableColorGraph, IsInt],
+        [IsColorGraph and IsRainbow and IsStableRainbow, IsInt],
 function(cgr,maxclasssize)
     local obj,part,varpart,tensor;
     
-    tensor:=StructureConstantsOfColorGraph(cgr);
+    rclr:=ReflexiveColors(cgr);
     
-    part:=WLBuildTrivialPartition(tensor);
-    varpart:=ShortLexSorted(StructuralCopy(part.classes{part.variable}));
-    varpart:=Filtered(varpart, x->not x[1] in ReflexiveColors(tensor));
+    part:=rec();
+    part.classes:=[rclr, Difference([1..RankOfColorGraph(cgr)], rclr)];
+    part.fixed:=[];
+    part.variable:=[1,2];
+    part.instabilFlags:=[false,false];
+    part.instabil:=FiFoNew();
+    part.totest:=FiFoNew();
+    part.totestFlags:=[false,false];
+    part.colorNames:=List([1..Length(part.classes)], x->[x,1]);
+    part.numberClasses:=ListWithIdenticalEntries(Length(part.classes), 1);
+    
+    varpart:=Difference([1..RankOfColorGraph(cgr)], rclr);
     
     obj:=rec( cgr:=cgr,
               ppart:=[],
@@ -57,13 +83,12 @@ function(cgr,maxclasssize)
     return Objectify(NewType(PRFusionsFamily(cgr), IsPartialRFusion and IsPartialRFusionRep), obj);
 end);
 
-InstallMethod(ExtendedPartialRFusion,
+InstallMethod(ExtendedPartialStablePartition,
         "for partial R-fusions and regular sets",
         [IsPartialRFusion and IsPartialRFusionRep, IsRegularSet],
 function(pfusion,gs)
-    local obj,tensor,class,npart,pos,nppart,nvarpart,sortpart,npfusion,mates;
+    local obj,class,npart,pos,nppart,nvarpart,sortpart,npfusion,mates;
     
-    tensor:=StructureConstantsOfColorGraph(pfusion!.cgr);
         
     class:=pfusion!.varpart[1];
     if class =AsSet(gs) then
@@ -89,7 +114,7 @@ function(pfusion,gs)
         nppart:=ShallowCopy(pfusion!.ppart);
         Add(nppart,AsSet(gs));
         nvarpart:=ShortLexSorted(StructuralCopy(npart.classes{npart.variable}));
-        nvarpart:=Filtered(nvarpart, x->not x[1] in ReflexiveColors(tensor));
+        nvarpart:=Filtered(nvarpart, x->not x[1] in ReflexiveColors(pfusion!.cgr));
                 
         obj:=rec( cgr:=pfusion!.cgr,
                   ppart:=nppart,
@@ -105,7 +130,7 @@ function(pfusion,gs)
     
 end);
 
-InstallMethod(IsRCompatibleWithPart,
+InstallMethod(IsCompatibleWithPartialStablePartition,
         "for partial R-fusions and regular sets",
         [IsPartialRFusion and IsPartialRFusionRep, IsRegularSet],
 function(pfusion, gs)
@@ -119,12 +144,12 @@ function(pfusion, gs)
     return false;
 end);
 
-InstallMethod( RainbowOfPartialRFusion,
-        "for partial R-fusions",
-        [IsPartialRFusion and IsPartialRFusionRep],
-function(pfus)
-    return pfus!.cgr;
-end);
+# InstallMethod( RainbowOfPartialRFusion,
+#         "for partial R-fusions",
+#         [IsPartialRFusion and IsPartialRFusionRep],
+# function(pfus)
+#     return pfus!.cgr;
+# end);
 
 InstallMethod( ViewString,
         "for partial R-fusions",
@@ -133,9 +158,9 @@ function(pfus)
     return Concatenation("<partial R-fusion: ", String(pfus!.ppart), ">");
 end);
 
-InstallImmediateMethod( IsCompletePartialRFusion,
+InstallImmediateMethod( IsCompletePartialStablePartition,
         "for partial R-fusions",
-       IsPartialRFusion,0,
+       IsPartialRFusion,
 function(pfus)
     if pfus!.varpart = [] then
         return true;
@@ -146,7 +171,7 @@ function(pfus)
     fi;
 end);
 
-InstallMethod( RFusionFromCompletePartialRFusion,
+InstallMethod( StablePartitionFromCompletePartialStablePartition,
         "for partial R-fusions",
         [IsPartialRFusion and IsPartialRFusionRep],
 function(cpfus)
@@ -168,19 +193,30 @@ function(cgr,g)
     return NewFamily("PRFusionOrbitsFam", IsPartialRFusionOrbit);
 end);
 
+InstallMethod(GetPartialStablePartitionOrbitFamily,
+"for partial regular R-fusions in PartialRFusionRep and a permutation group",
+[IsPartialRFusion and IsPartialRFusionRep, IsPermGroup],
+function(prset,grp)  
+    return PRFusionOrbitsFamily(prset!.cgr,grp);
+end);
+
 # PartialRFusionOrbitNC(<group>, <pjfus> ,<stab>)
 # <pjfus> is a partial R-fusion that is assumed to be minimal (wrt. short lex) in its orbit
 # the minimality property is not checked
 # <stab> is supposed to be the full (SetsSets-wise) stabilizer of <pfus> in <group>
-InstallGlobalFunction(PartialRFusionOrbitNC,
+InstallMethod(PartialStablePartitionOrbitNC,
+"for a permutation group, a partial R-fusion, and a permutation group",              
+[ IsPermGroup, IsPartialRFusion and IsPartialRFusionRep, IsPermGroup],
 function(group,pfus,stab)
-    local res;
+    local res,fam;
 
     res:=rec(
             group:=group,
             rep:=pfus,
             stab:=stab);
-   return Objectify(NewType(PRFusionOrbitsFamily(RainbowOfPartialRFusion(pfus),group), IsPartialRFusionOrbit and IsCocoOrbitRep), res);
+    fam:=GetPartialStablePartitionOrbitFamily(pfus,group);
+    
+    return Objectify(NewType(fam, IsPartialRFusionOrbit and IsCocoOrbitRep), res);
 end);
 
 InstallMethod( ViewString,
@@ -222,7 +258,7 @@ function(gsorb)
     maxrank:=ValueOption("maxrank");
 
     aaut:=UnderlyingGroupOfCocoOrbit(gsorb[1]);
-    pfus:=EmptyPartialRFusion(RainbowOfRegularSet(Representative(gsorb[1])), Maximum(List(gsorb, x->Size(Representative(x)))));
+    pfus:=EmptyPartialRFusion(UnderlyingCgrOfRegularSet(Representative(gsorb[1])), Maximum(List(gsorb, x->Size(Representative(x)))));
         
     state:=rec( pfus:=pfus,
                 maxrank:=maxrank,
@@ -272,7 +308,7 @@ function(iter)
             state.orbidx:=state.orbidx+1;
             
             if state.slice=[] then
-                ags:=OnRegularSets(gs, ColorMates(RainbowOfRegularSet(gs)));
+                ags:=OnRegularSets(gs, ColorMates(UnderlyingCgrOfRegularSet(gs)));
                 if AsSet(ags)<AsSet(gs) then
                     nH:=();
                     continue;
@@ -304,7 +340,7 @@ function(iter)
                                 orbidx:=1,
                                 linkback:=state);
             elif Length(state.slice[1])<Length(gs) then
-                ags:=OnRegularSets(gs, ColorMates(RainbowOfRegularSet(gs)));
+                ags:=OnRegularSets(gs, ColorMates(UnderlyingCgrOfRegularSet(gs)));
                 if AsSet(ags)<AsSet(gs) then
                     nH:=();
                     continue;
@@ -333,7 +369,7 @@ function(iter)
                                 linkback:=state);
             else
 #                Assert(1, Length(gs)>=Length(state.slice[1]));
-                ags:=OnRegularSets(gs, ColorMates(RainbowOfRegularSet(gs)));
+                ags:=OnRegularSets(gs, ColorMates(UnderlyingCgrOfRegularSet(gs)));
                 if AsSet(ags)<AsSet(gs) then
                     if not AsSet(ags) in state.slice then
                         nH:=();
@@ -495,7 +531,7 @@ function(newPart,gs)
     
     
     M:=AsSet(gs);
-    iM:=OnSets(M,ColorMates(RainbowOfRegularSet(gs)));
+    iM:=OnSets(M,ColorMates(UnderlyingCgrOfRegularSet(gs)));
 
     res:=repart(newPart,M,true);
     if res=fail then

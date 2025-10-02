@@ -18,7 +18,19 @@ function(cgr)
    return fam;
 end);
 
+InstallMethod(PartialRegularSetOrbitFamilyOp,
+        "for color graphs and permutation groups",
+        [IsColorGraph, IsPermGroup],
+function(cgr,g)
+    return NewFamily("PartialRegularSetOrbitFam", IsPartialStableSetOrbit);
+end);
 
+InstallMethod(GetPartialStableSetOrbitFamily,
+"for partial regular sets in PartialRegularSetRep and a permutation group",
+[IsPartialRegularSet and IsPartialRegularSetRep, IsPermGroup],
+function(prset,grp)  
+    return PartialRegularSetOrbitFamily(prset!.cgr,grp);
+end);
 
 InstallMethod( ViewString,
         "for partial regular sets in PartialRegularSetRep",
@@ -104,20 +116,20 @@ function(cand,pt)
 end);
 
 InstallMethod(EmptySymPartialRegularSet,
-        "for homogeneous WL-stable color graphs",
-        [IsColorGraph and IsRainbow and IsHomogeneous],
+        "for regular rainbows",
+        [IsColorGraph and IsRainbow and IsRegularColorGraph],
 function(cgr)
     local aaut,rclr,clr,sclr,aclr,imap,map, i, j,act,cand;
     
     
-    rclr:=ReflexiveColors(tensor);
-    clr:=Difference([1..OrderOfTensor(tensor)], rclr);
-    sclr:=Filtered(clr, x->x^Mates(tensor)=x);
-    aclr:=Filtered(clr, x->x<x^Mates(tensor));
+    rclr:=ReflexiveColors(cgr);
+    clr:=Difference([1..RankOfColorGraph(cgr)], rclr);
+    sclr:=Filtered(clr, x->x^ColorMates(cgr)=x);
+    aclr:=Filtered(clr, x->x<x^ColorMates(cgr));
     imap:=[];
  
     Append(imap, List(sclr, x->[x]));
-    Append(imap,List(aclr, x->[x,x^Mates(tensor)]));
+    Append(imap,List(aclr, x->[x,x^ColorMates(cgr)]));
     map:=[];
     for i in [1..Length(imap)] do
         for j in imap[i] do
@@ -130,7 +142,7 @@ function(cgr)
               imap:=imap,
               domain:=[1..Length(imap)],
               set:=[],               
-              maxlength:=Int((OrderOfTensor(tensor)-1)/2)
+              maxlength:=Int((RankOfColorGraph(cgr)-1)/2)
               );
    
    return Objectify(NewType(PartialRegularSetsFamily(cgr), IsSymPartialRegularSet and IsPartialRegularSetRep), cand);
@@ -138,7 +150,7 @@ end);
 
 
 
-InstallMethod(ExtendedPartialGoodSet,
+InstallMethod(ExtendedPartialStableSet,
     "for asymmetric partial regular sets in PartialRegularSetRep",
     [IsAsymPartialRegularSet and IsPartialRegularSetRep, IsPosInt],
 function(cand,pt)
@@ -166,13 +178,12 @@ end);
 
 InstallMethod(EmptyAsymPartialRegularSet,
         "for homogeneous WL-stable color graphs",
-        [IsColorGraph and IsWLStableColorGraph and IsHomogeneous],
+        [IsColorGraph and IsRainbow and IsRegularColorGraph],
 function(cgr)
-    local tensor,imap,map,i,grp,act,cand;
+    local imap,map,i,grp,act,cand;
     
-    tensor:=StructureConstantsOfColorGraph(cgr);
     
-    imap:=Filtered([1..OrderOfTensor(tensor)], x->x^Mates(tensor)<>x);
+    imap:=Filtered([1..RankOfColorGraph(cgr)], x->x^ColorMates(cgr)<>x);
     map:=[];
     for i in [1..Length(imap)] do
         map[imap[i]]:=i;
@@ -185,7 +196,7 @@ function(cgr)
               imap:=imap,
               domain:=[1..Length(imap)],
               set:=[],
-              maxlength:=Int((OrderOfTensor(tensor)-1)/2)
+              maxlength:=Int((RankOfColorGraph(cgr)-1)/2)
               );
     
     return Objectify(NewType(PartialRegularSetsFamily(cgr), IsAsymPartialRegularSet and IsPartialRegularSetRep), cand);
@@ -218,14 +229,13 @@ DeclareRepresentation("IsSymPartialRegularSetBlkRep",
           "maxdeg",
           "domdegreelist",
           "ridx",
-          "square",
           "fullrows",
           "kIsForced",
           "k"
           ]);
 
 
-InstallMethod(IsCompletePartialGoodSet,
+InstallMethod(IsCompletePartialStableSet,
     "for symmetric partial regular sets in SymPartialRegularSetBlkRep",
     [IsSymPartialRegularSet and IsSymPartialRegularSetBlkRep],
 function(cand)
@@ -258,7 +268,7 @@ end);
 
 
 InstallMethod(IsCompatiblePoint,
-    "for symmetric partial regular sets in SymPartialRegularSetBlk",
+    "for symmetric partial regular sets in SymPartialRegularSetBlk and positive integers",
     [IsSymPartialRegularSet and IsSymPartialRegularSetBlkRep, IsPosInt],
 function(cand,i)
     local  mates, sb, fb,  pos;
@@ -292,7 +302,7 @@ function(cand,i)
 end);
 
 
-InstallMethod(ExtendedPartialGoodSet,
+InstallMethod(ExtendedPartialStableSet,
     "for symmetric partial regular sets in SymPartialRegularSetBlk",
     [IsSymPartialRegularSet and IsSymPartialRegularSetBlkRep, IsPosInt],
 function(cand,pt)
@@ -435,7 +445,9 @@ function(cgr)
     
     tensor:=StructureConstantsOfColorGraph(cgr);
     if not IsBlockedTensorRep(tensor) then
-        ErrorNoReturn("this is not supposed to happen!");
+        TryNextMethod();
+        
+        ErrorNoReturn("This is not supposed to happen!");
     fi;
     
     mat:=List(tensor!.blocks, a->List(tensor!.blocks, Length));
@@ -540,7 +552,7 @@ DeclareRepresentation("IsAsymPartialRegularSetBlkRep",
           ]);
 
 
-InstallMethod(IsCompletePartialGoodSet,
+InstallMethod(IsCompletePartialStableSet,
     "for asymmetric partial regular sets in AsymPartialRegularSetBlkRep",
     [IsAsymPartialRegularSet and IsAsymPartialRegularSetBlkRep],
 function(cand)
@@ -573,7 +585,7 @@ function(cand)
 end);
 
 InstallMethod(IsCompatiblePoint,
-    "for asymmetric partial regular sets in AsymPartialRegularSetBlkRep",
+    "for asymmetric partial regular sets in AsymPartialRegularSetBlkRep and positive integers",
     [IsAsymPartialRegularSet and IsAsymPartialRegularSetBlkRep, IsPosInt],
 function(cand,i)
     local  t, clr, sb;
@@ -589,8 +601,8 @@ function(cand,i)
     return true;
 end);
 
-InstallMethod(ExtendedPartialGoodSet,
-    "for asymmetric partial regular sets in AsymPartialRegularSetBlkRep",
+InstallMethod(ExtendedPartialStableSet,
+    "for asymmetric partial regular sets in AsymPartialRegularSetBlkRep and positive integers",
     [IsAsymPartialRegularSet and IsAsymPartialRegularSetBlkRep, IsPosInt],
 function(cand,pt)
     local t,bm,npgs,color,sb,fb,sd,i,j,k,kmts,a,b,block,md,sq,icolor,ksb,kfb,sbinfr,ent,blkIdx,ba,bb,bc,bbl;
@@ -766,7 +778,6 @@ function(cgr)
               domcoldegs:=domcoldegs,
               ridx:=[],
               cidx:=[],
-              square:=ListWithIdenticalEntries(Order(tensor),0),
               fullrows:=[],
               kIsForced:=false,
               k:=0);
@@ -774,36 +785,9 @@ function(cgr)
 end);
 
 
-COCOInfoGSSize:=10;
-InstallMethod(AllRegularSetOrbits,
-        "for iterators of regular set candidates",
-        [IsIteratorOfPartialGoodSetOrbits and IsPartialGoodSetOrbitIterRep],
-function(iter)
-    local res,gens,stab,grp,gs;
-    
-    if IsDoneIterator(iter) then
-        return [];
-    fi;
-    
-    res:=[];
-    grp:=Source(iter!.state.act);
-    
-    while not IsDoneIterator(iter) do
-        if Length(iter!.state.M)<=COCOInfoGSSize then
-            Info(InfoCOCO,1,iter!.state.M,"\n");
-        fi;
-        
-        if IsCompletePartialGoodSet(iter!.state.cand) then
-            gs:=RegularSetFromPartialGoodSet(iter!.state.cand);
-            if gs <> fail then 
-                gens:=ShallowCopy(iter!.state.SM.generators);
-                stab:=Group(PreImagesSet(iter!.state.act,gens),());            
-                Add(res, RegularSetOrbit(grp,gs, stab));
-                Info(InfoCOCO,1,"*");
-            fi;
-        fi;
-        
-        NextIterator(iter);
-    od;
-    return res;
+InstallMethod(ConstructorOfStableSetOrbit,
+        "for all regular sets",
+        [IsRegularSet],
+function(orb)
+    return RegularSetOrbit;
 end);

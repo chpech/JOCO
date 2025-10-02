@@ -41,8 +41,92 @@ function(cgr)
     return true;
 end);
 
+InstallMethod( VertexPartitionOfRainbow,
+"for rainbows",
+[IsColorGraph and IsRainbow],
+function(cgr)
+    local  map, types, vpart;
+    map:=List([1..OrderOfColorGraph(cgr)], v->Filtered([1..RankOfColorGraph(cgr)], i->Neighbors(cgr,v,i)<>[]));
+    types:=Set(map);
+    vpart:=Set(types, x->Filtered([1..OrderOfColorGraph(cgr)], i->map[i]=x));
+    return vpart;
+end);
+
+InstallMethod( IsStableRainbow,
+"for rainbows",
+[IsColorGraph and IsRainbow],
+function(cgr)
+    local  vpart, i, j, p, q, val;
+    vpart:=VertexPartitionOfRainbow(cgr);
+    
+    for i in [1..RankOfColorGraph(cgr)] do
+        for p in vpart do
+            for q in vpart do
+                val:=Length(Intersection(Neighbors(cgr,p[1],i),q));
+                for j in [2..Length(p)] do
+                    if val <> Length(Intersection(Neighbors(cgr,p[j],i),q)) then
+                        return false;
+                    fi;
+                od;
+            od;
+        od;
+    od;
+    return true;
+end);
+               
+InstallMethod( RAlgebraicAutomorphismGroup,
+"for stable rainbows",
+[IsRainbow and IsStableRainbow],
+function(cgr)
+    local  OnPointsAndPairs, vpart, vrtmu, refl, mu, g;
+    
+    OnPointsAndPairs:=function(e,g)
+        if IsList(e) then
+            return OnPairs(e,g);
+        fi;
+        return OnPoints(e,g);
+    end;
+
+    vpart:=VertexPartitionOfRainbow(cgr);
+    vrtmu:=[1..RankOfColorGraph(cgr)];
+    Append(vrtmu, Tuples([1..Length(vpart)],2));
+    refl:=ReflexiveColors(cgr);
+    
+               
+    mu:=ColorGraph(Group(()),vrtmu,OnPointsAndPairs, true, 
+                   function(a,b)
+                       local colout,colin,col;
+                       
+                       if IsInt(a) and IsList(b) then
+                           colout:=Length(Intersection(Neighbors(cgr,vpart[b[1]][1],a), vpart[b[2]]));
+                           colin:=Length(Intersection(Neighbors(cgr, vpart[b[2]][1],a^ColorMates(cgr)), vpart[b[1]]));
+                           col:=[colin,colout];
+                       elif IsList(a) and IsInt(b) then
+                           colout:=Length(Intersection(Neighbors(cgr,vpart[a[1]][1],b), vpart[a[2]]));
+                           colin:=Length(Intersection(Neighbors(cgr, vpart[a[2]][1],b^ColorMates(cgr)), vpart[a[1]]));
+                           col:=[colin,colout];
+                       elif IsInt(a) and IsInt(b) then
+                           col:=[a in refl, b in refl, b=a^ColorMates(cgr)];
+                       else
+                           col:=[Length(vpart[a[1]]),Length(vpart[a[2]]),Length(vpart[b[1]]),Length(vpart[b[2]])];
+                       fi;
+                       return col;
+                   end);
+    g:=AutomorphismGroup(mu);
+    return Action(g,[1..RankOfColorGraph(cgr)]);
+end);
+
+
 # InstallTrueMethod(IsRainbow,IsColorGraph and IsSchurianCCRep);
 InstallTrueMethod(IsRainbow,IsColorGraph and IsWLStableColorGraph);
+InstallTrueMethod(IsStableRainbow, IsRainbow and IsRegularColorGraph);
+InstallTrueMethod(IsStableRainbow, IsWLStableColorGraph);
+
+
+InstallTrueMethod(IsRegularColorGraph, IsWLStableColorGraph and IsHomogeneous);
+InstallTrueMethod(IsRegularColorGraph, IsJStableColorGraph and IsUndirectedColorGraph);
+
+InstallTrueMethod(IsHomogeneous, IsRainbow and IsRegularColorGraph);
 
 
 InstallOtherMethod(ColorMates,

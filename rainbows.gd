@@ -1,6 +1,13 @@
 DeclareProperty( "IsRainbow",   IsColorGraph );
 
 
+DeclareAttribute( "VertexPartitionOfRainbow" , IsColorGraph and IsRainbow );
+DeclareProperty( "IsStableRainbow", IsColorGraph and IsRainbow );
+
+DeclareAttribute( "RAlgebraicAutomorphismGroup", IsColorGraph and IsRainbow and IsStableRainbow );
+DeclareSynonymAttr( "RAut", RAlgebraicAutomorphismGroup);
+
+
 DeclareProperty( "IsJStableColorGraph",   IsColorGraph );
 
 DeclareAttribute( "JStructureConstantsOfColorGraph", IsColorGraph and IsJStableColorGraph ); 
@@ -9,8 +16,6 @@ DeclareSynonymAttr ( "JAut", JAlgebraicAutomorphismGroup );
 
 
 DeclareAttribute( "NumberOfWeakFibres", IsColorGraph and IsRainbow );
-
-
 
 DeclareOperation( "PbagColorInvariant",                [IsColorGraph, IsColorGraph] );
 

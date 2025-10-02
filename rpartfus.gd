@@ -10,7 +10,7 @@
 #############################################################################
 
 
-DeclareCategory( "IsPartialRFusion", IsObject );
+DeclareCategory( "IsPartialRFusion", IsCocoPartialStablePartition );
 DeclareAttribute( "PRFusionsFamily", IsColorGraph );
 KeyDependentOperation( "PRFusionOrbitsFamily", IsColorGraph, IsPermGroup, ReturnTrue );
 

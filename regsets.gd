@@ -1,4 +1,4 @@
-DeclareCategory( "IsRegularSet", IsCocoObject );
+DeclareCategory( "IsRegularSet", IsCocoStableSet );
 
 DeclareGlobalFunction( "BuildRegularSet" ); 
 
@@ -6,9 +6,9 @@ DeclareAttribute( "RegularSetsFamily", IsColorGraph );
 
                        
 
-DeclareOperation( "RegularSetFromPartialGoodSet", [IsPartialGoodSet] );
+# DeclareOperation( "RegularSetFromPartialGoodSet", [IsPartialGoodSet] );
 
-DeclareOperation( "RainbowOfRegularSet", [IsRegularSet] ); 
+DeclareOperation( "UnderlyingCgrOfRegularSet", [IsRegularSet] ); 
 DeclareOperation( "OnRegularSets", [IsRegularSet, IsPerm] );    
 
 ################################################################################
@@ -19,8 +19,8 @@ KeyDependentOperation( "RegularSetOrbitsFamily", IsColorGraph, IsPermGroup, Retu
 
 DeclareGlobalFunction( "RegularSetOrbit" );   
 DeclareGlobalFunction( "RegularSetOrbitNC" );  
-DeclareOperation( "HomogeneousRegularSetOrbits", [IsColorGraph and IsWLStableColorGraph] );
+DeclareOperation( "HomogeneousRegularSetOrbits", [IsColorGraph and IsRainbow and IsStableRainbow] );
 
-DeclareAttribute( "HomogeneousSymRegularSetOrbits", IsColorGraph and IsWLStableColorGraph); 
+DeclareAttribute( "HomogeneousSymRegularSetOrbits", IsColorGraph and IsRainbow and IsStableRainbow); 
 
-DeclareAttribute( "HomogeneousAsymRegularSetOrbits", IsColorGraph and IsWLStableColorGraph ); 
+DeclareAttribute( "HomogeneousAsymRegularSetOrbits", IsColorGraph and IsRainbow and IsStableRainbow ); 

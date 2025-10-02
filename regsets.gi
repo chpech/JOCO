@@ -27,19 +27,15 @@ function(arg)
    return Objectify(NewType(RegularSetsFamily(cgr), IsRegularSet and IsRegularSetRep), res);
 end);
 
-InstallMethod(RegularSetFromPartialRegularSet,
+InstallMethod(StableSetFromPartialStableSet,
     "for partial regular sets in PartialRegularSetRep",
     [IsPartialRegularSet and IsPartialRegularSetRep],
 function(cand)
-    local  part;
-       
-    
     return BuildRegularSet(cand!.cgr, cand!.set);
-    
 end);
 
 
-InstallMethod(RainbowOfRegularSet,
+InstallMethod(UnderlyingCgrOfRegularSet,
         "for regular sets in RegularSetRep",
         [IsRegularSet and IsRegularSetRep],
 function(gs)
@@ -81,7 +77,6 @@ function(gs1,gs2)
     return AsSet(gs1)=AsSet(gs2);
 end);
 
-# <g> must be from Aut(<gs!.tensor>)
 InstallMethod(OnRegularSets,
         "for regular sets in RegularSetRep",
         [IsRegularSet and IsRegularSetRep, IsPerm],
@@ -132,7 +127,7 @@ function(arg)
             group:=group,
             rep:=gs,
             stab:=stab);
-   return Objectify(NewType(RegularSetOrbitsFamily(RainbowOfRegularSet(gs),group), IsRegularSetOrbit and IsCocoOrbitRep), res);
+   return Objectify(NewType(RegularSetOrbitsFamily(UnderlyingCgrOfRegularSet(gs),group), IsRegularSetOrbit and IsCocoOrbitRep), res);
 end);
 
 InstallGlobalFunction(RegularSetOrbit,
@@ -173,60 +168,87 @@ function(gsorb,perm)
 end);
 
 
+
 InstallMethod(HomogeneousSymRegularSetOrbits,
-        "for WL-stable color graphs",
-        [IsColorGraph and IsWLStableColorGraph],
+        "for stable rainbows",
+        [IsColorGraph and IsRainbow and IsStableRainbow],
 function(cgr)
-    local  tensor, iter, allgsorb;
+    local  g, iter, allgsorb;
     
-    tensor:=StructureConstantsOfColorGraph(cgr);
+    g:=RAlgebraicAutomorphismGroup(cgr);
     
-    iter:=IteratorOfPartialGoodSetOrbits(AutomorphismGroup(tensor), EmptySymPartialRegularSet(cgr));
-    allgsorb:=AllRegularSetOrbits(iter);
+    
+    iter:=IteratorOfPartialStableSetOrbits(g, EmptySymPartialRegularSet(cgr));
+    allgsorb:=AllStableSetOrbits(iter);
+    
+    return Filtered(allgsorb,orb->AsSet(Representative(orb))<>[]);
+end);
+
+InstallOtherMethod(HomogeneousSymRegularSetOrbits,
+        "for a stable rainbow and a permutation group",
+        [IsColorGraph and IsRainbow and IsStableRainbow, IsPermGroup],
+function(cgr,g)
+    local  iter, allgsorb;
+    
+    iter:=IteratorOfPartialStableSetOrbits(g, EmptySymPartialRegularSet(cgr));
+    allgsorb:=AllStableSetOrbits(iter);
     
     return Filtered(allgsorb,orb->AsSet(Representative(orb))<>[]);
 end);
 
 InstallMethod(HomogeneousAsymRegularSetOrbits,
-        "for WL-stable color graphs",
-        [IsColorGraph and IsWLStableColorGraph],
+        "for a stable rainbow",
+        [IsColorGraph and IsRainbow and IsStableRainbow],
 function(cgr)
-    local tensor,agsorbs,aaut;
+    local  g, tg, agsorbs;
     
-    tensor:=StructureConstantsOfColorGraph(cgr);
+    g:=RAlgebraicAutomorphismGroup(cgr);
     
-    aaut:=AutomorphismGroup(tensor);
-    aaut:=ClosureGroup(aaut,[Mates(tensor)]);
+    tg:=ClosureGroup(g,[ColorMates(cgr)]);
     
-    agsorbs:=AllRegularSetOrbits(IteratorOfPartialGoodSetOrbits(aaut,EmptyAsymPartialRegularSet(cgr)));
+    agsorbs:=AllStableSetOrbits(IteratorOfPartialStableSetOrbits(tg,EmptyAsymPartialRegularSet(cgr)));
     agsorbs:=Filtered(agsorbs, orb->AsSet(Representative(orb))<>[]);
     
-    return Union(List(agsorbs, orb->SubOrbitsOfCocoOrbit(AutomorphismGroup(tensor),orb)));    
+    return Union(List(agsorbs, orb->SubOrbitsOfCocoOrbit(g,orb)));    
+end);
+
+InstallOtherMethod(HomogeneousAsymRegularSetOrbits,
+        "for a stable rainbow and a permutation group",
+        [IsColorGraph and IsRainbow and IsStableRainbow,IsPermGroup],
+function(cgr,g)
+    local  tg, agsorbs;
+    
+    
+    tg:=ClosureGroup(g,[ColorMates(cgr)]);
+    
+    agsorbs:=AllStableSetOrbits(IteratorOfPartialStableSetOrbits(tg,EmptyAsymPartialRegularSet(cgr)));
+    agsorbs:=Filtered(agsorbs, orb->AsSet(Representative(orb))<>[]);
+    
+    return Union(List(agsorbs, orb->SubOrbitsOfCocoOrbit(g,orb)));    
 end);
 
 InstallMethod(HomogeneousRegularSetOrbits,
         "for WL-stable color graphs",
-        [IsColorGraph and IsWLStableColorGraph],
+        [IsColorGraph and IsRainbow and IsStableRainbow],
 function(cgr)
-    local tensor,lgs,sym,prim;
+    local g,lgs,sym,prim;
     
-    tensor:=StructureConstantsOfColorGraph(cgr);
     
     sym:=ValueOption("sym");
     if sym=fail then
         sym:=false;
     fi;
-    prim:=ValueOption("prim");
-    if prim=fail then
-        prim:=false;
-    fi;
+    # prim:=ValueOption("prim");
+    # if prim=fail then
+    #     prim:=false;
+    # fi;
     lgs:=Set(HomogeneousSymRegularSetOrbits(cgr));
     if not sym then
         lgs:=Union(lgs, HomogeneousAsymRegularSetOrbits(cgr));
     fi;
-    if prim then
-        lgs:=Filtered(lgs, x->ClosureSet(tensor, AsSet(Representative(x)))=[1..OrderOfTensor(tensor)]);
-    fi;
+    # if prim then
+    #     lgs:=Filtered(lgs, x->ClosureSet(tensor, AsSet(Representative(x)))=[1..OrderOfTensor(tensor)]);
+    # fi;
     
     return lgs;
 end);
