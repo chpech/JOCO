@@ -57,7 +57,7 @@ InstallMethod(EmptyPartialRFusion,
         "for tensors of structure constants",
         [IsColorGraph and IsRainbow and IsStableRainbow, IsInt],
 function(cgr,maxclasssize)
-    local obj,part,varpart,tensor;
+    local rclr,obj,part,varpart,tensor;
     
     rclr:=ReflexiveColors(cgr);
     

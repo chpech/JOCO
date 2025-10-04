@@ -4,7 +4,7 @@ DeclareRepresentation( "IsPartialStablePartitionRep",
 
 InstallMethod(IsEmptyPartialStablePartition,
         "for partial stable partitions in  PartialStablePartitionRep",
-        [IsCocoPartialStableSet and IsPartialStablePartitionRep],
+        [IsCocoPartialStablePartition and IsPartialStablePartitionRep],
 function(cand)
     return cand!.ppart=[];
 end);

@@ -11,10 +11,10 @@
 
 
 DeclareRepresentation("IsRFusionOfCgrRep",
-        IsAttributeStoringRep,
+        AttributeStoringRep,
         ["cgr",             # the rainbow over which the fusion lives
          "partition"        # the partition of colors of cgr
-]);
+        ]);
 
 InstallMethod(RFusionsFamily,
     "for rainbows",
@@ -232,19 +232,6 @@ function(arg)
     return RFusionOrbitNC(group, OnRFusions(fusion,can[1]), nstab^can[1]);
 end);
 
-# <g> must be from Aut(<fusion!.tensor>)
-InstallMethod(OnRFusions,
-        "for R-fusions in RFusionOfCgrRep",
-        [IsRFusionOfCgr and IsRFusionOfCgrRep, IsPerm],
-function(fusion, g)
-    local res;
-    res:=rec(
-                   cgr:=fusion!.cgr,
-             partition:=MakeImmutable(ShortLexSorted(OnSetsSets(Set(fusion!.partition),g)))
-    );
-
-    return Objectify(NewType(RFusionsFamily(fusion!.cgr), IsRFusionOfCgr and IsRFusionOfCgrRep), res);
-end);
 
 # RFusionOrbitNC(<group>, <Jfusion> [,<stab>])
 # <Rfusion> is a R-fusion that is assumed to be minimal (rev-lex wise) in its orbit
@@ -269,6 +256,18 @@ function(arg)
    return Objectify(NewType(RFusionOrbitsFamily(RainbowOfRFusion(fusion),group), IsRFusionOrbit and IsCocoOrbitRep), res);
 end);
 
+InstallMethod(OnRFusions,
+        "for R-fusions in RFusionOfCgrRep",
+        [IsRFusionOfCgr and IsRFusionOfCgrRep, IsPerm],
+function(fusion, g)
+    local res;
+    res:=rec(
+                   cgr:=fusion!.cgr,
+             partition:=MakeImmutable(ShortLexSorted(OnSetsSets(Set(fusion!.partition),g)))
+    );
+
+    return Objectify(NewType(RFusionsFamily(fusion!.cgr), IsRFusionOfCgr and IsRFusionOfCgrRep), res);
+end);
 
 InstallOtherMethod(ColorGraphByFusion,
         "for color graphs and for an R-fusion",
@@ -281,17 +280,17 @@ function(cgr,fusion)
     fi;
     res:= ColorGraphByFusion(cgr, PartitionOfFusion(fusion));
     SetIsRainbow(res,true);
-        
+    SetIsHomogeneous(res,true);
+    SetIsStablerainbow(res,true);
+    
     return res;
 end);
 
 InstallMethod(HomogeneousRFusionOrbits,
-        "for WL-stable color graphs",
-        [IsColorGraph and IsWLStableColorGraph],
+        "for stable rainbows",
+        [IsColorGraph and IsRainbow and IsStableRainbow],
 function(cgr)
-    local gsorbs,tensor;
-    
-    tensor:=StructureConstantsOfColorGraph(cgr);
+    local gsorbs;
     
     gsorbs:=HomogeneousRegularSetOrbits(cgr);
     return RFusionOrbitsFromRegularSetOrbits(gsorbs);

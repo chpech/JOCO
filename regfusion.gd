@@ -10,10 +10,10 @@
 #############################################################################
 
 
-DeclareCategory( "IsRFusionOfCgr", IsObject );
+DeclareCategory( "IsRFusionOfCgr", IsCocoStablePartition );
 
-DeclareGlobalFunction( "RFusionFromPartition" ); 
-DeclareGlobalFunction( "RFusionFromPartitionNC" ); 
+# DeclareGlobalFunction( "RFusionFromPartition" ); 
+# DeclareGlobalFunction( "RFusionFromPartitionNC" ); 
 DeclareGlobalFunction( "RFusionOrbitsFromRegularSetOrbits" ); 
 KeyDependentOperation( "RFusionOrbitsFamily", IsColorGraph, IsPermGroup, ReturnTrue );
 
