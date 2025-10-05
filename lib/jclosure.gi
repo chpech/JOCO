@@ -27,8 +27,8 @@
 
 
 
-
-JRepartition:=function(T, part, u,v,min)
+InstallGlobalFunction(JRepartition,
+function(T, part, u,v,min)
     local sym,vec,ix,x,i,j,ii,jj,colour, classes;
 
     sym:=ValueOption("sym");
@@ -89,10 +89,11 @@ JRepartition:=function(T, part, u,v,min)
         fi;
     od;
     return part;
-end;
+end);
 
 
-JStabil:=function(arg)
+InstallGlobalFunction(JStabil,
+function(arg)
     local u,v, i,T,part,min;
 
     min:=[];
@@ -131,11 +132,11 @@ JStabil:=function(arg)
         u:=WLInstabilQueueRemove(part);
     od;
     return part;
-end;
+end);
 
 
-
-IsJStablePartition:=function(T,p)
+InstallGlobalFunction(IsJStablePartition,
+function(T,p)
     local part;
 
     part:=WLBuildFixedPartition(p);
@@ -144,7 +145,7 @@ IsJStablePartition:=function(T,p)
     else
         return false;
     fi;
-end;
+end);
 
 
 

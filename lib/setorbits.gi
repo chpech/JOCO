@@ -245,7 +245,7 @@ end);
 
 
 COCOInfoGSSize:=10;
-InstallMethod(AllSetOrbits,
+InstallMethod(AllSetOrbitsFromIterator,
         "for iterators of set orbits",
         [IsIteratorOfSetOrbits and IsSetOrbitIterRep],
 function(iter)
@@ -309,19 +309,6 @@ function(orb)
     return SetOrbitNC;
 end);
 
-InstallGlobalFunction(SetOrbits,
-function(grp,domain,sizes)
-    local iter,dom;
-    
-    if IsInt(domain) then
-        dom:=[1..domain];
-    else
-        dom:=domain;
-    fi;
-    
-    iter:=IteratorOfSetOrbits(grp,dom,sizes);
-    return AllSetOrbits(iter);
-end);
 
 
 
@@ -374,7 +361,7 @@ function(iter)
                 y -> result[y]/Size(iter!.G));
 end);
 
-InstallGlobalFunction( SetOrbits,
+InstallGlobalFunction( AllSetOrbits,
 function(arg)
     local  g, dom, sizes, iter;
     
@@ -386,7 +373,7 @@ function(arg)
         sizes:=[1..Int(Length(dom)/2)];
     fi;
     iter:=IteratorOfSetOrbits(g,dom,sizes);
-    return AllSetOrbits(iter);
+    return AllSetOrbitsFromIterator(iter);
 end);
 
                        

@@ -11,7 +11,7 @@
 
 
 DeclareRepresentation("IsRFusionOfCgrRep",
-        AttributeStoringRep,
+        IsAttributeStoringRep,
         ["cgr",             # the rainbow over which the fusion lives
          "partition"        # the partition of colors of cgr
         ]);
@@ -25,24 +25,38 @@ function(cgr)
    return fam;
 end);
 
-InstallGlobalFunction(RFusionFromPartition,
-function(arg)
-   local cgr,set,part,res;
+# InstallGlobalFunction(RFusionFromPartition,
+# function(arg)
+#    local cgr,set,part,res;
 
-   cgr:=arg[1];
-   part:=arg[2];
-   return RFusionFromPartitionNC(cgr,part);
+#    cgr:=arg[1];
+#    part:=arg[2];
+#    return RFusionFromPartitionNC(cgr,part);
+# end);
+
+# InstallGlobalFunction(RFusionFromPartitionNC,
+# function(cgr,part)
+#    local obj;
+
+#    obj:=rec(
+#    	     cgr := cgr,
+#    	     partition := Immutable(ShortLexSorted(part)));
+#    return Objectify(NewType(RFusionsFamily(cgr), IsRFusionOfCgr and IsRFusionOfCgrRep), obj);
+# end);
+
+InstallMethod( StablePartitionFromCompletePartialStablePartition,
+        "for partial R-fusions",
+        [IsPartialRFusion and IsPartialRFusionRep],
+function(cpfus)
+    local obj;
+    
+    #   Assert(1, OnSetsSets(Set(cpfus!.part.classes),Mates(cpfus!.tensor))=Set(cpfus!.part.classes));
+    obj:=rec(
+   	      cgr := cpfus!.cgr,
+   	      partition := Immutable(ShortLexSorted(cpfus!.part.classes)));
+    return Objectify(NewType(RFusionsFamily(cpfus!.cgr), IsRFusionOfCgr and IsRFusionOfCgrRep), obj);
 end);
 
-InstallGlobalFunction(RFusionFromPartitionNC,
-function(cgr,part)
-   local obj;
-
-   obj:=rec(
-   			      cgr := cgr,
-   			partition := Immutable(ShortLexSorted(part)));
-   return Objectify(NewType(RFusionsFamily(cgr), IsRFusionOfCgr and IsRFusionOfCgrRep), obj);
-end);
 
 InstallOtherMethod(AsPartition,
         "for R-fusions in RFusionOfCgrRep",
@@ -281,7 +295,7 @@ function(cgr,fusion)
     res:= ColorGraphByFusion(cgr, PartitionOfFusion(fusion));
     SetIsRainbow(res,true);
     SetIsHomogeneous(res,true);
-    SetIsStablerainbow(res,true);
+    SetIsStableRainbow(res,true);
     
     return res;
 end);

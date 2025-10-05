@@ -36,22 +36,6 @@ function(cgr)
    return fam;
 end);
 
-InstallGlobalFunction(WLBuildTrivialPartition,
-function(T)
-    local part;
-
-    part:=rec();
-    part.classes:=[ReflexiveColors(T), Difference([1..OrderOfTensor(T)], ReflexiveColors(T))];
-    part.fixed:=[];
-    part.variable:=[1,2];
-    part.instabilFlags:=[false,false];
-    part.instabil:=FiFoNew();
-    part.totest:=FiFoNew();
-    part.totestFlags:=[false,false];
-    part.colorNames:=List([1..Length(part.classes)], x->[x,1]);
-    part.numberClasses:=ListWithIdenticalEntries(Length(part.classes), 1);
-    return part;
-end);
 
 InstallMethod(EmptyPartialRFusion,
         "for tensors of structure constants",
@@ -171,14 +155,6 @@ function(pfus)
     fi;
 end);
 
-InstallMethod( StablePartitionFromCompletePartialStablePartition,
-        "for partial R-fusions",
-        [IsPartialRFusion and IsPartialRFusionRep],
-function(cpfus)
- #   Assert(1, OnSetsSets(Set(cpfus!.part.classes),Mates(cpfus!.tensor))=Set(cpfus!.part.classes));
-    
-    return RFusionFromPartitionNC(cpfus!.cgr,cpfus!.part.classes);
-end);
 
 ###################################################################################
 # Partial R-fusion orbits

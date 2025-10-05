@@ -25,7 +25,7 @@ DeclareOperation( "OnRFusions", [IsRFusionOfCgr, IsPerm] );
 DeclareAttribute("RankOfRFusion", IsRFusionOfCgr);          
 DeclareAttribute("OrderOfRFusion", IsRFusionOfCgr);         
  
-DeclareAttribute( "HomogeneousRFusionOrbits", IsColorGraph and IsWLStableColorGraph );
+DeclareAttribute( "HomogeneousRFusionOrbits", IsColorGraph and IsRainbow and IsStableRainbow );
 
 DeclareAttribute( "RFusionsFamily", IsColorGraph );
 
