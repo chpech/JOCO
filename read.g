@@ -38,6 +38,6 @@ ReadPackage("joco", "lib/partregset.gi");
 ReadPackage("joco", "lib/regsets.gi");
 ReadPackage("joco", "lib/rpartfus.gi");
 ReadPackage("joco", "lib/regfusion.gi");
-ReadPackage("joco", "lib/setorbits.gi");
-ReadPackage("joco", "lib/partorbits.gi");
+# ReadPackage("joco", "lib/setorbits.gi");
+# ReadPackage("joco", "lib/partorbits.gi");
 ReadPackage("joco", "lib/auxiliary.gi");

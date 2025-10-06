@@ -41,7 +41,7 @@ InstallMethod(EmptyPartialRFusion,
         "for tensors of structure constants",
         [IsColorGraph and IsRainbow and IsStableRainbow, IsInt],
 function(cgr,maxclasssize)
-    local rclr,obj,part,varpart,tensor;
+    local  rclr, part, varpart, obj, prfus;
     
     rclr:=ReflexiveColors(cgr);
     
@@ -56,28 +56,59 @@ function(cgr,maxclasssize)
     part.colorNames:=List([1..Length(part.classes)], x->[x,1]);
     part.numberClasses:=ListWithIdenticalEntries(Length(part.classes), 1);
     
-    varpart:=Difference([1..RankOfColorGraph(cgr)], rclr);
+    varpart:=[Difference([1..RankOfColorGraph(cgr)], rclr)];
     
     obj:=rec( cgr:=cgr,
               ppart:=[],
               part:=part,
               varpart:=varpart,
               maxclasssize:=maxclasssize
-              );
-    return Objectify(NewType(PRFusionsFamily(cgr), IsPartialRFusion and IsPartialRFusionRep), obj);
+            );
+    prfus:= Objectify(NewType(PRFusionsFamily(cgr), IsPartialRFusion and IsPartialRFusionRep), obj);
+    SetIsIrredundantPartialStablePartition(prfus,true);
+    SetIsCompletePartialStablePartition(prfus,true);
+    SetPartialStablePartitionHasSmallerBase(prfus,false);
+    return prfus;
+    
 end);
 
 InstallMethod(ExtendedPartialStablePartition,
         "for partial R-fusions and regular sets",
         [IsPartialRFusion and IsPartialRFusionRep, IsRegularSet],
 function(pfusion,gs)
-    local obj,class,npart,pos,nppart,nvarpart,sortpart,npfusion,mates;
+    local  vdomain, rset, lclass, npart, pos, nppart, obj, ppart, 
+           part, varpart, maxclasssize, nvarpart, npfusion;
     
         
-    class:=pfusion!.varpart[1];
-    if class =AsSet(gs) then
+    vdomain:=pfusion!.varpart[1];
+    rset:=AsSet(gs);
+    if not IsSubset(vdomain,rset) then
+        return fail;
+    fi;
+    
+    if pfusion!.ppart<>[] then
+        lclass:=Last(pfusion!.ppart);
+        if Length(rset) < Length(lclass) then
+            return fail;
+        fi;
+        if Length(rset) = Length(lclass) and rset < lclass then
+            return fail;
+        fi;
+        if Length(vdomain) <> Length(rset) then
+            if Length(vdomain)-Length(rset) < Length(lclass) then
+                return fail;
+            fi;
+            if Length(vdomain) - Length(rset) = Length(lclass) and
+               Difference(vdomain, rset) < lclass then
+                return fail;
+            fi;
+        fi;
+    fi;
+    
+            
+    if vdomain =rset then
         npart:=WLShallowCopyStablePartition(pfusion!.part);
-        pos:=Position(npart.classes,AsSet(gs));
+        pos:=Position(npart.classes,rset);
         AddSet(npart.fixed, pos);
         RemoveSet(npart.variable,pos);
         nppart:=ShallowCopy(pfusion!.ppart);
@@ -88,7 +119,8 @@ function(pfusion,gs)
                   part:=npart,
                   varpart:=pfusion!.varpart{[2..Length(pfusion!.varpart)]},
                   maxclasssize:=pfusion!.maxclasssize);
-    elif Length(gs)<Length(class) or (Length(gs)=Length(class) and AsSet(gs)<=class) then
+    else
+        # Length(gs)<Length(class) or (Length(gs)=Length(class) and AsSet(gs)<=class) then
         npart:=WLShallowCopyStablePartition(pfusion!.part);
         npart:=RRefinedPartition(npart,gs);
         if npart=fail then
@@ -96,7 +128,7 @@ function(pfusion,gs)
         fi;
                 
         nppart:=ShallowCopy(pfusion!.ppart);
-        Add(nppart,AsSet(gs));
+        Add(nppart,rset);
         nvarpart:=ShortLexSorted(StructuralCopy(npart.classes{npart.variable}));
         nvarpart:=Filtered(nvarpart, x->not x[1] in ReflexiveColors(pfusion!.cgr));
                 
@@ -105,11 +137,39 @@ function(pfusion,gs)
                   part:=npart,
                   varpart:=nvarpart,
                   maxclasssize:=pfusion!.maxclasssize);
-    else
-        return fail;
+#    else
+#        return fail;
     fi;
     npfusion:=Objectify(NewType(PRFusionsFamily(pfusion!.cgr), IsPartialRFusion and IsPartialRFusionRep), obj);
-#    Assert(1, OnSetsSets(Set(npfusion!.part.classes),Mates(npfusion!.tensor))=Set(npfusion!.part.classes));
+    if Length(rset) < Length(vdomain) then
+        SetIsIrredundantPartialStablePartition(npfusion,true);
+        SetPartialStablePartitionHasSmallerBase(npfusion,false);
+        if Length(vdomain)-Length(rset) > Length(rset) then
+            SetIsCompletePartialStablePartition(npfusion,true);
+        else
+            SetIsCompletePartialStablePartition(npfusion,false);
+        fi;
+    elif obj!.varpart = [] then # Length(rset) = Length(vdomain)
+        SetIsCompletePartialStablePartition(npfusion,true);
+        SetIsIrredundantPartialStablePartition(npfusion,false);
+        SetPartialStablePartitionHasSmallerBase(npfusion,
+           IsCompletePartialStablePartition(pfusion) 
+           or PartialStablePartitionHasSmallerBase(pfusion));
+    elif Length(obj!.varpart[1]) = Length(rset) then # Length(rset) = Length(vdomain)
+        SetIsCompletePartialStablePartition(npfusion,false);
+        SetIsIrredundantPartialStablePartition(npfusion,false);
+        SetPartialStablePartitionHasSmallerBase(npfusion,
+           IsCompletePartialStablePartition(pfusion) 
+           or PartialStablePartitionHasSmallerBase(pfusion));
+    else  # Length(rset) = Length(vdomain) and Length(obj.varpart[1]) > Length(rset)
+        SetIsCompletePartialStablePartition(npfusion,true);
+        SetIsIrredundantPartialStablePartition(npfusion,false);
+        SetPartialStablePartitionHasSmallerBase(npfusion,
+           IsCompletePartialStablePartition(pfusion) 
+           or PartialStablePartitionHasSmallerBase(pfusion));
+    fi;
+        
+    #    Assert(1, OnSetsSets(Set(npfusion!.part.classes),Mates(npfusion!.tensor))=Set(npfusion!.part.classes));
     return npfusion;
     
 end);
@@ -206,256 +266,256 @@ end);
 ###################################################################################
 # Iterators of partial R-fusion orbits
 
-DeclareRepresentation( "IsPRFOrbitIterRep", IsComponentObjectRep, ["state"]);
+# DeclareRepresentation( "IsPRFOrbitIterRep", IsComponentObjectRep, ["state"]);
 
-PRFOrbitIteratorsFamily := NewFamily("PRFOrbitIteratorsFamily", 
-                                      IsIteratorOfPRFOrbits);
+# PRFOrbitIteratorsFamily := NewFamily("PRFOrbitIteratorsFamily", 
+#                                       IsIteratorOfPRFOrbits);
 
-InstallMethod(IteratorOfPartialRFusionOrbits,
-    "for partial R-fusions",
-    [IsList],
-function(gsorb)
-    local maxrank,state,aaut,tensor,pfus;
+# InstallMethod(IteratorOfPartialRFusionOrbits,
+#     "for partial R-fusions",
+#     [IsList],
+# function(gsorb)
+#     local maxrank,state,aaut,tensor,pfus;
     
     
-    if gsorb= [] then
-        state:=fail;
-    fi;
+#     if gsorb= [] then
+#         state:=fail;
+#     fi;
     
-    if not ForAll(gsorb, IsRegularSetOrbit) then
-        ErrorNoReturn("IteratorOfPartialRFusionOrbits: expecting a list of regular set orbits");
-    fi;
+#     if not ForAll(gsorb, IsRegularSetOrbit) then
+#         ErrorNoReturn("IteratorOfPartialRFusionOrbits: expecting a list of regular set orbits");
+#     fi;
         
-    if not ForAll(gsorb, gso->IsIdenticalObj(FamilyObj(gso),FamilyObj(gsorb[1]))) then
-        ErrorNoReturn("IteratorOfRPartialFusionOrbits: Regular sets are incompatible");
-    fi;
+#     if not ForAll(gsorb, gso->IsIdenticalObj(FamilyObj(gso),FamilyObj(gsorb[1]))) then
+#         ErrorNoReturn("IteratorOfRPartialFusionOrbits: Regular sets are incompatible");
+#     fi;
     
     
-    maxrank:=ValueOption("maxrank");
+#     maxrank:=ValueOption("maxrank");
 
-    aaut:=UnderlyingGroupOfCocoOrbit(gsorb[1]);
-    pfus:=EmptyPartialRFusion(UnderlyingCgrOfRegularSet(Representative(gsorb[1])), Maximum(List(gsorb, x->Size(Representative(x)))));
+#     aaut:=UnderlyingGroupOfCocoOrbit(gsorb[1]);
+#     pfus:=EmptyPartialRFusion(UnderlyingCgrOfRegularSet(Representative(gsorb[1])), Maximum(List(gsorb, x->Size(Representative(x)))));
         
-    state:=rec( pfus:=pfus,
-                maxrank:=maxrank,
-                G:=aaut,         # the group under which we enumerate orbits
-                GS:=aaut,        # the SetsSetsStabilizer of the finished slices
-                H:=aaut,         # the SetsSetsStabilizer of the current slice
-                slice:=[],       # the current slice
-                orbits:=Set(gsorb),   # compatible H-orbit representatives of good sets
-                orbidx:=1,
-                linkback:=fail
-              );
+#     state:=rec( pfus:=pfus,
+#                 maxrank:=maxrank,
+#                 G:=aaut,         # the group under which we enumerate orbits
+#                 GS:=aaut,        # the SetsSetsStabilizer of the finished slices
+#                 H:=aaut,         # the SetsSetsStabilizer of the current slice
+#                 slice:=[],       # the current slice
+#                 orbits:=Set(gsorb),   # compatible H-orbit representatives of good sets
+#                 orbidx:=1,
+#                 linkback:=fail
+#               );
     
-    return Objectify(NewType(PRFOrbitIteratorsFamily,
-                   IsIteratorOfPRFOrbits and IsPRFOrbitIterRep and IsMutable),
-                   rec(state:=state));
-end);
+#     return Objectify(NewType(PRFOrbitIteratorsFamily,
+#                    IsIteratorOfPRFOrbits and IsPRFOrbitIterRep and IsMutable),
+#                    rec(state:=state));
+# end);
 
 
 
-InstallMethod( NextIterator,
-        "for iterators of partial R-fusions",
-        [IsIteratorOfPRFOrbits and IsPRFOrbitIterRep and IsMutable],
-function(iter)
-    local NextState, pfus,grp,stab;
+# InstallMethod( NextIterator,
+#         "for iterators of partial R-fusions",
+#         [IsIteratorOfPRFOrbits and IsPRFOrbitIterRep and IsMutable],
+# function(iter)
+#     local NextState, pfus,grp,stab;
         
-    NextState:=function(state)
-        local gsorb,gs,ags,npfus,nH,nextstate,norbits,xnorbits;
+#     NextState:=function(state)
+#         local gsorb,gs,ags,npfus,nH,nextstate,norbits,xnorbits;
         
-        if state=fail then 
-            return fail; 
-        fi;        
+#         if state=fail then 
+#             return fail; 
+#         fi;        
         
-        if state.maxrank<>fail and RankOfPartialFusion(state.pfus) > state.maxrank  or 
-           RankOfPartialFusion(state.pfus) = state.maxrank and IsCompletePartialRFusion(state.pfus) then
-            Info(InfoCOCO,2,"*");
+#         if state.maxrank<>fail and RankOfPartialFusion(state.pfus) > state.maxrank  or 
+#            RankOfPartialFusion(state.pfus) = state.maxrank and IsCompletePartialStableFusion(state.pfus) then
+#             Info(InfoCOCO,2,"*");
             
-            return NextState(state.linkback);
-        fi;
+#             return NextState(state.linkback);
+#         fi;
             
-        if state.orbidx>Length(state.orbits) then
-            return NextState(state.linkback);
-        fi;
+#         if state.orbidx>Length(state.orbits) then
+#             return NextState(state.linkback);
+#         fi;
         
-        repeat
-            gsorb:=state.orbits[state.orbidx];
-            gs:=CanonicalRepresentativeOfCocoOrbit(gsorb);
-            state.orbidx:=state.orbidx+1;
+#         repeat
+#             gsorb:=state.orbits[state.orbidx];
+#             gs:=CanonicalRepresentativeOfCocoOrbit(gsorb);
+#             state.orbidx:=state.orbidx+1;
             
-            if state.slice=[] then
-                ags:=OnRegularSets(gs, ColorMates(UnderlyingCgrOfRegularSet(gs)));
-                if AsSet(ags)<AsSet(gs) then
-                    nH:=();
-                    continue;
-                fi;
-                npfus:=ExtendedPartialRFusion(state.pfus,gs);
-                if npfus=fail then
-                    nH:=();
-                    continue;
-                fi;
-                nH:=StabilizerOfCanonicalRepresentative(gsorb);
-                xnorbits:=Filtered(state.orbits, x->Length(Representative(x))>=Length(gs));
-                norbits:=Union(List(xnorbits, 
-                                    x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, 
-                                        y->IsRCompatibleWithPart(npfus,y))));
-                Assert(1,norbits=Union(List(xnorbits, 
-                                    x->Filtered(SubOrbitsOfCocoOrbit(nH,x),
-                                         y->IsRCompatibleWithPart(npfus,Representative(y))))));
+#             if state.slice=[] then
+#                 ags:=OnRegularSets(gs, ColorMates(UnderlyingCgrOfRegularSet(gs)));
+#                 if AsSet(ags)<AsSet(gs) then
+#                     nH:=();
+#                     continue;
+#                 fi;
+#                 npfus:=ExtendedPartialRFusion(state.pfus,gs);
+#                 if npfus=fail then
+#                     nH:=();
+#                     continue;
+#                 fi;
+#                 nH:=StabilizerOfCanonicalRepresentative(gsorb);
+#                 xnorbits:=Filtered(state.orbits, x->Length(Representative(x))>=Length(gs));
+#                 norbits:=Union(List(xnorbits, 
+#                                     x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, 
+#                                         y->IsRCompatibleWithPart(npfus,y))));
+#                 Assert(1,norbits=Union(List(xnorbits, 
+#                                     x->Filtered(SubOrbitsOfCocoOrbit(nH,x),
+#                                          y->IsRCompatibleWithPart(npfus,Representative(y))))));
                 
-                norbits:=Filtered(norbits, x->Representative(x)>gs);
-#                Assert(1, npfus!.varpart=[] or 2*Length(npfus!.varpart[1])>Order(npfus!.tensor) or npfus!.varpart[1] in Set(norbits, x->AsSet(Representative(x))));
+#                 norbits:=Filtered(norbits, x->Representative(x)>gs);
+# #                Assert(1, npfus!.varpart=[] or 2*Length(npfus!.varpart[1])>Order(npfus!.tensor) or npfus!.varpart[1] in Set(norbits, x->AsSet(Representative(x))));
                 
-                nextstate:=rec( pfus:=npfus,
-                                maxrank:=state.maxrank,
-                                G:=state.G,
-                                GS:=state.G,
-                                H:=nH,
-                                slice:=[AsSet(gs)],
-                                orbits:=norbits,
-                                orbidx:=1,
-                                linkback:=state);
-            elif Length(state.slice[1])<Length(gs) then
-                ags:=OnRegularSets(gs, ColorMates(UnderlyingCgrOfRegularSet(gs)));
-                if AsSet(ags)<AsSet(gs) then
-                    nH:=();
-                    continue;
-                fi;
-                npfus:=ExtendedPartialRFusion(state.pfus,gs);
-                if npfus=fail then
-                    nH:=();
-                    continue;
-                fi;
-                nH:=StabilizerOfCanonicalRepresentative(gsorb);
-                xnorbits:=Filtered(state.orbits, x->Length(Representative(x))>=Length(gs));
-                norbits:=Union(List(xnorbits, x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, y->IsRCompatibleWithPart(npfus,y))));
-#                Assert(1, norbits=Union(List(xnorbits, x->Filtered(SubOrbitsOfCocoOrbit(nH,x), y->IsCompatibleWithPart(npfus,Representative(y))))));
+#                 nextstate:=rec( pfus:=npfus,
+#                                 maxrank:=state.maxrank,
+#                                 G:=state.G,
+#                                 GS:=state.G,
+#                                 H:=nH,
+#                                 slice:=[AsSet(gs)],
+#                                 orbits:=norbits,
+#                                 orbidx:=1,
+#                                 linkback:=state);
+#             elif Length(state.slice[1])<Length(gs) then
+#                 ags:=OnRegularSets(gs, ColorMates(UnderlyingCgrOfRegularSet(gs)));
+#                 if AsSet(ags)<AsSet(gs) then
+#                     nH:=();
+#                     continue;
+#                 fi;
+#                 npfus:=ExtendedPartialRFusion(state.pfus,gs);
+#                 if npfus=fail then
+#                     nH:=();
+#                     continue;
+#                 fi;
+#                 nH:=StabilizerOfCanonicalRepresentative(gsorb);
+#                 xnorbits:=Filtered(state.orbits, x->Length(Representative(x))>=Length(gs));
+#                 norbits:=Union(List(xnorbits, x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, y->IsRCompatibleWithPart(npfus,y))));
+# #                Assert(1, norbits=Union(List(xnorbits, x->Filtered(SubOrbitsOfCocoOrbit(nH,x), y->IsCompatibleWithPart(npfus,Representative(y))))));
                 
-                norbits:=Filtered(norbits, x->Representative(x)>gs);                
-#                Assert(1, npfus!.varpart=[] or 2*Length(npfus!.varpart[1])>Order(npfus!.tensor) or npfus!.varpart[1] in Set(norbits, x->AsSet(Representative(x))));
+#                 norbits:=Filtered(norbits, x->Representative(x)>gs);                
+# #                Assert(1, npfus!.varpart=[] or 2*Length(npfus!.varpart[1])>Order(npfus!.tensor) or npfus!.varpart[1] in Set(norbits, x->AsSet(Representative(x))));
 
-                nextstate:=rec( pfus:=npfus,
-                                maxrank:=state.maxrank,
-                                G:=state.G,
-                                GS:=state.H,
-                                H:=nH,
-                                slice:=[AsSet(gs)],
-                                orbits:=norbits,
-                                orbidx:=1,
-                                linkback:=state);
-            else
-#                Assert(1, Length(gs)>=Length(state.slice[1]));
-                ags:=OnRegularSets(gs, ColorMates(UnderlyingCgrOfRegularSet(gs)));
-                if AsSet(ags)<AsSet(gs) then
-                    if not AsSet(ags) in state.slice then
-                        nH:=();
-                        continue;
-                    fi;
-                fi;
+#                 nextstate:=rec( pfus:=npfus,
+#                                 maxrank:=state.maxrank,
+#                                 G:=state.G,
+#                                 GS:=state.H,
+#                                 H:=nH,
+#                                 slice:=[AsSet(gs)],
+#                                 orbits:=norbits,
+#                                 orbidx:=1,
+#                                 linkback:=state);
+#             else
+# #                Assert(1, Length(gs)>=Length(state.slice[1]));
+#                 ags:=OnRegularSets(gs, ColorMates(UnderlyingCgrOfRegularSet(gs)));
+#                 if AsSet(ags)<AsSet(gs) then
+#                     if not AsSet(ags) in state.slice then
+#                         nH:=();
+#                         continue;
+#                     fi;
+#                 fi;
                 
-                npfus:=ExtendedPartialRFusion(state.pfus,gs);
-                if npfus=fail then
-                    nH:=();
-                    continue;
-                fi;
-                nH:=SetsSetsReducibilityTestOneCard(state.GS, StabilizerOfCanonicalRepresentative(gsorb),state.slice,AsSet(gs));
-                if IsPerm(nH) then
-                    continue;
-                fi;
-                norbits:=Union(List(state.orbits, x->SubOrbitsWithInvariantPropertyOfCocoOrbit(StabilizerOfCanonicalRepresentative(gsorb), x, y->IsRCompatibleWithPart(npfus,y))));
-#                Assert(1,norbits=Union(List(state.orbits, x->Filtered(SubOrbitsOfCocoOrbit(StabilizerOfCanonicalRepresentative(gsorb),x),y->IsCompatibleWithPart(npfus,Representative(y))))));
+#                 npfus:=ExtendedPartialRFusion(state.pfus,gs);
+#                 if npfus=fail then
+#                     nH:=();
+#                     continue;
+#                 fi;
+#                 nH:=SetsSetsReducibilityTestOneCard(state.GS, StabilizerOfCanonicalRepresentative(gsorb),state.slice,AsSet(gs));
+#                 if IsPerm(nH) then
+#                     continue;
+#                 fi;
+#                 norbits:=Union(List(state.orbits, x->SubOrbitsWithInvariantPropertyOfCocoOrbit(StabilizerOfCanonicalRepresentative(gsorb), x, y->IsRCompatibleWithPart(npfus,y))));
+# #                Assert(1,norbits=Union(List(state.orbits, x->Filtered(SubOrbitsOfCocoOrbit(StabilizerOfCanonicalRepresentative(gsorb),x),y->IsCompatibleWithPart(npfus,Representative(y))))));
 
-                norbits:=Set(norbits, x->RegularSetOrbit(nH, CanonicalRepresentativeOfCocoOrbit(x),
-                    ClosureGroup(StabilizerOfCanonicalRepresentative(x), Stabilizer(nH, AsSet(CanonicalRepresentativeOfCocoOrbit(x)),OnTuples))));
-                norbits:=Filtered(norbits, x->Representative(x)>gs);               
-#                Assert(1,npfus!.varpart=[] or 2*Length(npfus!.varpart[1])>Order(npfus!.tensor) or npfus!.varpart[1] in Set(norbits, x->AsSet(Representative(x))));
+#                 norbits:=Set(norbits, x->RegularSetOrbit(nH, CanonicalRepresentativeOfCocoOrbit(x),
+#                     ClosureGroup(StabilizerOfCanonicalRepresentative(x), Stabilizer(nH, AsSet(CanonicalRepresentativeOfCocoOrbit(x)),OnTuples))));
+#                 norbits:=Filtered(norbits, x->Representative(x)>gs);               
+# #                Assert(1,npfus!.varpart=[] or 2*Length(npfus!.varpart[1])>Order(npfus!.tensor) or npfus!.varpart[1] in Set(norbits, x->AsSet(Representative(x))));
 
-                nextstate:=rec( pfus:=npfus,
-                                maxrank:=state.maxrank,
-                                G:=state.G,
-                                GS:=state.GS,
-                                H:=nH,
-                                slice:=Concatenation(state.slice,[AsSet(gs)]),
-                                orbits:=norbits,
-                                orbidx:=1,
-                                linkback:=state);
-            fi;
-        until not IsPerm(nH) or state.orbidx > Length(state.orbits);
-        if IsPerm(nH) then
-            return NextState(state.linkback);
-        fi;
+#                 nextstate:=rec( pfus:=npfus,
+#                                 maxrank:=state.maxrank,
+#                                 G:=state.G,
+#                                 GS:=state.GS,
+#                                 H:=nH,
+#                                 slice:=Concatenation(state.slice,[AsSet(gs)]),
+#                                 orbits:=norbits,
+#                                 orbidx:=1,
+#                                 linkback:=state);
+#             fi;
+#         until not IsPerm(nH) or state.orbidx > Length(state.orbits);
+#         if IsPerm(nH) then
+#             return NextState(state.linkback);
+#         fi;
  
-        return nextstate;
-    end;
+#         return nextstate;
+#     end;
     
-    if iter!.state=fail then
-        return fail;
-    fi;
+#     if iter!.state=fail then
+#         return fail;
+#     fi;
     
-    pfus:=iter!.state.pfus;
-    grp:=iter!.state.G;
-    stab:=iter!.state.H;
+#     pfus:=iter!.state.pfus;
+#     grp:=iter!.state.G;
+#     stab:=iter!.state.H;
     
-    iter!.state:=NextState(iter!.state);
-    return PartialRFusionOrbitNC(grp,pfus,stab);
-end);
+#     iter!.state:=NextState(iter!.state);
+#     return PartialRFusionOrbitNC(grp,pfus,stab);
+# end);
 
-InstallMethod( IsDoneIterator,
-        "for partial R-fusion iterators",
-        [IsIteratorOfPRFOrbits and IsPRFOrbitIterRep],
-function(iter)
-    return iter!.state=fail;
-end);
+# InstallMethod( IsDoneIterator,
+#         "for partial R-fusion iterators",
+#         [IsIteratorOfPRFOrbits and IsPRFOrbitIterRep],
+# function(iter)
+#     return iter!.state=fail;
+# end);
 
 
 COCOInfoPFUSSize:=5;
-InstallMethod(AllRFusionOrbits,
-        "for iterators of partial R-fusion orbits",
-        [IsIteratorOfPRFOrbits and IsPRFOrbitIterRep],
-function(iter)
-    local res,pfus,fus,fusorb,flt;
+# InstallMethod(AllRFusionOrbits,
+#         "for iterators of partial R-fusion orbits",
+#         [IsIteratorOfPRFOrbits and IsPRFOrbitIterRep],
+# function(iter)
+#     local res,pfus,fus,fusorb,flt;
     
-    flt:=ValueOption("filter");
-    if flt=fail then
-        flt:=ReturnTrue;
-    fi;
+#     flt:=ValueOption("filter");
+#     if flt=fail then
+#         flt:=ReturnTrue;
+#     fi;
 
-    if IsDoneIterator(iter) then
-        return [];
-    fi;
+#     if IsDoneIterator(iter) then
+#         return [];
+#     fi;
     
-    res:=[];
+#     res:=[];
         
-    while not IsDoneIterator(iter) do
-        if Length(iter!.state.slice)<=COCOInfoPFUSSize then
-            Info(InfoCOCO,1,iter!.state.slice,"\n");
-        fi;
-        if IsCompletePartialRFusion(iter!.state.pfus) then
-            pfus:=iter!.state.pfus;
-            fus:=RFusionFromCompletePartialRFusion(pfus);
+#     while not IsDoneIterator(iter) do
+#         if Length(iter!.state.slice)<=COCOInfoPFUSSize then
+#             Info(InfoCOCO,1,iter!.state.slice,"\n");
+#         fi;
+#         if IsCompletePartialStableFusion(iter!.state.pfus) then
+#             pfus:=iter!.state.pfus;
+#             fus:=RFusionFromCompletePartialRFusion(pfus);
             
-            fusorb:=RFusionOrbitNC(iter!.state.G, fus, iter!.state.H);
-            Assert(1,iter!.state.H = Stabilizer(iter!.state.G, AsPartition(fus),OnSetsSets));
+#             fusorb:=RFusionOrbitNC(iter!.state.G, fus, iter!.state.H);
+#             Assert(1,iter!.state.H = Stabilizer(iter!.state.G, AsPartition(fus),OnSetsSets));
             
-            if flt(fusorb) then
-                Info(InfoCOCO,1,"!");
-                Add(res, fusorb);
-            fi;
+#             if flt(fusorb) then
+#                 Info(InfoCOCO,1,"!");
+#                 Add(res, fusorb);
+#             fi;
             
-        fi;
+#         fi;
         
-        NextIterator(iter);
-    od;
-    return res;
-end);
+#         NextIterator(iter);
+#     od;
+#     return res;
+# end);
 
-InstallMethod( ViewString,
-        "for partial R-fusion iterators",
-        [IsIteratorOfPRFOrbits and IsPRFOrbitIterRep],
-function(iter)
-    return Concatenation("<partial R-fusion orbit iterator, current slice: ",
-          String(iter!.state.slice), ">");
-end);
+# InstallMethod( ViewString,
+#         "for partial R-fusion iterators",
+#         [IsIteratorOfPRFOrbits and IsPRFOrbitIterRep],
+# function(iter)
+#     return Concatenation("<partial R-fusion orbit iterator, current slice: ",
+#           String(iter!.state.slice), ">");
+# end);
 
 InstallGlobalFunction(RRefinedPartition,
 function(newPart,gs)
@@ -534,7 +594,7 @@ end);
 
 InstallMethod(ConstructorOfCocoOrbitNC,
         "for all partial fusion orbits",
-        [IsPartialFusionOrbit],
+        [IsPartialRFusionOrbit],
 function(orb)
     return PartialRFusionOrbitNC;
 end);

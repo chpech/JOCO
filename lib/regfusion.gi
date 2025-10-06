@@ -206,13 +206,20 @@ function(fs1,fs2)
 end);
 
 InstallGlobalFunction(RFusionOrbitsFromRegularSetOrbits,
-function(gsorbits)
-    local iter;
+function(cgr,gsorbits)
+    local pfus, iter,max;
+    
+    if gsorbits=[] then
+        max:=0;
+    else
+        max:=Maximum(List(gsorbits, x->Size(Representative(x))));
+    fi;
+    
+    pfus:=EmptyPartialRFusion(cgr, max);
 
+    iter:=IteratorOfPartialStablePartitionOrbits(pfus,gsorbits);
     
-    iter:=IteratorOfPartialRFusionOrbits(gsorbits);
-    
-    return AllRFusionOrbits(iter);
+    return AllStablePartitionOrbits(iter);
 end);
 
 
@@ -307,29 +314,30 @@ function(cgr)
     local gsorbs;
     
     gsorbs:=HomogeneousRegularSetOrbits(cgr);
-    return RFusionOrbitsFromRegularSetOrbits(gsorbs);
+    rforb:=RFusionOrbitsFromRegularSetOrbits(cgr,gsorbs);
+    
 end);
 
-InstallOtherMethod(HomogeneousRFusionOrbits,
-        "for WL-stable color graphs",
-        [IsPermGroup, IsColorGraph and IsWLStableColorGraph],
-function(grp,cgr)
-    local fsorbs,T;
+# InstallOtherMethod(HomogeneousRFusionOrbits,
+#         "for WL-stable color graphs",
+#         [IsPermGroup, IsColorGraph and IsWLStableColorGraph],
+# function(grp,cgr)
+#     local fsorbs,T;
     
-    T:=StructureConstantsOfColorGraph(cgr);
+#     T:=StructureConstantsOfColorGraph(cgr);
     
-    if not ForAll(GeneratorsOfGroup(grp), g->IsAutomorphismOfObject(T,g)) then
-        Error("The given group must preserve the tensor of structure-constants!");
-        return fail;
-    fi;
+#     if not ForAll(GeneratorsOfGroup(grp), g->IsAutomorphismOfObject(T,g)) then
+#         Error("The given group must preserve the tensor of structure-constants!");
+#         return fail;
+#     fi;
     
-    fsorbs:=HomogeneousRFusionOrbits(T);
-    if Size(grp)< Size(AutomorphismGroup(T)) then
-        fsorbs:=Union(List(fsorbs, fso->SubOrbitsOfCocoOrbit(grp,fso)));
-    fi;
+#     fsorbs:=HomogeneousRFusionOrbits(T);
+#     if Size(grp)< Size(AutomorphismGroup(T)) then
+#         fsorbs:=Union(List(fsorbs, fso->SubOrbitsOfCocoOrbit(grp,fso)));
+#     fi;
     
-    return fsorbs;
-end);
+#     return fsorbs;
+# end);
 
 InstallMethod(OnCocoOrbits,
         "for all R-fusion orbits",
@@ -622,5 +630,19 @@ InstallMethod(ConstructorOfCocoOrbitNC,
         "for all R-fusion orbits",
         [IsRFusionOrbit],
 function(orb)
+    return RFusionOrbitNC;
+end);
+
+InstallMethod(ConstructorOfStablePartitionOrbit,
+"for all RFusions",
+[IsRFusionOfCgr],
+function(rfus)
+    return RFusionOrbit;
+end);
+
+InstallMethod(ConstructorOfStablePartitionOrbitNC,
+"for all RFusions",
+[IsRFusionOfCgr],
+function(rfus)
     return RFusionOrbitNC;
 end);

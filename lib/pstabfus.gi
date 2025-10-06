@@ -69,12 +69,12 @@ function(part, setorb)
     if setorb= [] then
         state:=fail;
     else
-        if not ForAll(setorb, IsPartialStableSetOrbit) then
-            ErrorNoReturn("IteratorOfPartialStablePartitionOrbits: expecting a list of stable set orbits");
+        if not ForAll(setorb, IsCocoSetOrbit) then
+            ErrorNoReturn("IteratorOfPartialStablePartitionOrbits: expecting a list of set orbits");
         fi;
         
         if not ForAll(setorb, so->IsIdenticalObj(FamilyObj(so),FamilyObj(setorb[1]))) then
-            ErrorNoReturn("IteratorOfPartialStablePartitionOrbits: stable set orbits are incompatible");
+            ErrorNoReturn("IteratorOfPartialStablePartitionOrbits: set orbits are incompatible");
         fi;
         
         maxrank:=ValueOption("maxrank");
@@ -189,7 +189,7 @@ function(iter)
                                 G:=state.G,
                                 GS:=state.G,
                                 H:=nH,
-                                slice:=[set],
+                                slice:=[AsSet(set)],
                                 orbits:=Set(norbits),
                                 orbidx:=1,
                                 linkback:=state);
@@ -217,13 +217,13 @@ function(iter)
                                 G:=state.G,
                                 GS:=state.H,
                                 H:=nH,
-                                slice:=[set],
+                                slice:=[AsSet(set)],
                                 orbits:=Set(norbits),
                                 orbidx:=1,
                                 linkback:=state);
             else
                 Info(InfoCOCO,2,"Checking irreducibility...");
-                nH:=SetsSetsReducibilityTestOneCard(state.GS, StabilizerOfCanonicalRepresentative(setorb),state.slice,set);
+                nH:=SetsSetsReducibilityTestOneCard(state.GS, StabilizerOfCanonicalRepresentative(setorb),state.slice,AsSet(set));
                 
                 Info(InfoCOCO,2,"done.\n");
                 
@@ -249,14 +249,14 @@ function(iter)
                 
                 norbits:=List(norbits, o->[
                    CopyStabChain(Stbc(ClosureGroup(StabilizerOfCanonicalRepresentative(o), 
-                      Stabilizer(nH, CanonicalRepresentativeOfCocoOrbit(o),
+                      Stabilizer(nH, AsSet(CanonicalRepresentativeOfCocoOrbit(o)),
                                  OnTuples)))),o]);
-                norbits:=List(norbits, o->[o[1], SetCanonifiers(Stbc(nH), o[1],Representative(o[2]):failIfNotCanonical),o[2]]);
+                norbits:=List(norbits, o->[o[1], SetCanonifiers(Stbc(nH), o[1],AsSet(Representative(o[2])):failIfNotCanonical),o[2]]);
                 norbits:=Filtered(norbits, o->o[2]<>fail);
                 
                 
                 norbits:=List(norbits, 
-                              o->[o[3],SetOrbitNC(nH, Representative(o[3]), 
+                    o->[o[3],ConstructorOfCocoOrbitNC(o[3])(nH, Representative(o[3]), 
                                                   Group(Union(o[1].generators,o[2]),()))]);
                 
                 
@@ -270,7 +270,7 @@ function(iter)
                                 G:=state.G,
                                 GS:=state.GS,
                                 H:=nH,
-                                slice:=Concatenation(state.slice,[set]),
+                                slice:=Concatenation(state.slice,[AsSet(set)]),
                                 orbits:=Set(norbits),
                                 orbidx:=1,
                                 linkback:=state);
@@ -305,6 +305,14 @@ function(iter)
     return iter!.state=fail;
 end);
 
+InstallMethod( ViewString,
+        "for partial R-fusion iterators",
+        [IsIteratorOfPartialStablePartitionOrbits and IsPartialStablePartitionOrbitIterRep],
+function(iter)
+    return Concatenation("<partial stable partition orbit iterator, current slice: ",
+          String(iter!.state.slice), ">");
+end);
+
 InstallMethod(AllStablePartitionOrbits,
         "for an iterator of partial stable partition orbits",
         [IsIteratorOfPartialStablePartitionOrbits],
@@ -332,9 +340,9 @@ function(iter)
             not PartialStablePartitionHasSmallerBase(ppart) then
             
             Info(InfoCOCO,1,"!");
-            part:=PartitionFromCompletePartialPartition(ppart);
+            part:=StablePartitionFromCompletePartialStablePartition(ppart);
             
-            partorb:=PartitionOrbitNC(UnderlyingGroupOfCocoOrbit(pporb), part, 
+            partorb:=ConstructorOfStablePartitionOrbitNC(part)(UnderlyingGroupOfCocoOrbit(pporb), part, 
                                       StabilizerOfCanonicalRepresentative(pporb));
             Assert(1,StabilizerOfCanonicalRepresentative(pporb) = 
                      Stabilizer(UnderlyingGroupOfCocoOrbit(pporb), Set(part),OnSetsSets));

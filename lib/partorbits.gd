@@ -17,7 +17,7 @@ DeclareOperation( "PartitionFromCompletePartialPartition", [IsCocoPartialPartiti
 DeclareAttribute( "RankOfPartialPartition", IsCocoPartialPartition );
 
 DeclareOperation( "AsSetsSet", [IsCocoPartialPartition] );
-DeclareOperation( "DomainOfPartialPartition" ,[IsCocoPartialPartition] );
+# DeclareOperation( "DomainOfPartialPartition" ,[IsCocoPartialPartition] );
 
 
 DeclareAttribute( "PartialPartitionOrbitsFamily", IsPermGroup );

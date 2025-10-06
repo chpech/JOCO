@@ -26,6 +26,7 @@ DeclareCategory( "IsPartialStablePartitionOrbit", IsCocoOrbit );
 DeclareOperation( "PartialStablePartitionOrbitNC", [IsPermGroup, IsCocoPartialStablePartition, IsPermGroup] );
 
 DeclareOperation( "ConstructorOfStablePartitionOrbit", [IsCocoStablePartition] );
+DeclareOperation( "ConstructorOfStablePartitionOrbitNC", [IsCocoStablePartition] );
 
 DeclareOperation( "GetPartialStablePartitionOrbitFamily", [IsCocoPartialStablePartition, IsPermGroup] );
 

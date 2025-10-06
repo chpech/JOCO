@@ -74,12 +74,12 @@ function(domain)
     return ppart;
 end);
 
-InstallMethod( DomainOfPartialPartition,
-        "for a partial partition in PartialPartitionRep",
-        [IsPartialPartition and IsPartialPartitionRep],
-function(ppart)
-    return ppart!.domain;
-end);
+# InstallMethod( DomainOfPartialPartition,
+#         "for a partial partition in PartialPartitionRep",
+#         [IsPartialPartition and IsPartialPartitionRep],
+# function(ppart)
+#     return ppart!.domain;
+# end);
 
 
 # <set> is a class to be added to ppart.
