@@ -712,6 +712,7 @@ function(cgr)
     
     tensor:=StructureConstantsOfColorGraph(cgr);
     if not IsBlockedTensorRep(tensor) then
+        TryNextMethod();
         ErrorNoReturn("This is not supposed to happen!");
     fi;
     

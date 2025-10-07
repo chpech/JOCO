@@ -108,7 +108,9 @@ function(cgr)
                        elif IsInt(a) and IsInt(b) then
                            col:=[a in refl, b in refl, b=a^ColorMates(cgr)];
                        else
-                           col:=[Length(vpart[a[1]]),Length(vpart[a[2]]),Length(vpart[b[1]]),Length(vpart[b[2]])];
+                           col:=[a[1]=a[2],a[1]=b[1],a[1]=b[2],a[2]=b[1],a[2]=b[2],b[1]=b[2]];
+                           Append(col, [Length(vpart[a[1]]), Length(vpart[a[2]]), 
+                                  Length(vpart[b[1]]), Length(vpart[b[2]])]);
                        fi;
                        return col;
                    end);

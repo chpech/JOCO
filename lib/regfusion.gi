@@ -311,33 +311,25 @@ InstallMethod(HomogeneousRFusionOrbits,
         "for stable rainbows",
         [IsColorGraph and IsRainbow and IsStableRainbow],
 function(cgr)
-    local gsorbs;
+    local gsorbs,rforb;
     
     gsorbs:=HomogeneousRegularSetOrbits(cgr);
     rforb:=RFusionOrbitsFromRegularSetOrbits(cgr,gsorbs);
+    return rforb;
     
 end);
 
-# InstallOtherMethod(HomogeneousRFusionOrbits,
-#         "for WL-stable color graphs",
-#         [IsPermGroup, IsColorGraph and IsWLStableColorGraph],
-# function(grp,cgr)
-#     local fsorbs,T;
+InstallOtherMethod(HomogeneousRFusionOrbits,
+        "for a stable rainbow and a permutation group",
+        [IsColorGraph and IsRainbow and IsStableRainbow, IsPermGroup],
+function(cgr,g)
     
-#     T:=StructureConstantsOfColorGraph(cgr);
+    local gsorbs,rforb;
     
-#     if not ForAll(GeneratorsOfGroup(grp), g->IsAutomorphismOfObject(T,g)) then
-#         Error("The given group must preserve the tensor of structure-constants!");
-#         return fail;
-#     fi;
-    
-#     fsorbs:=HomogeneousRFusionOrbits(T);
-#     if Size(grp)< Size(AutomorphismGroup(T)) then
-#         fsorbs:=Union(List(fsorbs, fso->SubOrbitsOfCocoOrbit(grp,fso)));
-#     fi;
-    
-#     return fsorbs;
-# end);
+    gsorbs:=HomogeneousRegularSetOrbits(cgr,g);
+    rforb:=RFusionOrbitsFromRegularSetOrbits(cgr,gsorbs);
+    return rforb;
+end);
 
 InstallMethod(OnCocoOrbits,
         "for all R-fusion orbits",

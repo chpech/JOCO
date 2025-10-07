@@ -253,6 +253,32 @@ function(cgr)
     return lgs;
 end);
 
+InstallOtherMethod(HomogeneousRegularSetOrbits,
+        "for WL-stable color graphs",
+        [IsColorGraph and IsRainbow and IsStableRainbow, IsPermGroup],
+function(cgr,g)
+    local lgs,sym,prim;
+    
+    
+    sym:=ValueOption("sym");
+    if sym=fail then
+        sym:=false;
+    fi;
+    # prim:=ValueOption("prim");
+    # if prim=fail then
+    #     prim:=false;
+    # fi;
+    lgs:=Set(HomogeneousSymRegularSetOrbits(cgr,g));
+    if not sym then
+        lgs:=Union(lgs, HomogeneousAsymRegularSetOrbits(cgr,g));
+    fi;
+    # if prim then
+    #     lgs:=Filtered(lgs, x->ClosureSet(tensor, AsSet(Representative(x)))=[1..OrderOfTensor(tensor)]);
+    # fi;
+    
+    return lgs;
+end);
+
 InstallMethod(ActionOfCocoOrbit,
         "for all regular set orbits",
         [IsRegularSetOrbit],
