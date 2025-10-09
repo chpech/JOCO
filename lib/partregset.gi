@@ -72,12 +72,6 @@ end);
 
 
 
-InstallMethod(DomainOfPartialStableSet,
-        "for partial regular sets in PartialRegularSetRep",
-        [IsPartialRegularSet and IsPartialRegularSetRep],
-function(cand)
-    return cand!.domain;
-end);
 
 
 InstallMethod(IsExtendiblePartialStableSet,

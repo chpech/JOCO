@@ -1,8 +1,40 @@
+# given a universe [1..n] and an ordered partition imap on it
+# map be the unique mapping from [1..n] to [1..Length(imap)] with the property
+# that map[i] is the unique j with the property that i \in imap[j]
+#
+# given further a family F of subsets of [1..n] such that for every M \in F holds
+# that 
+# (*)  \forall i : if i \in M then imap[map[i]] \subseteq M. 
+# The elements of F are called stable sets.
+#
+# A family FF of [1..n] is called a family of partial stable sets if 
+#   (1) each of its elements satisfies (*),
+#   (2) every subset satisfying (*) and contained in some element of FF is also in FF
+#   (3) every element of F is in FF
+# 
+# An element of FF is called complete if it is in F
+# 
+# The domain of some M from FF consists of all elements j of [1..Length(imap)] such that
+#    (a) imap[j] \cap M = \emptyset,
+#    (b) M \cup imap[j] \in FF
+#
+# When talking about orbits of partial stable sets then we have in mind a 
+# permutation group G on [1..n] such that
+#    (i)   G leaves invariant Set(imap) in action OnSetsSets,
+#    (ii)  G leaves invariant FF in action OnSetsSets,
+#    (iii) G leaves invariant F in action OnSetsSets.
+# then orbit representatives of G on F may be found by enumerating orbit 
+# representatives of G on FF and returning only those that are from F
+# the efficiency of this aproach depends strongly on the clever choice of FF
+# Generally, the smaller is FF, the more efficient the approach becomes.
+
+
 DeclareRepresentation("IsPartialStableSetRep",
         IsAttributeStoringRep,
         [ "set",                   # the partial stable set
           "map",
-          "imap"
+          "imap",
+          "domain"
         ]);
 
 InstallMethod(IsEmptyPartialStableSet,
@@ -17,6 +49,13 @@ InstallMethod(IMapOfPartialStableSet,
         [IsCocoPartialStableSet and IsPartialStableSetRep],
 function(cand)
     return cand!.imap;
+end);
+
+InstallMethod(DomainOfPartialStableSet,
+        "for partial stable sets in PartialStableSetRep",
+        [IsPartialStableSet and IsPartialStableSetRep],
+function(cand)
+    return cand!.domain;
 end);
 
 
