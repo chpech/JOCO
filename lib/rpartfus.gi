@@ -3,7 +3,6 @@
 ##  rpartfus.gi                  JOCO package
 ##                                                              Mikhail Klin
 ##                                                            Christian Pech
-##                                                             Sven Reichard
 ##
 ##  Implementation of partial R-fusions 
 ##

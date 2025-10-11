@@ -10,6 +10,8 @@ ReadPackage("joco", "lib/jgoodsets.gd");
 ReadPackage("joco", "lib/jpartfus.gd"); 
 ReadPackage("joco", "lib/regsets.gd");
 ReadPackage("joco", "lib/partregset.gd");
+ReadPackage("joco", "lib/parcregset.gd");
+ReadPackage("joco", "lib/arcregset.gd");
 ReadPackage("joco", "lib/rpartfus.gd");
 ReadPackage("joco", "lib/regfusion.gd");
 ReadPackage("joco", "lib/setorbits.gd");

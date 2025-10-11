@@ -11,6 +11,11 @@ DeclareOperation( "DomainOfPartialStableSet", [IsCocoPartialStableSet] );       
 DeclareProperty( "IsCompletePartialStableSet", IsCocoPartialStableSet );
 
 
+
+# ExtendedPartialStableSet extends a partial stable set by one point from its domain
+# if during the process of extension it becomes clear that the new partial stable set 
+# can not be completed to a complete partial stable set, then ExtendedPartialStableSet 
+# may return fail instead of a new partial stable set.
 DeclareOperation( "ExtendedPartialStableSet", [IsCocoPartialStableSet, IsPosInt] );                  # internal
 
 # the following two operations should be eliminated
@@ -20,8 +25,8 @@ DeclareOperation( "ExtendedPartialStableSet", [IsCocoPartialStableSet, IsPosInt]
 # also by definition, every point in DomainOfPartialStableSet is compatible
 # if partial stable sets are artificially restricted in size, then this can be 
 # implemented in ExtendedPartialStableSet
-DeclareProperty( "IsExtendiblePartialStableSet", IsCocoPartialStableSet );                           # internal
-DeclareOperation( "IsCompatiblePoint", [IsCocoPartialStableSet,IsPosInt] );
+# DeclareProperty( "IsExtendiblePartialStableSet", IsCocoPartialStableSet );                           # internal
+# DeclareOperation( "IsCompatiblePoint", [IsCocoPartialStableSet,IsPosInt] );
 
 
 # this is just a type conversion operation that is there mainly to get rid of 

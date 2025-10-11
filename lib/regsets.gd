@@ -1,6 +1,7 @@
 DeclareCategory( "IsRegularSet", IsCocoStableSet );
 
-DeclareGlobalFunction( "BuildRegularSet" ); 
+DeclareConstructor("RegularSet", [IsRegularSet, IsColorGraph, IsList]);
+
 
 DeclareAttribute( "RegularSetsFamily", IsColorGraph );
 

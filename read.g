@@ -36,6 +36,8 @@ ReadPackage("joco", "lib/jfusion.gi");
 ReadPackage("joco", "lib/jpartfus.gi");
 ReadPackage("joco", "lib/partregset.gi");
 ReadPackage("joco", "lib/regsets.gi");
+ReadPackage("joco", "lib/parcregset.gi");
+ReadPackage("joco", "lib/arcregset.gi");
 ReadPackage("joco", "lib/rpartfus.gi");
 ReadPackage("joco", "lib/regfusion.gi");
 # ReadPackage("joco", "lib/setorbits.gi");

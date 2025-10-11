@@ -3,7 +3,6 @@
 ##  rpartfus.gd                  JOCO package
 ##                                                              Mikhail Klin
 ##                                                            Christian Pech
-##                                                             Sven Reichard
 ##
 ##  Declarations for partial R-fusions 
 ##
@@ -13,8 +12,6 @@
 DeclareCategory( "IsPartialRFusion", IsCocoPartialStablePartition );
 DeclareAttribute( "PRFusionsFamily", IsColorGraph );
 KeyDependentOperation( "PRFusionOrbitsFamily", IsColorGraph, IsPermGroup, ReturnTrue );
-
-
 
 DeclareOperation( "EmptyPartialRFusion", [IsColorGraph,IsInt] );
 DeclareOperation( "ExtendedPartialRFusion", [IsPartialRFusion, IsRegularSet] );

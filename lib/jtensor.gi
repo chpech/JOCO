@@ -4,7 +4,14 @@
 ##    <creps> is a list of arcs of <cgr>.
 ##    There has to be at least one arc from each color of <cgr>.
 ##    This constructor is not supposed to be used by the user of coco
-
+#
+# cgr must be a rainbow (otherwise it can not be J-stable and hence 
+# it cannot have a tensor of J-structure constants)
+# for rainbows the colors of cgr may be blocked according to the reflexive colors of cgr
+# if there is just one reflexive color then a tensor in IsTensorRep is returned
+# otherwise a tensor in IsBlockedTensorRep is returned
+# note that the partition of vertices into fibres is not necessarily equitable for cgr
+# as there are, e.g.,  homogeneous J-stable cgrs that are not regular
 InstallGlobalFunction(JTensorFromColorReps,
 function(cgr,tor)
     local o,r,k,i,j,tensor,mat,submat,
@@ -79,7 +86,8 @@ function(cgr,tor)
         a:=rowBlk[k];
         b:=colBlk[k];
         mat:=LocalIntersectionArray(cgr,r);
-        mat:=1/2*(mat + TransposedMat(mat));
+        mat:=mat + TransposedMat(mat);   # note that we do not divide by two anymore because 
+                                         # of the changed definition os JStructureConstants
         for c in [1..Length(reflexiveColors)] do
             submat:=List(mat{blocks[a][c]}, x->x{blocks[c][b]});
             if IsBound(entries[a][b][c][blockIndices[k]]) then
@@ -146,8 +154,7 @@ function(cgr,tor)
     SetOrderOfCocoObject(tensor, RankOfColorGraph(cgr));
     
     return tensor;
-end
-);
+end);
 
 InstallMethod(EntryOfTensor,
      "for blocked tensors",

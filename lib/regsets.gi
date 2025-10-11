@@ -14,24 +14,25 @@ function(cgr)
    return fam;
 end);
 
-InstallGlobalFunction(BuildRegularSet,
-function(arg)
-   local cgr,set,part,res;
-
-   cgr:=arg[1];
-   set:=arg[2];
-
+InstallMethod(RegularSet,
+"for Regular sets",              
+[ IsRegularSet, IsColorGraph, IsList ],
+function(filter, cgr, set)
+   local res;
+    
+    
    res:=rec(
             cgr:=cgr,
             set:=Immutable(set));
-   return Objectify(NewType(RegularSetsFamily(cgr), IsRegularSet and IsRegularSetRep), res);
+   return Objectify(NewType(RegularSetsFamily(cgr), filter and IsRegularSetRep), res);
 end);
+
 
 InstallMethod(StableSetFromPartialStableSet,
     "for partial regular sets in PartialRegularSetRep",
     [IsPartialRegularSet and IsPartialRegularSetRep],
 function(cand)
-    return BuildRegularSet(cand!.cgr, cand!.set);
+    return RegularSet( IsRegularSet, cand!.cgr, cand!.set);
 end);
 
 
@@ -78,14 +79,10 @@ function(gs1,gs2)
 end);
 
 InstallMethod(OnRegularSets,
-        "for regular sets in RegularSetRep",
+        "for a regular set in RegularSetRep and a permutation",
         [IsRegularSet and IsRegularSetRep, IsPerm],
 function(gs, g)
-    local res;
-   res:=rec(
-            cgr:=gs!.cgr,
-            set:=MakeImmutable(OnSets(gs!.set,g)));
-   return Objectify(NewType(RegularSetsFamily(gs!.cgr), IsRegularSet and IsRegularSetRep), res);
+    return RegularSet(IsRegularSet, gs!.cgr, MakeImmutable(OnSets(gs!.set,g)));
 end);
 
 InstallOtherMethod(Size,
@@ -96,8 +93,8 @@ function(gs)
 end);
 
 InstallMethod(ViewString,
-        "for regular set orbits",
-        [IsRegularSet and IsRegularSetRep],
+        "for regular sets",
+        [IsRegularSet],
 function(x) 
     return Concatenation("<", "RegularSet ", String(AsSet(x)), ">");
 end);
@@ -228,8 +225,8 @@ function(cgr,g)
 end);
 
 InstallMethod(HomogeneousRegularSetOrbits,
-        "for WL-stable color graphs",
-        [IsColorGraph and IsRainbow and IsStableRainbow],
+"for stable rainbows",
+[IsColorGraph and IsRainbow and IsStableRainbow],
 function(cgr)
     local g,lgs,sym,prim;
     
@@ -254,8 +251,8 @@ function(cgr)
 end);
 
 InstallOtherMethod(HomogeneousRegularSetOrbits,
-        "for WL-stable color graphs",
-        [IsColorGraph and IsRainbow and IsStableRainbow, IsPermGroup],
+"for a stable rainbow and a permutation group",
+[IsColorGraph and IsRainbow and IsStableRainbow, IsPermGroup],
 function(cgr,g)
     local lgs,sym,prim;
     

@@ -63,50 +63,39 @@ function(prs)
         return false;
     fi;
     
-    if Length(set) > prs!.maxlength then
-      return false;
-   fi;
-
     return true;
 end);
 
 
-
-
-
-InstallMethod(IsExtendiblePartialStableSet,
-    "for partial regular sets in PartialRegularSetRep",
-    [IsPartialRegularSet and IsPartialRegularSetRep],
-function(cand)
-   if cand!.domain=[] then
-      return false;
-   fi;
-
-   if Length(cand!.set) >= cand!.maxlength then
-      return false;
-   fi;
-
-   return true;
-end);
-
-
 InstallMethod(ExtendedPartialStableSet,
-    "for symmetric partial regular sets in PartialRegularSetRep",
-    [IsSymPartialRegularSet and IsPartialRegularSetRep, IsPosInt],
+"for symmetric partial regular sets in PartialRegularSetRep",
+[IsSymPartialRegularSet and IsPartialRegularSetRep, IsPosInt],
 function(cand,pt)
-    local  ndom, obj;
-      
-   ndom:=Filtered(cand!.domain, x->x>pt);
+    local  clr, ndom, obj;
+    
+    clr:=cand!.imap[pt];
+    
+    if Length(cand!.set) + Length(clr) > cand!.maxlength then
+        return fail;
+    fi;
+    
+        
+    if Length(cand!.set) + Length(clr) = cand!.maxlength then
+        ndom := [];
+    else
+        ndom:=Filtered(cand!.domain, x->x>pt);
+    fi;
+    
 
-   obj:=rec(
-            cgr:=cand!.cgr,
-            map:=cand!.map,
-            imap:=cand!.imap,
-            domain:=ndom,
-            set:=Union(cand!.set,cand!.imap[pt]),
-            maxlength:=cand!.maxlength);
-   
-   return Objectify(NewType(PartialRegularSetsFamily(cand!.cgr), IsSymPartialRegularSet and IsPartialRegularSetRep), obj);
+    obj:=rec(
+              cgr:=cand!.cgr,
+              map:=cand!.map,
+              imap:=cand!.imap,
+              domain:=ndom,
+              set:=Union(cand!.set,clr),
+              maxlength:=cand!.maxlength);
+    
+    return Objectify(NewType(PartialRegularSetsFamily(cand!.cgr), IsSymPartialRegularSet and IsPartialRegularSetRep), obj);
 end);
 
 InstallMethod(EmptySymPartialRegularSet,
@@ -148,15 +137,24 @@ InstallMethod(ExtendedPartialStableSet,
     "for asymmetric partial regular sets in PartialRegularSetRep",
     [IsAsymPartialRegularSet and IsPartialRegularSetRep, IsPosInt],
 function(cand,pt)
-    local  cgr, clr, ipt, ndom, obj, 
-           maxlength;
+    local  cgr, clr, ipt, ndom, obj;
     
     cgr:=cand!.cgr;
     clr:=cand!.imap[pt][1];
     ipt:=cand!.map[cand!.imap[pt][1]^ColorMates(cgr)];
     
+    if Length(cand!.set) + 1 > cand!.maxlength then
+        Error("not supposed to happen");
+        return fail;
+    fi;
     
-    ndom:=Filtered(cand!.domain, x->x>pt and x<>ipt);
+    if Length(cand!.set) + 1 = cand!.maxlength then
+        ndom := [];
+    else
+        ndom:=Filtered(cand!.domain, x->x>pt and x<>ipt);
+    fi;
+
+    
    
     obj:=rec(
              cgr:=cand!.cgr,
@@ -253,57 +251,22 @@ function(cand)
     return true;
 end);
 
-InstallMethod(IsCompatiblePoint,
-        "for partial regular sets and positive integers",
-        [IsPartialRegularSet, IsPosInt],
-function(cand, i)
-    return true;
-end);
 
 
-InstallMethod(IsCompatiblePoint,
-    "for symmetric partial regular sets in SymPartialRegularSetBlk and positive integers",
-    [IsSymPartialRegularSet and IsSymPartialRegularSetBlkRep, IsPosInt],
-function(cand,i)
-    local  mates, sb, fb,  pos;
-    
-    mates:=cand!.imap[i];
-   
-    sb:=cand!.startBlock[mates[1]];
-    fb:=cand!.finishBlock[mates[1]];
-    pos:=Minimum([sb,fb]);  # this is the row in which i resides
-    if pos<=2 then
-        return true;
-    fi;
-    
-    if pos=cand!.currentRow then
-        return true;
-    fi;
-    
-    if not sb in cand!.fullrows and not fb in cand!.fullrows then
-        return true;
-    fi;
-    
-    
-    if IsSubset(cand!.fullrows, [cand!.currentRow..pos-1]) then
-#        Assert(1,IsSubset(Union(cand!.fullrows,[cand!.currentRow]), [1..pos-1]));
-        
-        return true;
-    fi;
-    
-    
-    return false;
-end);
 
 
 InstallMethod(ExtendedPartialStableSet,
     "for symmetric partial regular sets in SymPartialRegularSetBlk",
     [IsSymPartialRegularSet and IsSymPartialRegularSetBlkRep, IsPosInt],
 function(cand,pt)
-    local t,npgs,color,icolor,sb,fb,i,b,j,a,block,sd,sbinfr,fbinfr,sq,bm,k,kmts,
+    local clr,t,npgs,color,icolor,sb,fb,i,b,j,a,block,sd,sbinfr,fbinfr,sq,bm,k,kmts,
           ksb,kfb,ncand,ent,blkIdx,ba,bb,bc,bbl;                
     
-    
+    clr:=cand!.imap[pt];
+    if Length(cand!.set) + Length(clr) > cand!.maxlength then
+        return fail;
+    fi;
+
     t:=StructureConstantsOfColorGraph(cand!.cgr);
     
     npgs:=rec(
@@ -317,14 +280,14 @@ function(cand,pt)
               maxlength:=cand!.maxlength
               );
     
-    color:=cand!.imap[pt][1];
+    color:=clr[1];
     icolor:=color^ColorMates(cand!.cgr);
     sb:=cand!.startBlock[color];
     fb:=cand!.finishBlock[color];
     
     if fb<sb then
-        color:=cand!.imap[pt][2];
-        icolor:=cand!.imap[pt][1];
+        color:=clr[2];
+        icolor:=clr[1];
         sb:=cand!.startBlock[color];
         fb:=cand!.finishBlock[color];
     fi;
@@ -337,10 +300,10 @@ function(cand,pt)
             npgs.kIsForced:=true;
             npgs.k:=cand!.degreelist[1];
             if npgs.k<cand!.maxdeg then
-                return nonext;
+                return fail;
             fi;
             if ForAny([2..sb-1], x->cand!.degreelist[x]<>npgs.k) then
-                return nonext;
+                return fail;
             fi;
             
             npgs.fullrows:=Filtered([1..Length(cand!.blocks)], x->cand!.degreelist[x]=npgs.k);
@@ -354,12 +317,13 @@ function(cand,pt)
     npgs.set:=Union(cand!.set, [color,icolor]);
     npgs.ridx:=Union(cand!.ridx,[sb,fb]);
     
-    sd:=OutValencies(cand!.cgr);
     
     npgs.blockingmat:=ShallowCopy(cand!.blockingmat);
     npgs.blockingmat[sb]:=ShallowCopy(npgs.blockingmat[sb]);
     npgs.blockingmat[sb][fb]:=ShallowCopy(npgs.blockingmat[sb][fb]);
     AddSet(npgs.blockingmat[sb][fb],color);
+    
+    sd:=OutValencies(cand!.cgr);
     
     npgs.degreelist:=ShallowCopy(cand!.degreelist);
     npgs.degreelist[sb]:=npgs.degreelist[sb]+sd[color];
@@ -392,38 +356,44 @@ function(cand,pt)
         fbinfr:=sbinfr;
     fi;
     
-    npgs.domain:=[];
-    npgs.domdegreelist:=ShallowCopy(cand!.domdegreelist);
-    for j in [1..Length(cand!.domain)] do
-        k:=cand!.domain[j];
-        kmts:=cand!.imap[k];
-        ksb:=cand!.startBlock[kmts[1]];
-        kfb:=cand!.finishBlock[kmts[1]];
-        if k<=pt 
-           or ksb in npgs.fullrows
-           or kfb in npgs.fullrows
-           or npgs.kIsForced and (sd[kmts[1]]+npgs.degreelist[ksb]>npgs.k 
-                   or  (Length(kmts)=2 and sd[kmts[2]]+npgs.degreelist[kfb]>npgs.k))
-           then
-            npgs.domdegreelist[ksb]:=npgs.domdegreelist[ksb]-sd[kmts[1]];
-            if npgs.domdegreelist[ksb]+npgs.degreelist[ksb]<npgs.maxdeg then
-                return fail;
-            fi;
-            if Length(kmts)=2 then
-                npgs.domdegreelist[kfb]:=npgs.domdegreelist[kfb]-sd[kmts[2]];
-                if npgs.domdegreelist[kfb]+npgs.degreelist[kfb]<npgs.maxdeg then
+
+    if Length(npgs.set) = npgs!.maxlength then
+        npgs.domain:=[];
+        npgs.domdegreelist:=ListWithIdenticalEntries(Length(cand!.domdegreelist), 0);
+    else
+        npgs.domain:=[];
+        npgs.domdegreelist:=ShallowCopy(cand!.domdegreelist);
+        for j in [1..Length(cand!.domain)] do
+            k:=cand!.domain[j];
+            kmts:=cand!.imap[k];
+            ksb:=cand!.startBlock[kmts[1]];
+            kfb:=cand!.finishBlock[kmts[1]];
+            if k<=pt 
+               or ksb in npgs.fullrows
+               or kfb in npgs.fullrows
+               or npgs.kIsForced and (sd[kmts[1]]+npgs.degreelist[ksb]>npgs.k 
+                                      or  (Length(kmts)=2 and sd[kmts[2]]+npgs.degreelist[kfb]>npgs.k))
+            then
+                npgs.domdegreelist[ksb]:=npgs.domdegreelist[ksb]-sd[kmts[1]];
+                if npgs.domdegreelist[ksb]+npgs.degreelist[ksb]<npgs.maxdeg then
                     return fail;
                 fi;
+                if Length(kmts)=2 then
+                    npgs.domdegreelist[kfb]:=npgs.domdegreelist[kfb]-sd[kmts[2]];
+                    if npgs.domdegreelist[kfb]+npgs.degreelist[kfb]<npgs.maxdeg then
+                        return fail;
+                    fi;
+                fi;
+            else
+                Add(npgs.domain,k);
             fi;
-        else
-            Add(npgs.domain,k);
-        fi;
-    od;    
-
-    blkIdx:=t!.blkIdx;
+        od;    
+    fi;
+        
+    #blkIdx:=t!.blkIdx;
     
     
-    bm:=npgs.blockingmat;
+    #bm:=npgs.blockingmat;
          
             
     Objectify(NewType(PartialRegularSetsFamily(cand!.cgr), IsSymPartialRegularSet and IsSymPartialRegularSetBlkRep), npgs);
@@ -578,28 +548,19 @@ function(cand)
     return true;
 end);
 
-InstallMethod(IsCompatiblePoint,
-    "for asymmetric partial regular sets in AsymPartialRegularSetBlkRep and positive integers",
-    [IsAsymPartialRegularSet and IsAsymPartialRegularSetBlkRep, IsPosInt],
-function(cand,i)
-    local  t, clr, sb;
-    
-    
-    clr:=cand!.imap[i][1];
-   
-    sb:=cand!.startBlock[clr];
-   
-    if sb-1>cand!.currentRow then
-        return false;
-    fi;
-    return true;
-end);
 
 InstallMethod(ExtendedPartialStableSet,
     "for asymmetric partial regular sets in AsymPartialRegularSetBlkRep and positive integers",
     [IsAsymPartialRegularSet and IsAsymPartialRegularSetBlkRep, IsPosInt],
 function(cand,pt)
-    local t,bm,npgs,color,sb,fb,sd,i,j,k,kmts,a,b,block,md,sq,icolor,ksb,kfb,sbinfr,ent,blkIdx,ba,bb,bc,bbl;
+    local clr,t,bm,npgs,color,sb,fb,sd,i,j,k,kmts,a,b,block,md,sq,icolor,ksb,kfb,sbinfr,ent,blkIdx,ba,bb,bc,bbl;
+    
+    clr:=cand!.imap[pt];
+    if Length(cand!.set) + Length(clr) > cand!.maxlength then
+        Error("this is not supposed to happen");
+        
+        return fail;
+    fi;
 
     t:=StructureConstantsOfColorGraph(cand!.cgr);
     
@@ -614,7 +575,7 @@ function(cand,pt)
               maxlength:=cand!.maxlength
               );
     
-    color:=cand!.imap[pt][1];
+    color:=clr[1];
     sb:=cand!.startBlock[color];
     fb:=cand!.finishBlock[color];
     
@@ -629,10 +590,10 @@ function(cand,pt)
             npgs.kIsForced:=true;
             npgs.k:=cand!.rowdegs[1];
             if npgs.k<cand!.rmaxdeg or npgs.k<cand!.cmaxdeg then
-                return nonext;
+                return fail;
             fi;
             if ForAny([2..sb-1], x->cand!.rowdegs[x]<>npgs.k) then
-                return nonext;
+                return fail;
             fi;
             npgs.fullrows:=[1..sb-1];
         fi;
@@ -669,29 +630,34 @@ function(cand,pt)
         AddSet(npgs.fullrows,sb);
     fi;
     
-    npgs.domain:=[];
-    npgs.domrowdegs:=ShallowCopy(cand!.domrowdegs);
-    npgs.domcoldegs:=ShallowCopy(cand!.domcoldegs);
-    for k in cand!.domain do
-#        k:=cand!.domain[j];
-        kmts:=[cand!.imap[k][1],cand!.imap[k][1]^Mates(t)];
-        ksb:=cand!.startBlock[kmts[1]];
-        kfb:=cand!.finishBlock[kmts[1]];
-        if k<=pt  
-           or kmts[1]=color^Mates(t) 
-           or ksb in npgs.fullrows  
-           or npgs.kIsForced and (sd[kmts[1]]+npgs.rowdegs[ksb]>npgs.k 
-                   or sd[kmts[2]]+npgs.coldegs[kfb]>npgs.k) 
-           then
-            npgs.domrowdegs[ksb]:=npgs.domrowdegs[ksb]-sd[kmts[1]];
-            npgs.domcoldegs[kfb]:=npgs.domcoldegs[kfb]-sd[kmts[2]];
-            if npgs.domrowdegs[ksb]+npgs.rowdegs[ksb]<md or npgs.domcoldegs[kfb]+npgs.coldegs[kfb]<md then
-                return fail;
+    if Length(npgs.set) = npgs!.maxlength then
+        npgs.domain:=[];
+        npgs.domrowdegs:=ListWithIdenticalEntries(Length(cand!.domrowdegs), 0);
+        npgs.domcoldegs:=ListWithIdenticalEntries(Length(cand!.domcoldegs), 0);
+    else
+        npgs.domain:=[];
+        npgs.domrowdegs:=ShallowCopy(cand!.domrowdegs);
+        npgs.domcoldegs:=ShallowCopy(cand!.domcoldegs);
+        for k in cand!.domain do
+            kmts:=[cand!.imap[k][1],cand!.imap[k][1]^Mates(t)];
+            ksb:=cand!.startBlock[kmts[1]];
+            kfb:=cand!.finishBlock[kmts[1]];
+            if k<=pt  
+               or kmts[1]=color^Mates(t) 
+               or ksb in npgs.fullrows  
+               or npgs.kIsForced and (sd[kmts[1]]+npgs.rowdegs[ksb]>npgs.k 
+                                      or sd[kmts[2]]+npgs.coldegs[kfb]>npgs.k) 
+            then
+                npgs.domrowdegs[ksb]:=npgs.domrowdegs[ksb]-sd[kmts[1]];
+                npgs.domcoldegs[kfb]:=npgs.domcoldegs[kfb]-sd[kmts[2]];
+                if npgs.domrowdegs[ksb]+npgs.rowdegs[ksb]<md or npgs.domcoldegs[kfb]+npgs.coldegs[kfb]<md then
+                    return fail;
+                fi;
+            else 
+                Add(npgs.domain,k);
             fi;
-        else 
-            Add(npgs.domain,k);
-        fi;
-    od;    
+        od;    
+    fi;
     
     Objectify(NewType(PartialRegularSetsFamily(cand!.cgr), IsAsymPartialRegularSet and IsAsymPartialRegularSetBlkRep), npgs);
     return npgs;

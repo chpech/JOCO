@@ -53,7 +53,7 @@ end);
 
 InstallMethod(DomainOfPartialStableSet,
         "for partial stable sets in PartialStableSetRep",
-        [IsPartialStableSet and IsPartialStableSetRep],
+        [IsCocoPartialStableSet and IsPartialStableSetRep],
 function(cand)
     return cand!.domain;
 end);
@@ -148,9 +148,13 @@ function(iter)
         fi;
         
         
-        if not IsExtendiblePartialStableSet(state.cand) then
+        if DomainOfPartialStableSet(state.cand) = [] then
             return NextState(state.linkback);
         fi;
+        
+#        if not IsExtendiblePartialStableSet(state.cand) then
+#            return NextState(state.linkback);
+#        fi;
         
         if state.orbidx>Length(state.orbreps) then
             return NextState(state.linkback);
@@ -161,22 +165,22 @@ function(iter)
         repeat
             pt:=state.orbreps[state.orbidx];
             state.orbidx:=state.orbidx+1;
-            if IsCompatiblePoint(state.cand,pt) then
+#            if IsCompatiblePoint(state.cand,pt) then
 
-                ncand:=ExtendedPartialStableSet(state.cand,pt);
-                if ncand=nonext then
+            ncand:=ExtendedPartialStableSet(state.cand,pt);
+            # if ncand=nonext then
+            #     ncand:=fail;
+            #     break;
+            # fi;
+                
+                
+            if ncand<>fail then
+                SC:=CocoSetReducibilityTest(state.S,state.SM,state.M,pt);
+                if IsPerm(SC) then
                     ncand:=fail;
-                    break;
-                fi;
-                
-                
-                if ncand<>fail then
-                    SC:=CocoSetReducibilityTest(state.S,state.SM,state.M,pt);
-                    if IsPerm(SC) then
-                        ncand:=fail;
-                    fi;
                 fi;
             fi;
+#            fi;
         until ncand<>fail or state.orbidx > Length(state.orbreps);
         
         
