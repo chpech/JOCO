@@ -3,6 +3,9 @@ DeclareProperty( "IsRainbow",   IsColorGraph );
 
 DeclareAttribute( "VertexPartitionOfRainbow" , IsColorGraph and IsRainbow );
 DeclareProperty( "IsStableRainbow", IsColorGraph and IsRainbow );
+DeclareProperty( "IsWellFibredRainbow", IsColorGraph and IsRainbow );
+
+
 
 DeclareAttribute( "RAlgebraicAutomorphismGroup", IsColorGraph and IsRainbow and IsStableRainbow );
 DeclareSynonymAttr( "RAut", RAlgebraicAutomorphismGroup);

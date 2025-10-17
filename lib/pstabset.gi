@@ -28,6 +28,7 @@
 # the efficiency of this aproach depends strongly on the clever choice of FF
 # Generally, the smaller is FF, the more efficient the approach becomes.
 
+BindConstant("nonextensible", false);
 
 DeclareRepresentation("IsPartialStableSetRep",
         IsAttributeStoringRep,
@@ -165,13 +166,11 @@ function(iter)
         repeat
             pt:=state.orbreps[state.orbidx];
             state.orbidx:=state.orbidx+1;
-#            if IsCompatiblePoint(state.cand,pt) then
-
             ncand:=ExtendedPartialStableSet(state.cand,pt);
-            # if ncand=nonext then
-            #     ncand:=fail;
-            #     break;
-            # fi;
+            if ncand=nonextensible then
+                ncand:=fail;
+                break;
+            fi;
                 
                 
             if ncand<>fail then
@@ -180,7 +179,6 @@ function(iter)
                     ncand:=fail;
                 fi;
             fi;
-#            fi;
         until ncand<>fail or state.orbidx > Length(state.orbreps);
         
         

@@ -7,6 +7,7 @@ DeclareOperation( "IsEmptyPartialStableSet", [IsCocoPartialStableSet] );
 DeclareOperation( "IMapOfPartialStableSet", [IsCocoPartialStableSet] );
 DeclareOperation( "DomainOfPartialStableSet", [IsCocoPartialStableSet] );                            # internal
 
+DeclareGlobalName( "nonextensible" );
 
 DeclareProperty( "IsCompletePartialStableSet", IsCocoPartialStableSet );
 

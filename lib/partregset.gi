@@ -630,7 +630,7 @@ function(cand,pt)
         AddSet(npgs.fullrows,sb);
     fi;
     
-    if Length(npgs.set) = npgs!.maxlength then
+    if Length(npgs.set) = npgs.maxlength then
         npgs.domain:=[];
         npgs.domrowdegs:=ListWithIdenticalEntries(Length(cand!.domrowdegs), 0);
         npgs.domcoldegs:=ListWithIdenticalEntries(Length(cand!.domcoldegs), 0);

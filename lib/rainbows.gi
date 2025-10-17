@@ -73,7 +73,15 @@ function(cgr)
     od;
     return true;
 end);
-               
+
+InstallMethod( IsWellFibredRainbow, 
+"for rainbows",
+[IsColorGraph and IsRainbow],
+function(cgr)
+    return Length(VertexPartitionOfRainbow(cgr)) = NumberOfFibres(cgr);
+end);
+
+
 InstallMethod( RAlgebraicAutomorphismGroup,
 "for stable rainbows",
 [IsRainbow and IsStableRainbow],
