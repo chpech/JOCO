@@ -414,8 +414,10 @@ InstallMethod(ExtendedPartialStableSet,
 "for asymmetric partial arc regular sets in AsymPartialarcRegularSetBlkRep",
 [IsAsymPartialArcRegularSet and IsAsymPartialArcRegularSetBlkRep, IsPosInt],
 function(cand,pt)
-    local cgr,t,bm,npgs,color,sb,fb,sblk,sd,i,j,k,kmts,a,b,block,
-          md,sq,icolor,ksb,kfb,sbinfr,fbinfc,ent,blkIdx,ba,bb,bc,bbl;
+    local  cgr, t, npgs, color, sb, fb, sblk, 
+           a, b, block, sd, icolor, md, sbinfr, fbinfc, 
+           k, kmts, ksb, kfb, sq, bm, ent, blkIdx, bbl, 
+           c, ba, bb, bc, i, j;
     
     cgr:=cand!.cgr;
     
@@ -462,6 +464,9 @@ function(cand,pt)
             npgs.kIsForced:=true;
             npgs.k:=cand!.rowdegs[1];
             
+            npgs.fullrows:=Filtered([1..Length(cand!.blocks)], x->cand!.rowdegs[x]=npgs.k);
+            npgs.fullcols:=Filtered([1..Length(cand!.blocks)], x->cand!.coldegs[x]=npgs.k);
+            
             if npgs.k<cand!.rmaxdeg or npgs.k<cand!.cmaxdeg then
                 return nonextensible;
             fi;
@@ -472,13 +477,9 @@ function(cand,pt)
                 return nonextensible;
             fi;
             
-            npgs.fullrows:=Filtered([1..Length(cand!.blocks)], x->cand!.rowdegs[x]=npgs.k);
-            npgs.fullcols:=Filtered([1..Length(cand!.blocks)], x->cand!.coldegs[x]=npgs.k);
             
-            for i in [1..Length(npgs.fullrows)] do
-                b:=npgs.fullrows[i];
-                for j in [1..i] do   #check!
-                    a:=npgs.fullrows[j];
+            for a in npgs.fullrows do
+                for b in npgs.fullcols do   
                     block:=cand!.blockingmat[a][b];
                     if block<>[] then
                         npgs.lbdIsForced:=true;
@@ -494,10 +495,8 @@ function(cand,pt)
                 fi;
             od;
             if npgs.lbdIsForced then
-                for i in [i..Length(npgs.fullrows)] do
-                    b:=npgs.fullrows[i];
-                    for j in [1..i] do
-                        a:=npgs.fullrows[j];
+                for a in npgs.fullrows do
+                    for b in npgs.fullcols do
                         if ForAny(cand!.blockingmat[a][b], x->cand!.square[x]<>npgs.lbd) then
                             return nonextensible;
                         fi;
@@ -508,12 +507,9 @@ function(cand,pt)
     fi;
     
     if npgs.lbdIsForced and cand!.square[color]>npgs.lbd then
-        Info(InfoCOCO,2,"1");
-        
         return fail;
     fi;
     npgs.set:=Union(cand!.set, [color]);
-    
     npgs.ridx:=Union(cand!.ridx,[sb]);
     npgs.cidx:=Union(cand!.cidx,[fb]);
     
@@ -535,7 +531,6 @@ function(cand,pt)
     md:=Maximum(npgs.rmaxdeg, npgs.cmaxdeg);
     
     if npgs.kIsForced and md>npgs.k then
-        Info(InfoCOCO,2,"2");
         return fail;
     fi;
     
@@ -557,39 +552,34 @@ function(cand,pt)
         npgs.domain:=ShallowCopy(cand!.domain);
         npgs.domrowdegs:=ShallowCopy(cand!.domrowdegs);
         npgs.domcoldegs:=ShallowCopy(cand!.domcoldegs);
-        
         for k in cand!.domain do
             kmts:=[cand!.imap[k][1],cand!.imap[k][1]^ColorMates(cgr)];
             ksb:=cand!.startBlock[kmts[1]];
             kfb:=cand!.finishBlock[kmts[1]];
-            if k<=pt  
-               or kmts[1]=color^ColorMates(cgr) 
-               or ksb in npgs.fullrows  
-               or npgs.kIsForced and (sd[kmts[1]]+npgs.rowdegs[ksb]>npgs.k 
-                                      or sd[kmts[2]]+npgs.coldegs[kfb]>npgs.k) 
+            if k<=pt or  
+               kmts[1]=icolor or 
+               ksb in npgs.fullrows or
+               kfb in npgs.fullcols or
+               npgs.kIsForced and (sd[kmts[1]]+npgs.rowdegs[ksb]>npgs.k 
+                                   or sd[kmts[2]]+npgs.coldegs[kfb]>npgs.k) 
             then
                 npgs.domrowdegs[ksb]:=npgs.domrowdegs[ksb]-sd[kmts[1]];
                 npgs.domcoldegs[kfb]:=npgs.domcoldegs[kfb]-sd[kmts[2]];
                 RemoveSet(npgs.domain,k);
-                
                 if npgs.domrowdegs[ksb]+npgs.rowdegs[ksb]<md 
                    or npgs.domcoldegs[kfb]+npgs.coldegs[kfb]<md then
-                    Info(InfoCOCO,2,"3");
-                    
                     return fail;
                 fi;
-#            else 
-                # Add(npgs.domain,k);
             fi;
-            # Assert(1, List(List(BlockingMat(StructureConstantsOfColorGraph(cgr), 
-            #                                 OnSets(Union(npgs!.imap{npgs!.domain}),())),
-            #                     r->List(r,c->Sum(OutValencies(cgr){c}))),Sum)
-            #           =npgs.domrowdegs);
-            # Assert(1, List(List(BlockingMat(StructureConstantsOfColorGraph(cgr), 
-            #                                 OnSets(Union(npgs!.imap{npgs!.domain}),
-            #                                        ColorMates(cgr))),
-            #                     r->List(r,c->Sum(OutValencies(cgr){c}))),Sum)
-            #           =npgs.domcoldegs);
+            Assert(1, List(List(BlockingMat(StructureConstantsOfColorGraph(cgr), 
+                                            OnSets(Union(npgs!.imap{npgs!.domain}),())),
+                                r->List(r,c->Sum(OutValencies(cgr){c}))),Sum)
+                      =npgs.domrowdegs);
+            Assert(1, List(List(BlockingMat(StructureConstantsOfColorGraph(cgr), 
+                                            OnSets(Union(npgs!.imap{npgs!.domain}),
+                                                   ColorMates(cgr))),
+                                r->List(r,c->Sum(OutValencies(cgr){c}))),Sum)
+                      =npgs.domcoldegs);
 
         od;
     fi;
@@ -601,131 +591,247 @@ function(cand,pt)
     npgs.maxlbd:=cand!.maxlbd;
     ent:=t!.entries;
     blkIdx:=t!.blkIdx;
-    #     c
-    #    _.._
-    #    /||\
-    # c /    \ c       This is done for good sets
-    #  /      \
-    # +-------->+
-    #a           b
-    #
-    # 
-    #     c
-    #    _.
-    #    /| \
-    # c /    \ c       What we want for arc-regular sets
-    #  /     _\|
-    # +-------->+
-    #a           b
-    if sb = fb then 
-        block:=bm[sb][fb];      # c * c = 2 c^2 (relevant only if sb=fb otherwise c * c = 0
-        ba:=sb/npgs.perm;
-        bb:=fb/npgs.perm;
-        bc:=fb/npgs.perm;
-        bbl:=cand!.blocks[sb][fb];
-    
-        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[color]];
-    
-        if block<>[] then
-            npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
-        fi;
-        if npgs.lbdIsForced and npgs.maxlbd> npgs.lbd then
-            Info(InfoCOCO,2,"4");
-            return fail;
-        fi;
+    if sb = fb then
+        for a in npgs.ridx do
+            for b in npgs.cidx do
+                block:=bm[a][b];
+                bbl:=cand!.blocks[a][b];
+                if bbl = [] or a <> sb and b <> fb then
+                    continue;
+                fi;
+                c:=fb;
+                ba:=a/npgs.perm;
+                bb:=b/npgs.perm;
+                bc:=c/npgs.perm;
+                if a = sb and b = fb then
+                    sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[color]];
+                fi;
+                if a in cand!.ridx and b=fb  then # A * color (part A color)
+                    for i in cand!.blockingmat[a][c] do
+                        sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[i]][blkIdx[color]];
+                    od;
+                fi;
+                if a=sb and b in cand!.cidx and b <> fb then # A * color (part color A)
+                    for j in cand!.blockingmat[c][b] do
+                        sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[color]][blkIdx[j]];
+                    od;
+                fi;
+                if block <> [] then
+                    npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
+                    
+                    if npgs.lbdIsForced  and npgs.maxlbd > npgs.lbd then
+                        return fail;
+                    fi;
+                    
+                    
+                    # check all new complete blocks of npgs
+                    if (a in Difference(npgs.fullrows,cand!.fullrows) and 
+                        b in npgs.fullcols) or
+                       (a in npgs.fullrows and 
+                        b in Difference(npgs.fullcols, cand!.fullcols))
+                    then
+                        if not npgs.lbdIsForced then
+                            npgs.lbdIsForced := true;
+                            npgs.lbd:=sq[block[1]];
+                            if npgs.lbd <> npgs.maxlbd then
+                                return fail;
+                            fi;
+                            # if ForAny(block, x->sq[x]<>npgs.lbd) then
+                            #     return fail;
+                            # fi;
+                        fi;
+                        
+                        if ForAny(block, x->sq[x]<>npgs.lbd) then
+                            return fail;
+                        fi;
+                    fi;
+                fi;
+            od;
+        od;
+        Assert(1,sq=ComplexProduct(t,npgs.set,npgs.set));
+    else
+        for a in npgs.ridx do
+            for b in npgs.cidx do
+                block:=bm[a][b];
+                bbl:=cand!.blocks[a][b];
+                if bbl = [] or a <> sb and  b <> fb then
+                    continue;
+                fi;
+                ba:=a/npgs.perm;
+                bb:=b/npgs.perm;
+                if a in cand!.ridx and b = fb then # A * color (part A color)
+                    c:=sb;
+                    bc:=c/npgs.perm;
+                    for i in cand!.blockingmat[a][c] do
+                        sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[i]][blkIdx[color]];
+                    od;
+                fi;
+                if a = sb and b in cand!.cidx then # A * color (color part A)
+                    c:=fb;
+                    bc:=c/npgs.perm;
+                    for j in cand!.blockingmat[c][b] do
+                        sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[color]][blkIdx[j]];
+                    od;
+                fi;
+                if block <> [] then
+                    npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
+                    
+                    if npgs.lbdIsForced  and npgs.maxlbd > npgs.lbd then
+                        return fail;
+                    fi;
+                        
+                    # check all new complete blocks of npgs
+                    if (a in Difference(npgs.fullrows,cand!.fullrows) and 
+                        b in npgs.fullcols) or
+                       (a in npgs.fullrows and 
+                        b in Difference(npgs.fullcols, cand!.fullcols)) 
+                    then
+                        if not npgs.lbdIsForced then
+                            npgs.lbdIsForced := true;
+                            npgs.lbd:=sq[block[1]];
+                            if npgs.lbd <> npgs.maxlbd then
+                                return fail;
+                            fi;
+                            # if ForAny(block, x->sq[x]<>npgs.lbd) then
+                            #     return fail;
+                            # fi;
+                        fi;
+                        
+                        if ForAny(block, x->sq[x]<>npgs.lbd) then
+                            return fail;
+                        fi;
+                    fi;
+                fi;
+            od;
+        od;
+        Assert(1,sq=ComplexProduct(t,npgs.set,npgs.set));
     fi;
+        
+    # #     c
+    # #    _.._
+    # #    /||\
+    # # c /    \ c       This is done for good sets
+    # #  /      \
+    # # +-------->+
+    # #a           b
+    # #
+    # # 
+    # #     c
+    # #    _.
+    # #    /| \
+    # # c /    \ c       What we want for arc-regular sets
+    # #  /     _\|
+    # # +-------->+
+    # #a           b
+    # if sb = fb then 
+    #     block:=bm[sb][fb];      # c * c = 2 c^2 (relevant only if sb=fb otherwise c * c = 0
+    #     ba:=sb/npgs.perm;
+    #     bb:=fb/npgs.perm;
+    #     bc:=fb/npgs.perm;
+    #     bbl:=cand!.blocks[sb][fb];
     
-    # computing c * A 
-    # first for cA and then for those arcs of shape Ac that are not already counted,
-    # due to the way blocked tensors work
-    #        c
-    #       _.
-    #       /| \
-    #    c /    \ A      A = cand!.set, c = color, j is from A
-    #     /     _\|      a = sb(c), c = fb(c), b is some fb(j) for j from A 
-    #    +-------->+     block is the block of the possible color of the base arc (?)
-    #   a     ?     b
-    for b in cand!.cidx do      # b goes through all blocks for which bm[fb][b] <> emptyset
-        block:=bm[sb][b]; # the possible colors of  the base edges (?)
-        for j in cand!.blockingmat[fb][b] do
-            ba:=sb/npgs.perm;
-            bb:=b/npgs.perm;
-            bc:=fb/npgs.perm;
-            bbl:=cand!.blocks[sb][b]; # all colors from sb to b
-            sq{bbl}:=sq{bbl} + 2* ent[ba][bb][bc][blkIdx[color]][blkIdx[j]];
-        od;
-        if block<>[] then
-            npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
-        fi;
-        if AsSortedList([sb,b]) < sblk and block<>[] then # if block(=bm[sb][b]) is complete
-            if sbinfr and b in npgs.fullcols then
-                if not npgs.lbdIsForced then
-                    npgs.lbdIsForced:=true;
-                    npgs.lbd:=sq[block[1]];
-                    
-                    if npgs.lbd<npgs.maxlbd then
-                        Info(InfoCOCO,2,"5");
-                        return fail;
-                    fi;
-                fi;
-                if ForAny(block, x->sq[x] <> npgs.lbd) then
-                    
-                    Info(InfoCOCO,2,"6");
-                    return fail;
-                fi;
-            fi;
-        fi;
-        if npgs.lbdIsForced and npgs.maxlbd> npgs.lbd then
-            Info(InfoCOCO,2,"7");
-            return fail;
-        fi;
-    od;
-    #        c
-    #       _.
-    #       /| \
-    #    A /    \ c      A = cand!.set, c = color, i is from A
-    #     /     _\|      c = sb(c), b = fb(c), a is some fb(i) for i from A 
-    #    +-------->+     block is the block of the possible color of the base arc (?)
-    #   a     ?     b
-    for a in cand!.ridx do # all a  for which bm[a][sb] <> emptyset
-        if a = sb and sb = fb then
-            continue; # this case was handled already above
-        fi;
-        block:=bm[a][fb]; 
-        for i in cand!.blockingmat[a][sb] do
-            ba:=a/npgs.perm;
-            bb:=fb/npgs.perm;
-            bc:=sb/npgs.perm;
-            bbl:=cand!.blocks[a][fb];
-            sq{bbl}:=sq{bbl} + 2*ent[ba][bb][bc][blkIdx[i]][blkIdx[color]];
-        od;
-        if block<>[] then
-            npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
-        fi;
-        if  AsSortedList([a, fb]) < sblk and block <> [] then # block (=bm[a][fb] is complete  and non-empty
-            if fb in npgs.fullcols and a in npgs.fullrows then 
-                if not npgs.lbdIsForced then 
-                    npgs.lbdIsForced:=true;
-                    npgs.lbd:=sq[block[1]];
-                    if npgs.lbd<npgs.maxlbd then
-                        Info(InfoCOCO,2,"8");
-                        return fail;
-                    fi;
-                fi;
-                if ForAny(block, x->sq[x] <> npgs.lbd) then
-                    Info(InfoCOCO,2,"9");
-                    
-                    return fail;
-                fi;
-            fi;
-        fi;
-        if npgs.lbdIsForced and npgs.maxlbd> npgs.lbd then
-            Info(InfoCOCO,2,"A");
-            return fail;
-        fi;
-    od;
+    #     sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[color]];
     
-    Assert(1,sq=ComplexProduct(t,npgs.set,npgs.set));
+    #     if block<>[] then
+    #         npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
+    #     fi;
+    #     if npgs.lbdIsForced and npgs.maxlbd> npgs.lbd then
+    #         Info(InfoCOCO,2,"4");
+    #         return fail;
+    #     fi;
+    # fi;
+    
+    # # computing c * A 
+    # # first for cA and then for those arcs of shape Ac that are not already counted,
+    # # due to the way blocked tensors work
+    # #        c
+    # #       _.
+    # #       /| \
+    # #    c /    \ A      A = cand!.set, c = color, j is from A
+    # #     /     _\|      a = sb(c), c = fb(c), b is some fb(j) for j from A 
+    # #    +-------->+     block is the block of the possible color of the base arc (?)
+    # #   a     ?     b
+    # for b in cand!.cidx do      # b goes through all blocks for which bm[fb][b] <> emptyset
+    #     block:=bm[sb][b]; # the possible colors of  the base edges (?)
+    #     for j in cand!.blockingmat[fb][b] do
+    #         ba:=sb/npgs.perm;
+    #         bb:=b/npgs.perm;
+    #         bc:=fb/npgs.perm;
+    #         bbl:=cand!.blocks[sb][b]; # all colors from sb to b
+    #         sq{bbl}:=sq{bbl} + 2* ent[ba][bb][bc][blkIdx[color]][blkIdx[j]];
+    #     od;
+    #     if block<>[] then
+    #         npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
+    #     fi;
+    #     if AsSortedList([sb,b]) < sblk and block<>[] then # if block(=bm[sb][b]) is complete
+    #         if sbinfr and b in npgs.fullcols then
+    #             if not npgs.lbdIsForced then
+    #                 npgs.lbdIsForced:=true;
+    #                 npgs.lbd:=sq[block[1]];
+                    
+    #                 if npgs.lbd<npgs.maxlbd then
+    #                     Info(InfoCOCO,2,"5");
+    #                     return fail;
+    #                 fi;
+    #             fi;
+    #             if ForAny(block, x->sq[x] <> npgs.lbd) then
+                    
+    #                 Info(InfoCOCO,2,"6");
+    #                 return fail;
+    #             fi;
+    #         fi;
+    #     fi;
+    #     if npgs.lbdIsForced and npgs.maxlbd> npgs.lbd then
+    #         Info(InfoCOCO,2,"7");
+    #         return fail;
+    #     fi;
+    # od;
+    # #        c
+    # #       _.
+    # #       /| \
+    # #    A /    \ c      A = cand!.set, c = color, i is from A
+    # #     /     _\|      c = sb(c), b = fb(c), a is some fb(i) for i from A 
+    # #    +-------->+     block is the block of the possible color of the base arc (?)
+    # #   a     ?     b
+    # for a in cand!.ridx do # all a  for which bm[a][sb] <> emptyset
+    #     if a = sb and sb = fb then
+    #         continue; # this case was handled already above
+    #     fi;
+    #     block:=bm[a][fb]; 
+    #     for i in cand!.blockingmat[a][sb] do
+    #         ba:=a/npgs.perm;
+    #         bb:=fb/npgs.perm;
+    #         bc:=sb/npgs.perm;
+    #         bbl:=cand!.blocks[a][fb];
+    #         sq{bbl}:=sq{bbl} + 2*ent[ba][bb][bc][blkIdx[i]][blkIdx[color]];
+    #     od;
+    #     if block<>[] then
+    #         npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
+    #     fi;
+    #     if  AsSortedList([a, fb]) < sblk and block <> [] then # block (=bm[a][fb] is complete  and non-empty
+    #         if fb in npgs.fullcols and a in npgs.fullrows then 
+    #             if not npgs.lbdIsForced then 
+    #                 npgs.lbdIsForced:=true;
+    #                 npgs.lbd:=sq[block[1]];
+    #                 if npgs.lbd<npgs.maxlbd then
+    #                     Info(InfoCOCO,2,"8");
+    #                     return fail;
+    #                 fi;
+    #             fi;
+    #             if ForAny(block, x->sq[x] <> npgs.lbd) then
+    #                 Info(InfoCOCO,2,"9");
+                    
+    #                 return fail;
+    #             fi;
+    #         fi;
+    #     fi;
+    #     if npgs.lbdIsForced and npgs.maxlbd> npgs.lbd then
+    #         Info(InfoCOCO,2,"A");
+    #         return fail;
+    #     fi;
+    # od;
+    
+    # Assert(1,sq=ComplexProduct(t,npgs.set,npgs.set));
     
     Objectify(NewType(PartialArcRegularSetsFamily(cgr), IsAsymPartialArcRegularSet and IsAsymPartialArcRegularSetBlkRep), npgs);
     return npgs;
@@ -970,6 +1076,7 @@ function(cand,pt)
             
             npgs.kIsForced:=true;
             npgs.k:=cand!.degreelist[1];
+            npgs.fullrows:=Filtered([1..Length(cand!.blocks)], x->cand!.degreelist[x]=npgs.k);
             
             if npgs.k<cand!.maxdeg then
                 return nonextensible;
@@ -981,7 +1088,6 @@ function(cand,pt)
             if ForAny([sb..Length(cand!.blocks)], x->cand!.degreelist[x]>npgs.k) then
                 return nonextensible;
             fi;
-            npgs.fullrows:=Filtered([1..Length(cand!.blocks)], x->cand!.degreelist[x]=npgs.k);
             
             for i in [1..Length(npgs.fullrows)] do
                 a:=npgs.fullrows[i];
@@ -1072,11 +1178,19 @@ function(cand,pt)
             kmts:=cand!.imap[k];
             ksb:=cand!.startBlock[kmts[1]];
             kfb:=cand!.finishBlock[kmts[1]];
-            if k<=pt 
-               or ksb in npgs.fullrows
-               or kfb in npgs.fullrows
-               or npgs.kIsForced and (sd[kmts[1]]+npgs.degreelist[ksb]>npgs.k 
-                                      or  (Length(kmts)=2 and sd[kmts[2]]+npgs.degreelist[kfb]>npgs.k))
+            if kfb < ksb then
+                kmts:=Reversed(kmts);
+                ksb:=cand!.startBlock[kmts[1]];
+                kfb:=cand!.finishBlock[kmts[1]];
+            fi;
+            if k<=pt or
+               Length(npgs.set)+Length(kmts) > npgs.maxlength or 
+               ksb in npgs.fullrows or
+               kfb in npgs.fullrows or
+               (npgs.kIsForced and ksb=kfb  and Length(kmts)=2 and sd[kmts[1]]+sd[kmts[2]]+npgs.degreelist[ksb]>npgs.k) or
+               (npgs.kIsForced and ksb=kfb  and Length(kmts)=1 and sd[kmts[1]]+npgs.degreelist[ksb]>npgs.k) or
+               (npgs.kIsForced and ksb<>kfb and sd[kmts[1]]+npgs.degreelist[ksb]>npgs.k) or
+               (npgs.kIsForced and ksb<>kfb and Length(kmts)=2 and sd[kmts[2]]+npgs.degreelist[ksb]>npgs.k)
             then
                 npgs.domdegreelist[ksb]:=npgs.domdegreelist[ksb]-sd[kmts[1]];
                 RemoveSet(npgs.domain,k);
@@ -1107,7 +1221,7 @@ function(cand,pt)
         for a in npgs.ridx do
             for b in npgs.ridx do
                 block:=bm[a][b];
-                bbl:=cand!.blocks[a,b];
+                bbl:=cand!.blocks[a][b];
                 if bbl = [] or a <> sb and b <> fb then
                     continue;
                 fi;
@@ -1172,7 +1286,7 @@ function(cand,pt)
         for a in npgs.ridx do
             for b in npgs.ridx do
                 block:=bm[a][b];
-                bbl:=cand!.blocks[a,b];
+                bbl:=cand!.blocks[a][b];
                 if bbl = [] or a <> sb and a <> fb and b <> sb and b <> fb then
                     continue;
                 fi;
