@@ -181,7 +181,7 @@ function(cand,pt)
     
     ent:=t!.entries;
     if Length(cand!.set) + 1 > cand!.maxlength then
-        Error("not supposed to happen");
+        Error("this is not supposed to happen");
         return fail;
     fi;
     
@@ -278,7 +278,8 @@ DeclareRepresentation("IsAsymPartialArcRegularSetBlkRep",
           "kIsForced",
           "k",
           "lbdIsForced",
-          "lbd"
+          "lbd",
+          "maxlbd"
           ]);
 
 InstallMethod(EmptyAsymPartialArcRegularSet,
@@ -399,7 +400,7 @@ function(cand)
     fi;
     
     for b in [1..Length(cand!.blocks)] do
-        for a in [1..b] do # check!
+        for a in [1..b] do # is ok for the second variant because AA* is symmetric
             block:=cand!.blockingmat[a][b];
             if ForAny(block, x->cand!.square[x]<>cand!.maxlbd) then
                 return false;
@@ -417,7 +418,7 @@ function(cand,pt)
     local  cgr, t, npgs, color, sb, fb, sblk, 
            a, b, block, sd, icolor, md, sbinfr, fbinfc, 
            k, kmts, ksb, kfb, sq, bm, ent, blkIdx, bbl, 
-           c, ba, bb, bc, i, j;
+           c, ba, bb, bc, i, j, ii, ij;
     
     cgr:=cand!.cgr;
     
@@ -477,9 +478,13 @@ function(cand,pt)
                 return nonextensible;
             fi;
             
+            # first variant: A * A
+            # for a in npgs.fullrows do
+            #     for b in npgs.fullcols do   
             
-            for a in npgs.fullrows do
-                for b in npgs.fullcols do   
+            # second variant: A * A*
+            for a in Intersection(npgs.fullrows,npgs.fullcols) do
+                for b in Intersection(npgs.fullrows, npgs.fullcols) do   
                     block:=cand!.blockingmat[a][b];
                     if block<>[] then
                         npgs.lbdIsForced:=true;
@@ -591,29 +596,43 @@ function(cand,pt)
     npgs.maxlbd:=cand!.maxlbd;
     ent:=t!.entries;
     blkIdx:=t!.blkIdx;
-    if sb = fb then
-        for a in npgs.ridx do
-            for b in npgs.cidx do
+    
+    # second variant A * A*
+    if sb = fb then 
+        for a in Union(npgs.ridx,npgs.cidx) do
+            for b in Union(npgs.ridx,npgs.cidx) do
                 block:=bm[a][b];
                 bbl:=cand!.blocks[a][b];
-                if bbl = [] or a <> sb and b <> fb then
+                if bbl = [] or a <> sb and b <> sb then
                     continue;
                 fi;
                 c:=fb;
                 ba:=a/npgs.perm;
                 bb:=b/npgs.perm;
                 bc:=c/npgs.perm;
-                if a = sb and b = fb then
-                    sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[color]];
+                if a = sb and b = sb then  # color * icolor
+                    sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[icolor]];
                 fi;
-                if a in cand!.ridx and b=fb  then # A * color (part A color)
+                if a in cand!.ridx and b = sb then # A icolor
                     for i in cand!.blockingmat[a][c] do
-                        sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[i]][blkIdx[color]];
+                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[i]][blkIdx[icolor]];
                     od;
                 fi;
-                if a=sb and b in cand!.cidx and b <> fb then # A * color (part color A)
+                if a = fb and b in cand!.cidx and b<>sb  then # icolor A
                     for j in cand!.blockingmat[c][b] do
-                        sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[color]][blkIdx[j]];
+                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[icolor]][blkIdx[j]];
+                    od;
+                fi;
+                if a in cand!.cidx and b = fb then # A* color
+                    for i in cand!.blockingmat[c][a] do
+                        ii:=i^ColorMates(cgr);
+                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[ii]][blkIdx[color]];
+                    od;
+                fi;
+                if a =sb and b in cand!.ridx and b <> fb  then # color A*
+                    for j in cand!.blockingmat[b][c] do
+                        ij:=j^ColorMates(cgr);
+                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[ij]];
                     od;
                 fi;
                 if block <> [] then
@@ -623,12 +642,11 @@ function(cand,pt)
                         return fail;
                     fi;
                     
-                    
                     # check all new complete blocks of npgs
-                    if (a in Difference(npgs.fullrows,cand!.fullrows) and 
-                        b in npgs.fullcols) or
-                       (a in npgs.fullrows and 
-                        b in Difference(npgs.fullcols, cand!.fullcols))
+                    if a in npgs.fullrows and a in npgs.fullcols and
+                       b in npgs.fullrows and b in npgs.fullcols and
+                       not ( a in cand!.fullrows and a in cand!.fullcols and
+                             b in cand!.fullrows and b in cand!.fullcols)
                     then
                         if not npgs.lbdIsForced then
                             npgs.lbdIsForced := true;
@@ -648,31 +666,60 @@ function(cand,pt)
                 fi;
             od;
         od;
-        Assert(1,sq=ComplexProduct(t,npgs.set,npgs.set));
+        Assert(1,sq=ComplexProduct(t,npgs.set,OnSets(npgs.set,ColorMates(cgr))));
     else
-        for a in npgs.ridx do
-            for b in npgs.cidx do
+        for a in Union(npgs.ridx,npgs.cidx) do
+            for b in Union(npgs.ridx, npgs.cidx) do
                 block:=bm[a][b];
                 bbl:=cand!.blocks[a][b];
-                if bbl = [] or a <> sb and  b <> fb then
+                if bbl = [] or not a in [sb,fb] and  not b in [sb,fb] then
                     continue;
                 fi;
+
                 ba:=a/npgs.perm;
                 bb:=b/npgs.perm;
-                if a in cand!.ridx and b = fb then # A * color (part A color)
-                    c:=sb;
-                    bc:=c/npgs.perm;
-                    for i in cand!.blockingmat[a][c] do
-                        sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[i]][blkIdx[color]];
-                    od;
-                fi;
-                if a = sb and b in cand!.cidx then # A * color (color part A)
+                if a = sb and b = sb then # c c*
                     c:=fb;
                     bc:=c/npgs.perm;
-                    for j in cand!.blockingmat[c][b] do
-                        sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[color]][blkIdx[j]];
+                    sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[icolor]];
+                fi;
+                if a = fb and b = fb then # c* c
+                    c:=sb;
+                    bc:=c/npgs.perm;
+                    sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[icolor]][blkIdx[color]];
+                fi;
+                if a in cand!.ridx and b = sb then # A icolor
+                    c:=fb;
+                    bc:=c/npgs.perm;
+                    for i in cand!.blockingmat[a][c] do
+                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[i]][blkIdx[icolor]];
                     od;
                 fi;
+                if a = fb and b in cand!.cidx then # icolor A
+                    c:=sb;
+                    bc:=c/npgs.perm;
+                    for j in cand!.blockingmat[c][b] do
+                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[icolor]][blkIdx[j]];
+                    od;
+                fi;
+                if a in cand!.cidx and b = fb then # A* color
+                    c:=sb;
+                    bc:=c/npgs.perm;
+                    for i in cand!.blockingmat[c][a] do
+                        ii:=i^ColorMates(cgr);
+                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[ii]][blkIdx[color]];
+                    od;
+                fi;
+                if a = sb and b in cand!.ridx then # color A*
+                    c:=fb;
+                    bc:=c/npgs.perm;
+                    for j in cand!.blockingmat[b][c] do
+                        ij:=j^ColorMates(cgr);
+                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[ij]];
+                    od;
+                fi;
+                
+                        
                 if block <> [] then
                     npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
                     
@@ -681,10 +728,10 @@ function(cand,pt)
                     fi;
                         
                     # check all new complete blocks of npgs
-                    if (a in Difference(npgs.fullrows,cand!.fullrows) and 
-                        b in npgs.fullcols) or
-                       (a in npgs.fullrows and 
-                        b in Difference(npgs.fullcols, cand!.fullcols)) 
+                    if a in npgs.fullrows and a in npgs.fullcols and
+                       b in npgs.fullrows and b in npgs.fullcols and
+                       not ( a in cand!.fullrows and a in cand!.fullcols and
+                             b in cand!.fullrows and b in cand!.fullcols)
                     then
                         if not npgs.lbdIsForced then
                             npgs.lbdIsForced := true;
@@ -704,8 +751,129 @@ function(cand,pt)
                 fi;
             od;
         od;
-        Assert(1,sq=ComplexProduct(t,npgs.set,npgs.set));
+        Assert(1,sq=ComplexProduct(t,npgs.set,OnSets(npgs.set,ColorMates(cgr))));
     fi;
+    
+    
+    
+    
+                    
+    # First variant A * A
+    # if sb = fb then
+    #     for a in npgs.ridx do
+    #         for b in npgs.cidx do
+    #             block:=bm[a][b];
+    #             bbl:=cand!.blocks[a][b];
+    #             if bbl = [] or a <> sb and b <> fb then
+    #                 continue;
+    #             fi;
+    #             c:=fb;
+    #             ba:=a/npgs.perm;
+    #             bb:=b/npgs.perm;
+    #             bc:=c/npgs.perm;
+    #             if a = sb and b = fb then
+    #                 sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[color]];
+    #             fi;
+    #             if a in cand!.ridx and b=fb  then # A * color (part A color)
+    #                 for i in cand!.blockingmat[a][c] do
+    #                     sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[i]][blkIdx[color]];
+    #                 od;
+    #             fi;
+    #             if a=sb and b in cand!.cidx and b <> fb then # A * color (part color A)
+    #                 for j in cand!.blockingmat[c][b] do
+    #                     sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[color]][blkIdx[j]];
+    #                 od;
+    #             fi;
+    #             if block <> [] then
+    #                 npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
+                    
+    #                 if npgs.lbdIsForced  and npgs.maxlbd > npgs.lbd then
+    #                     return fail;
+    #                 fi;
+                    
+                    
+    #                 # check all new complete blocks of npgs
+    #                 if (a in Difference(npgs.fullrows,cand!.fullrows) and 
+    #                     b in npgs.fullcols) or
+    #                    (a in npgs.fullrows and 
+    #                     b in Difference(npgs.fullcols, cand!.fullcols))
+    #                 then
+    #                     if not npgs.lbdIsForced then
+    #                         npgs.lbdIsForced := true;
+    #                         npgs.lbd:=sq[block[1]];
+    #                         if npgs.lbd <> npgs.maxlbd then
+    #                             return fail;
+    #                         fi;
+    #                         # if ForAny(block, x->sq[x]<>npgs.lbd) then
+    #                         #     return fail;
+    #                         # fi;
+    #                     fi;
+                        
+    #                     if ForAny(block, x->sq[x]<>npgs.lbd) then
+    #                         return fail;
+    #                     fi;
+    #                 fi;
+    #             fi;
+    #         od;
+    #     od;
+    #     Assert(1,sq=ComplexProduct(t,npgs.set,npgs.set));
+    # else
+    #     for a in npgs.ridx do
+    #         for b in npgs.cidx do
+    #             block:=bm[a][b];
+    #             bbl:=cand!.blocks[a][b];
+    #             if bbl = [] or a <> sb and  b <> fb then
+    #                 continue;
+    #             fi;
+    #             ba:=a/npgs.perm;
+    #             bb:=b/npgs.perm;
+    #             if a in cand!.ridx and b = fb then # A * color (part A color)
+    #                 c:=sb;
+    #                 bc:=c/npgs.perm;
+    #                 for i in cand!.blockingmat[a][c] do
+    #                     sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[i]][blkIdx[color]];
+    #                 od;
+    #             fi;
+    #             if a = sb and b in cand!.cidx then # A * color (color part A)
+    #                 c:=fb;
+    #                 bc:=c/npgs.perm;
+    #                 for j in cand!.blockingmat[c][b] do
+    #                     sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[color]][blkIdx[j]];
+    #                 od;
+    #             fi;
+    #             if block <> [] then
+    #                 npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
+                    
+    #                 if npgs.lbdIsForced  and npgs.maxlbd > npgs.lbd then
+    #                     return fail;
+    #                 fi;
+                        
+    #                 # check all new complete blocks of npgs
+    #                 if (a in Difference(npgs.fullrows,cand!.fullrows) and 
+    #                     b in npgs.fullcols) or
+    #                    (a in npgs.fullrows and 
+    #                     b in Difference(npgs.fullcols, cand!.fullcols)) 
+    #                 then
+    #                     if not npgs.lbdIsForced then
+    #                         npgs.lbdIsForced := true;
+    #                         npgs.lbd:=sq[block[1]];
+    #                         if npgs.lbd <> npgs.maxlbd then
+    #                             return fail;
+    #                         fi;
+    #                         # if ForAny(block, x->sq[x]<>npgs.lbd) then
+    #                         #     return fail;
+    #                         # fi;
+    #                     fi;
+                        
+    #                     if ForAny(block, x->sq[x]<>npgs.lbd) then
+    #                         return fail;
+    #                     fi;
+    #                 fi;
+    #             fi;
+    #         od;
+    #     od;
+    #     Assert(1,sq=ComplexProduct(t,npgs.set,npgs.set));
+    # fi;
         
     # #     c
     # #    _.._

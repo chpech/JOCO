@@ -129,6 +129,7 @@ end);
 
 # InstallTrueMethod(IsRainbow,IsColorGraph and IsSchurianCCRep);
 InstallTrueMethod(IsRainbow,IsColorGraph and IsWLStableColorGraph);
+InstallTrueMethod(IsRainbow,IsColorGraph and IsJStableColorGraph);
 InstallTrueMethod(IsStableRainbow, IsRainbow and IsRegularColorGraph);
 InstallTrueMethod(IsStableRainbow, IsWLStableColorGraph);
 

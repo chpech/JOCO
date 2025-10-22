@@ -157,7 +157,7 @@ InstallMethod(IsArcRegularSet,
 function(rset)
     local  cgr, set, m, iset, g, gor, lval, v, h, dom, hor, w, lx;
     
-    cgr:=UnderlyingCgrOfRegularSet(rset);
+    cgr:=UnderlyingCgrOfColorSet(rset);
     set:=AsSet(rset);
     m:=ColorMates(cgr);
     iset:=OnSets(set,m);

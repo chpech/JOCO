@@ -566,7 +566,7 @@ function(newPart,gs)
     
     
     M:=AsSet(gs);
-    iM:=OnSets(M,ColorMates(UnderlyingCgrOfRegularSet(gs)));
+    iM:=OnSets(M,ColorMates(UnderlyingCgrOfColorSet(gs)));
 
     res:=repart(newPart,M,true);
     if res=fail then

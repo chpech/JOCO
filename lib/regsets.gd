@@ -1,15 +1,11 @@
-DeclareCategory( "IsRegularSet", IsCocoStableSet );
+DeclareCategory( "IsRegularSet", IsColorSet );
 
 DeclareConstructor("RegularSet", [IsRegularSet, IsColorGraph, IsList]);
 
 
 DeclareAttribute( "RegularSetsFamily", IsColorGraph );
 
-                       
-
-# DeclareOperation( "RegularSetFromPartialGoodSet", [IsPartialGoodSet] );
-
-DeclareOperation( "UnderlyingCgrOfRegularSet", [IsRegularSet] ); 
+# DeclareOperation( "UnderlyingCgrOfRegularSet", [IsRegularSet] ); 
 DeclareOperation( "OnRegularSets", [IsRegularSet, IsPerm] );    
 
 ################################################################################
