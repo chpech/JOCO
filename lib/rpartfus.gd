@@ -9,27 +9,28 @@
 #############################################################################
 
 
-DeclareCategory( "IsPartialRFusion", IsCocoPartialStablePartition );
-DeclareAttribute( "PRFusionsFamily", IsColorGraph );
-KeyDependentOperation( "PRFusionOrbitsFamily", IsColorGraph, IsPermGroup, ReturnTrue );
+DeclareCategory( "IsPartialRegularFusion", IsCocoPartialStablePartition );
+DeclareAttribute( "PartialRegularFusionsFamily", IsColorGraph );
+KeyDependentOperation( "PartialRegularFusionOrbitsFamily", IsColorGraph, IsPermGroup, ReturnTrue );
 
-DeclareOperation( "EmptyPartialRFusion", [IsColorGraph,IsInt] );
-DeclareOperation( "ExtendedPartialRFusion", [IsPartialRFusion, IsRegularSet] );
-DeclareProperty( "IsExtendiblePartialRFusion", IsPartialRFusion );
-DeclareOperation( "IsRCompatibleWithPart", [IsPartialRFusion, IsRegularSet] );
-DeclareOperation( "RainbowOfPartialRFusion", [IsPartialRFusion] );
-DeclareAttribute( "IsCompletePartialRFusion", IsPartialRFusion );
-DeclareOperation( "RFusionFromCompletePartialRFusion", [IsPartialRFusion ] );
-
-DeclareAttribute("RankOfPartialFusion", IsPartialRFusion );
-
-
-
-DeclareCategory( "IsPartialRFusionOrbit", IsCocoOrbit );
-DeclareGlobalFunction( "PartialRFusionOrbitNC" );
-
-DeclareCategory( "IsIteratorOfPRFOrbits", IsIterator );
-DeclareOperation( "IteratorOfPartialRFusionOrbits", [IsList] );
-DeclareOperation( "AllRFusionOrbits", [IsIteratorOfPRFOrbits] );
-
+DeclareOperation( "EmptyPartialRegularFusion", [IsColorGraph,IsInt] );
 DeclareGlobalFunction( "RRefinedPartition" );     # undocumented
+
+# DeclareOperation( "ExtendedPartialRFusion", [IsPartialRFusion, IsRegularSet] );
+#DeclareProperty( "IsExtendiblePartialRFusion", IsPartialRFusion );
+# DeclareOperation( "IsRCompatibleWithPart", [IsPartialRFusion, IsRegularSet] );
+#DeclareOperation( "RainbowOfPartialRFusion", [IsPartialRFusion] );
+# DeclareAttribute( "IsCompletePartialRFusion", IsPartialRFusion );
+#DeclareOperation( "RFusionFromCompletePartialRFusion", [IsPartialRFusion ] );
+
+#DeclareAttribute("RankOfPartialFusion", IsPartialRFusion );
+
+
+
+#DeclareCategory( "IsPartialRFusionOrbit", IsCocoOrbit );
+#DeclareGlobalFunction( "PartialRFusionOrbitNC" );
+
+#DeclareCategory( "IsIteratorOfPRFOrbits", IsIterator );
+#DeclareOperation( "IteratorOfPartialRFusionOrbits", [IsList] );
+#DeclareOperation( "AllRFusionOrbits", [IsIteratorOfPRFOrbits] );
+

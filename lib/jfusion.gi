@@ -3,7 +3,6 @@
 ##  jfusion.gi                  JOCO package
 ##                                                              Mikhail Klin
 ##                                                            Christian Pech
-##                                                             Sven Reichard
 ##
 ##  Implementation of the J-fusion data type
 ##

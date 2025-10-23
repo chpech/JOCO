@@ -1,18 +1,3 @@
-DeclareRepresentation("IsHadamardSetRep",
-        IsAttributeStoringRep,
-        [ "cgr",                # the rainbow over which the Hadamard set "lives"
-          "set"                 # the Hadamard set of colors of <cgr>
-        ]);
-
-InstallMethod(HadamardSetsFamily,
-    "for color graphs",
-	[IsColorGraph],
-function(cgr)
-   local fam;
-   fam:=NewFamily("HadamardSetsFam", IsHadamardSet);
-   return fam;
-end);
-
 InstallMethod(HadamardSet,
 "for a color graph and a set",              
 [ IsColorGraph, IsList ],
@@ -23,81 +8,43 @@ function(cgr, set)
    res:=rec(
             cgr:=cgr,
             set:=Immutable(set));
-   return Objectify(NewType(HadamardSetsFamily(cgr), IsHadamardSetRep), res);
+   return Objectify(NewType(HadamardSetsFamily(cgr), IsColorSetRep), res);
+end);
+
+InstallMethod(HadamardSetsFamily,
+"for a color graph",
+[IsColorGraph],
+function(cgr)
+   local fam;
+   fam:=NewFamily("HadamardSetsFam", IsHadamardSet);
+   return fam;
 end);
 
 InstallMethod(StableSetFromPartialStableSet,
-"for partial Hadamard sets in PartialHadamardSetRep",
+"for a partial Hadamard set in PartialHadamardSetRep",
 [IsPartialHadamardSet and IsPartialHadamardSetRep],
 function(cand)
     return HadamardSet( cand!.cgr, cand!.set);
 end);
 
-InstallMethod(UnderlyingCgrOfHadamardSet,
-        "for Hadamard sets in hadamardSetRep",
-        [IsHadamardSet and IsHadamardSetRep],
-function(gs)
-   return gs!.cgr;
-end);
-
-InstallOtherMethod(AsSet,
-        "for Hadamard sets in HadamardSetRep",
-        [IsHadamardSet and IsHadamardSetRep],
-function(gs)
-  return gs!.set;
-end);
-
-InstallOtherMethod(Length,
-        "for Hadamard sets",
-        [IsHadamardSet],
-function(gs)
-    return Length(AsSet(gs));
-end);
-
-InstallOtherMethod(\<,
-        "for Hadamard sets",
-        IsIdenticalObj,
-        [IsHadamardSet,IsHadamardSet],
-function(gs1,gs2)
-    if Length(gs1)<>Length(gs2) then
-        return Length(gs1)<Length(gs2);
-    else
-        return AsSet(gs1)<AsSet(gs2);
-    fi;
-end);
-
-InstallOtherMethod(\=,
-        "for Hadamard sets",
-        IsIdenticalObj,
-        [IsHadamardSet,IsHadamardSet],
-function(gs1,gs2)
-    return AsSet(gs1)=AsSet(gs2);
-end);
-
 InstallMethod(OnHadamardSets,
-        "for a Hadamard set in HadamardSetRep and a permutation",
-        [IsHadamardSet and IsHadamardSetRep, IsPerm],
+"for a Hadamard set in HadamardSetRep and a permutation",
+[IsHadamardSet and IsColorSetRep, IsPerm],
 function(gs, g)
     return HadamardSet(gs!.cgr, MakeImmutable(OnSets(gs!.set,g)));
 end);
 
-InstallOtherMethod(Size,
-        "for Hadamard sets in HadamardSetRep",
-        [IsHadamardSet and IsHadamardSetRep],
-function(gs)
-    return Size(gs!.set);
-end);
 
 InstallMethod(ViewString,
-        "for Hadamard sets",
-        [IsHadamardSet],
+"for a Hadamard set",
+[IsHadamardSet],
 function(x) 
-    return Concatenation("<HadamardSet ", String(AsSet(x)), ">");
+    return Concatenation("<HadamardSet: ", String(AsSet(x)), ">");
 end);
 
 InstallMethod(HadamardSetOrbitsFamilyOp,
-        "for a color graph  and a permutation group",
-        [IsColorGraph, IsPermGroup],
+"for a color graph  and a permutation group",
+[IsColorGraph, IsPermGroup],
 function(cgr,g)
     return NewFamily("HadamardSetOrbitsFam", IsHadamardSetOrbit);
 end);
@@ -118,7 +65,7 @@ function(arg)
             group:=group,
             rep:=gs,
             stab:=stab);
-   return Objectify(NewType(HadamardSetOrbitsFamily(UnderlyingCgrOfHadamardSet(gs),group), IsHadamardSetOrbit and IsCocoOrbitRep), res);
+   return Objectify(NewType(HadamardSetOrbitsFamily(UnderlyingCgrOfColorSet(gs),group), IsHadamardSetOrbit and IsCocoOrbitRep), res);
 end);
 
 InstallGlobalFunction(HadamardSetOrbit,
@@ -141,8 +88,8 @@ function(arg)
 end);
 
 InstallMethod(OnCocoOrbits,
-        "for all Hadamard set orbits",
-        [IsHadamardSetOrbit, IsPerm],
+"for a Hadamard set orbit and a permutation",
+[IsHadamardSetOrbit, IsPerm],
 function(gsorb,perm)
     local   grp,  gs,  stab,  ngs,  ngrp,  nstab;
     
@@ -159,13 +106,12 @@ function(gsorb,perm)
 end);
 
 InstallMethod(HadamardSetOrbits,
-        "for J-stable color graphs",
-        [IsColorGraph and IsJStableColorGraph],
+"for a J-stable color graph",
+[IsColorGraph and IsJStableColorGraph],
 function(cgr)
     local  g, iter, allgsorb;
     
     g:=JAlgebraicAutomorphismGroup(cgr);
-    
     
     iter:=IteratorOfPartialStableSetOrbits(g, EmptyPartialHadamardSet(cgr));
     allgsorb:=AllStableSetOrbits(iter);
@@ -176,8 +122,8 @@ function(cgr)
 end);
 
 InstallOtherMethod(HadamardSetOrbits,
-        "for a J-stable color graph and a permutation group",
-        [IsColorGraph and IsJStableColorGraph, IsPermGroup],
+"for a J-stable color graph and a permutation group",
+[IsColorGraph and IsJStableColorGraph, IsPermGroup],
 function(cgr,g)
     local  iter, allgsorb;
     
@@ -190,15 +136,15 @@ function(cgr,g)
 end);
 
 InstallMethod(ActionOfCocoOrbit,
-        "for all Hadamard set orbits",
-        [IsHadamardSetOrbit],
+"for a Hadamard set orbit",
+[IsHadamardSetOrbit],
 function(orb)
     return OnHadamardSets;
 end);
 
 InstallMethod(ViewString,
-        "for Hadamard set orbits",
-        [IsHadamardSetOrbit],
+"for a Hadamard set orbit",
+[IsHadamardSetOrbit],
 function(x)
     local res;
     
@@ -210,15 +156,15 @@ function(x)
 end);
 
 InstallMethod(ConstructorOfCocoOrbit,
-        "for all Hadamard set orbits",
-        [IsHadamardSetOrbit],
+"for a Hadamard set orbit",
+[IsHadamardSetOrbit],
 function(orb)
     return HadamardSetOrbit;
 end);
 
 InstallMethod(ConstructorOfCocoOrbitNC,
-        "for all Hadamard set orbits",
-        [IsHadamardSetOrbit],
+"for a Hadamard set orbit",
+[IsHadamardSetOrbit],
 function(orb)
     return HadamardSetOrbitNC;
 end);

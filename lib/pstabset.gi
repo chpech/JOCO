@@ -229,13 +229,22 @@ end);
 
 
 
+InstallMethod(ActionOfPartialStableSetOrbitIterator,
+        "for iterators of partial stable set orbits in PartialStableSetOrbitIterRep",
+        [IsIteratorOfPartialStableSetOrbits and IsPartialStableSetOrbitIterRep],
+function(iter)        
+    if iter!.state=fail then
+        return fail;
+    fi;
+    return iter!.state.act;
+end);
 
 COCOInfoGSSize:=10;
 InstallMethod(AllStableSetOrbits,
         "for iterators of partial stable set orbits in PartialStableSetOrbitIterRep",
         [IsIteratorOfPartialStableSetOrbits and IsPartialStableSetOrbitIterRep],
 function(iter)
-    local res,gens,stab,grp,gs;
+    local  res, grp, gs, gens, act, ker, stab;
     
     if IsDoneIterator(iter) then
         return [];
@@ -253,7 +262,11 @@ function(iter)
             gs:=StableSetFromPartialStableSet(iter!.state.cand);
             if gs <> fail then 
                 gens:=ShallowCopy(iter!.state.SM.generators);
-                stab:=Group(PreImagesSet(iter!.state.act,gens),());            
+                act:=iter!.state.act;
+                ker:=GeneratorsOfGroup(Kernel(act));
+                stab:=Union(List(gens,g->PreImagesRepresentative(act,g)*ker));
+                stab:=Group(stab,());
+#                stab:=Group(PreImagesSet(iter!.state.act,gens),());            
                 Add(res, ConstructorOfStableSetOrbit(gs)(grp,gs, stab));
                 Info(InfoCOCO,1,"*");
             fi;

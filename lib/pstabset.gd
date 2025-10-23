@@ -1,4 +1,4 @@
-# in COCO2P a set of colors
+
 DeclareCategory("IsCocoStableSet", IsObject );
 
 DeclareCategory("IsCocoPartialStableSet", IsObject );
@@ -49,4 +49,5 @@ DeclareOperation( "GetPartialStableSetOrbitFamily", [IsCocoPartialStableSet, IsP
 DeclareCategory( "IsIteratorOfPartialStableSetOrbits", IsIterator );
 DeclareOperation( "IteratorOfPartialStableSetOrbits", [IsPermGroup, IsCocoPartialStableSet] );                     # internal
 DeclareOperation( "AllStableSetOrbits", [IsIteratorOfPartialStableSetOrbits] );                  # internal
+DeclareOperation( "ActionOfPartialStableSetOrbitIterator",  [IsIteratorOfPartialStableSetOrbits] );
 

@@ -3,7 +3,6 @@
 ##  jfusion.gd                  JOCO package
 ##                                                              Mikhail Klin
 ##                                                            Christian Pech
-##                                                             Sven Reichard
 ##
 ##  Declarations for the J-fusion-datatype
 ##

@@ -150,18 +150,31 @@ end);
 
 InstallOtherMethod(ColorGraphByFusion,
         "for color graphs and for a J-fusion",
-        [IsColorGraph, IsJFusionOfTensor],
+        [IsColorGraph, IsJordanFusion],
 function(cgr,fusion)
-    local T,res;
+    local res;
 
-    T:=StructureConstantsOfColorGraph(cgr);
-    res:= ColorGraphByFusion(cgr, PartitionOfFusion(fusion));
-    SetIsRainbow(res,true);
-        
+    res:= ColorGraphByFusion(cgr, UnderlyingPartitionOfColorPartition(fusion));
     SetIsJStableColorGraph(res,true);
     return res;
 end);
 
+InstallOtherMethod(ColorGraphByFusion,
+"for a color graph and for a regular fusion",
+[IsColorGraph, IsRegularFusion],
+function(cgr,fusion)
+    local res;
+
+    if not IsIdenticalObj(RegularFusionsFamily(cgr), FamilyObj(fusion)) then
+        Error("The given fusion must belong to the given color graph!");
+    fi;
+    res:= ColorGraphByFusion(cgr, PartitionOfFusion(fusion));
+    SetIsRainbow(res,true);
+    SetIsHomogeneous(res,true);
+    SetIsStableRainbow(res,true);
+    
+    return res;
+end);
 
 
 InstallOtherMethod(ReflexiveColors,

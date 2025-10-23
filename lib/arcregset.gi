@@ -13,29 +13,29 @@ function(filter, cgr, set)
 end);
 
 InstallMethod(StableSetFromPartialStableSet,
-    "for partial arc regular sets in PartialArcRegularSetRep",
-    [IsPartialArcRegularSet and IsPartialArcRegularSetRep],
+"for a partial arc regular set in PartialArcRegularSetRep",
+[IsPartialArcRegularSet and IsPartialArcRegularSetRep],
 function(cand)
     return RegularSet( IsRegularSet and IsArcRegularSet, cand!.cgr, cand!.set);
 end);
 
 InstallMethod(OnRegularSets,
-        "for an arc regular set and a permutation",
-        [IsRegularSet and IsArcRegularSet and IsRegularSetRep, IsPerm],
+"for an arc regular set and a permutation",
+[IsRegularSet and IsArcRegularSet and IsColorSetRep, IsPerm],
 function(gs, g)
     return RegularSet(IsRegularSet and IsArcRegularSet, gs!.cgr, MakeImmutable(OnSets(gs!.set,g)));
 end);
 
 InstallMethod(ViewString,
-        "for arc regular sets",
-        [IsRegularSet and IsArcRegularSet],
+"for an arc regular set",
+[IsRegularSet and IsArcRegularSet],
 function(x) 
-    return Concatenation("<", "ArcRegularSet ", String(AsSet(x)), ">");
+    return Concatenation("<", "ArcRegularSet: ", String(AsSet(x)), ">");
 end);
 
 InstallMethod(HomogeneousSymArcRegularSetOrbits,
-        "for J-stable color graphs",
-        [IsColorGraph and IsJStableColorGraph],
+"for a J-stable color graph",
+[IsColorGraph and IsJStableColorGraph],
 function(cgr)
     local  g, iter, allgsorb;
     
@@ -50,12 +50,10 @@ function(cgr)
 end);
 
 InstallOtherMethod(HomogeneousSymArcRegularSetOrbits,
-        "for a J-stable color graph and a permutation group",
-        [IsColorGraph and IsJStableColorGraph, IsPermGroup],
+"for a J-stable color graph and a permutation group",
+[IsColorGraph and IsJStableColorGraph, IsPermGroup],
 function(cgr,g)
     local  iter, allgsorb;
-    
-    
     
     iter:=IteratorOfPartialStableSetOrbits(g, EmptySymPartialArcRegularSet(cgr));
     allgsorb:=AllStableSetOrbits(iter);
@@ -65,8 +63,8 @@ function(cgr,g)
 end);
 
 InstallMethod(HomogeneousAsymArcRegularSetOrbits,
-        "for a J-stable color graph",
-        [IsColorGraph and IsJStableColorGraph],
+"for a J-stable color graph",
+[IsColorGraph and IsJStableColorGraph],
 function(cgr)
     local  g, iter, agsorbs;
     
@@ -81,26 +79,18 @@ function(cgr)
 end);
 
 InstallOtherMethod(HomogeneousAsymArcRegularSetOrbits,
-        "for a J-stable color graph and a permutation group",
-        [IsColorGraph and IsJStableColorGraph, IsPermGroup],
+"for a J-stable color graph and a permutation group",
+[IsColorGraph and IsJStableColorGraph, IsPermGroup],
 function(cgr,g)
-    local tg, iter, agsorbs;
+    local iter;
     
+    iter:=IteratorOfPartialStableSetOrbits(g,EmptyAsymPartialArcRegularSet(cgr));
     
-    tg:=ClosureGroup(g,[ColorMates(cgr)]);
-    
-    iter:=IteratorOfPartialStableSetOrbits(tg,EmptyAsymPartialArcRegularSet(cgr));
-    
-    agsorbs:=AllStableSetOrbits(iter);
-    if g = tg then
-        return agsorbs;
-    else
-        return Union(List(agsorbs, orb->SubOrbitsOfCocoOrbit(g,orb)));
-    fi;
+    return AllStableSetOrbits(iter);
 end);
 
 InstallMethod(HomogeneousArcRegularSetOrbits,
-"for J-stable color graphs",
+"for a J-stable color graph",
 [IsColorGraph and IsJStableColorGraph],
 function(cgr)
     local g,lgs,sym,prim;
@@ -152,7 +142,7 @@ function(cgr,g)
 end);
 
 InstallMethod(IsArcRegularSet,
-"for regular sets",
+"for a regular set",
 [IsRegularSet],
 function(rset)
     local  cgr, set, m, iset, g, gor, lval, v, h, dom, hor, w, lx;

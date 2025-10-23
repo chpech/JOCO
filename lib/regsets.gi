@@ -1,9 +1,3 @@
-DeclareRepresentation("IsRegularSetRep",
-        IsColorSetRep,
-        [ "cgr",                # the rainbow over which the regular set "lives"
-          "set"                 # the regular set of colors of <cgr>
-        ]);
-
 
 InstallMethod(RegularSetsFamily,
     "for color graphs",
@@ -20,11 +14,10 @@ InstallMethod(RegularSet,
 function(filter, cgr, set)
    local res;
     
-    
-   res:=rec(
+    res:=rec(
             cgr:=cgr,
             set:=Immutable(set));
-   return Objectify(NewType(RegularSetsFamily(cgr), filter and IsRegularSetRep), res);
+   return Objectify(NewType(RegularSetsFamily(cgr), filter and IsColorSetRep), res);
 end);
 
 
@@ -80,7 +73,7 @@ end);
 
 InstallMethod(OnRegularSets,
         "for a regular set in RegularSetRep and a permutation",
-        [IsRegularSet and IsRegularSetRep, IsPerm],
+        [IsRegularSet and IsColorSetRep, IsPerm],
 function(gs, g)
     return RegularSet(IsRegularSet, gs!.cgr, MakeImmutable(OnSets(gs!.set,g)));
 end);

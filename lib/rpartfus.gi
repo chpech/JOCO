@@ -8,7 +8,7 @@
 ##
 #############################################################################
 
-DeclareRepresentation( "IsPartialRFusionRep",
+DeclareRepresentation( "IsPartialRegularFusionRep",
         IsPartialStablePartitionRep,
         [ "cgr",
           "ppart",
@@ -19,26 +19,26 @@ DeclareRepresentation( "IsPartialRFusionRep",
 
 
 InstallMethod(RankOfPartialStablePartition,
-"for partilal R-fusions in PartialRFusionRep",
-[IsPartialRFusion and IsPartialRFusionRep],
+"for partilal regular fusions in PartialRegularFusionRep",
+[IsPartialRegularFusion and IsPartialRegularFusionRep],
 function(ppart)
     return Length(ppart!.part.classes);
 end);
               
 
-InstallMethod(PRFusionsFamily,
-    "for color graphs ",
-	[IsColorGraph],
+InstallMethod(PartialRegularFusionsFamily,
+"for color graphs ",
+[IsColorGraph],
 function(cgr)
    local fam;
-   fam:=NewFamily("PRFusionsFam", IsPartialRFusion);
+   fam:=NewFamily("PartialRegularFusionsFam", IsPartialRegularFusion);
    return fam;
 end);
 
 
-InstallMethod(EmptyPartialRFusion,
-        "for tensors of structure constants",
-        [IsColorGraph and IsRainbow and IsStableRainbow, IsInt],
+InstallMethod(EmptyPartialRegularFusion,
+"for a stable rainbow and an integer and an integer",
+[IsColorGraph and IsRainbow and IsStableRainbow, IsInt],
 function(cgr,maxclasssize)
     local  rclr, part, varpart, obj, prfus;
     
@@ -63,22 +63,20 @@ function(cgr,maxclasssize)
               varpart:=varpart,
               maxclasssize:=maxclasssize
             );
-    prfus:= Objectify(NewType(PRFusionsFamily(cgr), IsPartialRFusion and IsPartialRFusionRep), obj);
+    prfus:= Objectify(NewType(PartialRegularFusionsFamily(cgr), IsPartialRegularFusion and IsPartialRegularFusionRep), obj);
     SetIsIrredundantPartialStablePartition(prfus,true);
     SetIsCompletePartialStablePartition(prfus,true);
     SetPartialStablePartitionHasSmallerBase(prfus,false);
     return prfus;
-    
 end);
 
 InstallMethod(ExtendedPartialStablePartition,
-        "for partial R-fusions and regular sets",
-        [IsPartialRFusion and IsPartialRFusionRep, IsRegularSet],
+"for a partial regular fusion and a regular set",
+[IsPartialRegularFusion and IsPartialRegularFusionRep, IsRegularSet],
 function(pfusion,gs)
     local  vdomain, rset, lclass, npart, pos, nppart, obj, ppart, 
            part, varpart, maxclasssize, nvarpart, npfusion;
     
-        
     vdomain:=pfusion!.varpart[1];
     rset:=AsSet(gs);
     if not IsSubset(vdomain,rset) then
@@ -119,7 +117,6 @@ function(pfusion,gs)
                   varpart:=pfusion!.varpart{[2..Length(pfusion!.varpart)]},
                   maxclasssize:=pfusion!.maxclasssize);
     else
-        # Length(gs)<Length(class) or (Length(gs)=Length(class) and AsSet(gs)<=class) then
         npart:=WLShallowCopyStablePartition(pfusion!.part);
         npart:=RRefinedPartition(npart,gs);
         if npart=fail then
@@ -136,10 +133,8 @@ function(pfusion,gs)
                   part:=npart,
                   varpart:=nvarpart,
                   maxclasssize:=pfusion!.maxclasssize);
-#    else
-#        return fail;
     fi;
-    npfusion:=Objectify(NewType(PRFusionsFamily(pfusion!.cgr), IsPartialRFusion and IsPartialRFusionRep), obj);
+    npfusion:=Objectify(NewType(PartialRegularFusionsFamily(pfusion!.cgr), IsPartialRegularFusion and IsPartialRegularFusionRep), obj);
     if Length(rset) < Length(vdomain) then
         SetIsIrredundantPartialStablePartition(npfusion,true);
         SetPartialStablePartitionHasSmallerBase(npfusion,false);
@@ -148,19 +143,19 @@ function(pfusion,gs)
         else
             SetIsCompletePartialStablePartition(npfusion,false);
         fi;
-    elif obj!.varpart = [] then # Length(rset) = Length(vdomain)
+    elif obj!.varpart = [] then 
         SetIsCompletePartialStablePartition(npfusion,true);
         SetIsIrredundantPartialStablePartition(npfusion,false);
         SetPartialStablePartitionHasSmallerBase(npfusion,
            IsCompletePartialStablePartition(pfusion) 
            or PartialStablePartitionHasSmallerBase(pfusion));
-    elif Length(obj!.varpart[1]) = Length(rset) then # Length(rset) = Length(vdomain)
+    elif Length(obj!.varpart[1]) = Length(rset) then 
         SetIsCompletePartialStablePartition(npfusion,false);
         SetIsIrredundantPartialStablePartition(npfusion,false);
         SetPartialStablePartitionHasSmallerBase(npfusion,
            IsCompletePartialStablePartition(pfusion) 
            or PartialStablePartitionHasSmallerBase(pfusion));
-    else  # Length(rset) = Length(vdomain) and Length(obj.varpart[1]) > Length(rset)
+    else  
         SetIsCompletePartialStablePartition(npfusion,true);
         SetIsIrredundantPartialStablePartition(npfusion,false);
         SetPartialStablePartitionHasSmallerBase(npfusion,
@@ -174,8 +169,8 @@ function(pfusion,gs)
 end);
 
 InstallMethod(IsCompatibleWithPartialStablePartition,
-        "for partial R-fusions and regular sets",
-        [IsPartialRFusion and IsPartialRFusionRep, IsRegularSet],
+"for a partial regular fusion and a regular set",
+        [IsPartialRegularFusion and IsPartialRegularFusionRep, IsRegularSet],
 function(pfusion, gs)
     local class;
     
@@ -187,23 +182,17 @@ function(pfusion, gs)
     return false;
 end);
 
-# InstallMethod( RainbowOfPartialRFusion,
-#         "for partial R-fusions",
-#         [IsPartialRFusion and IsPartialRFusionRep],
-# function(pfus)
-#     return pfus!.cgr;
-# end);
 
 InstallMethod( ViewString,
-        "for partial R-fusions",
-        [IsPartialRFusion and IsPartialRFusionRep],
+"for a partial regular fusion",
+[IsPartialRegularFusion and IsPartialRegularFusionRep],
 function(pfus)
-    return Concatenation("<partial R-fusion: ", String(pfus!.ppart), ">");
+    return Concatenation("<partial regular fusion: ", String(pfus!.ppart), ">");
 end);
 
 InstallImmediateMethod( IsCompletePartialStablePartition,
-        "for partial R-fusions",
-       IsPartialRFusion,
+"for a partial regular fusion",
+IsPartialRegularFusion,
 function(pfus)
     if pfus!.varpart = [] then
         return true;
@@ -221,27 +210,27 @@ end);
 
 
 
-InstallMethod(PRFusionOrbitsFamilyOp,
-        "for tensors and permutation groups",
-        [IsColorGraph, IsPermGroup],
+InstallMethod(PartialRegularFusionOrbitsFamilyOp,
+"for a color graph and a permutation group",
+[IsColorGraph, IsPermGroup],
 function(cgr,g)
-    return NewFamily("PRFusionOrbitsFam", IsPartialRFusionOrbit);
+    return NewFamily("PartialRegularFusionOrbitsFam", IsPartialStablePartitionOrbit);
 end);
 
 InstallMethod(GetPartialStablePartitionOrbitFamily,
-"for partial regular R-fusions in PartialRFusionRep and a permutation group",
-[IsPartialRFusion and IsPartialRFusionRep, IsPermGroup],
+"for a partial regular fusion in PartialRegularFusionRep and a permutation group",
+[IsPartialRegularFusion and IsPartialRegularFusionRep, IsPermGroup],
 function(prset,grp)  
-    return PRFusionOrbitsFamily(prset!.cgr,grp);
+    return PartialRegularFusionOrbitsFamily(prset!.cgr,grp);
 end);
 
-# PartialRFusionOrbitNC(<group>, <pjfus> ,<stab>)
-# <pjfus> is a partial R-fusion that is assumed to be minimal (wrt. short lex) in its orbit
+# PartialStablePartitionOrbitNC(<group>, <pfus> ,<stab>)
+# <pfus> is a partial R-fusion that is assumed to be minimal (wrt. short lex) in its orbit
 # the minimality property is not checked
 # <stab> is supposed to be the full (SetsSets-wise) stabilizer of <pfus> in <group>
 InstallMethod(PartialStablePartitionOrbitNC,
-"for a permutation group, a partial R-fusion, and a permutation group",              
-[ IsPermGroup, IsPartialRFusion and IsPartialRFusionRep, IsPermGroup],
+"for a permutation group, a partial regular fusion, and a permutation group",              
+[IsPermGroup, IsPartialRegularFusion, IsPermGroup],
 function(group,pfus,stab)
     local res,fam;
 
@@ -251,15 +240,15 @@ function(group,pfus,stab)
             stab:=stab);
     fam:=GetPartialStablePartitionOrbitFamily(pfus,group);
     
-    return Objectify(NewType(fam, IsPartialRFusionOrbit and IsCocoOrbitRep), res);
+    return Objectify(NewType(fam, IsPartialStablePartitionOrbit and IsPartialStablePartitionOrbitRep), res);
 end);
 
-InstallMethod( ViewString,
-        "for partial R-fusion orbits",
-        [IsPartialRFusionOrbit],
-function(pforb)
-    return Concatenation("<partial R-fusion orbit of length ", String(Size(pforb)), ">");
-end);
+# InstallMethod( ViewString,
+# "for a partial R-fusion orbits",
+#         [IsPartialRFusionOrbit],
+# function(pforb)
+#     return Concatenation("<partial R-fusion orbit of length ", String(Size(pforb)), ">");
+# end);
 
 
 ###################################################################################
@@ -467,7 +456,6 @@ end);
 # end);
 
 
-COCOInfoPFUSSize:=5;
 # InstallMethod(AllRFusionOrbits,
 #         "for iterators of partial R-fusion orbits",
 #         [IsIteratorOfPRFOrbits and IsPRFOrbitIterRep],
@@ -591,9 +579,9 @@ end);
 #     return PartialRFusionOrbit;
 # end);
 
-InstallMethod(ConstructorOfCocoOrbitNC,
-        "for all partial fusion orbits",
-        [IsPartialRFusionOrbit],
-function(orb)
-    return PartialRFusionOrbitNC;
-end);
+# InstallMethod(ConstructorOfCocoOrbitNC,
+# "for a partial regular all partial fusion orbits",
+#         [IsPartialRFusionOrbit],
+# function(orb)
+#     return PartialRFusionOrbitNC;
+# end);

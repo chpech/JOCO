@@ -13,7 +13,6 @@ DeclareOperation( "ExtendedPartialStablePartition", [IsCocoPartialStablePartitio
 DeclareProperty( "IsExtendiblePartialStablePartition", IsCocoPartialStablePartition );
 DeclareOperation( "IsCompatibleWithPartialStablePartition", [IsCocoPartialStablePartition, IsCocoStableSet] );
 
-# DeclareOperation( "RainbowOfPartialRFusion", [IsPartialRFusion] );
 
 
 

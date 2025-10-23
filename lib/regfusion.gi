@@ -3,50 +3,25 @@
 ##  regfusion.gi                  JOCO package
 ##                                                              Mikhail Klin
 ##                                                            Christian Pech
-##                                                             Sven Reichard
 ##
-##  Implementation of the R-fusion data type
+##  Implementation of the datatype of regular fusions
 ##
 #############################################################################
 
 
-DeclareRepresentation("IsRFusionOfCgrRep",
-        IsAttributeStoringRep,
-        ["cgr",             # the rainbow over which the fusion lives
-         "partition"        # the partition of colors of cgr
-        ]);
-
-InstallMethod(RFusionsFamily,
-    "for rainbows",
-	[IsColorGraph],
+InstallMethod(RegularFusionsFamily,
+"for a color graph",
+[IsColorGraph],
 function(cgr)
    local fam;
-   fam:=NewFamily("RFusionsFam", IsRFusionOfCgr);
+   fam:=NewFamily("RegularFusionsFam", IsRegularFusion);
    return fam;
 end);
 
-# InstallGlobalFunction(RFusionFromPartition,
-# function(arg)
-#    local cgr,set,part,res;
-
-#    cgr:=arg[1];
-#    part:=arg[2];
-#    return RFusionFromPartitionNC(cgr,part);
-# end);
-
-# InstallGlobalFunction(RFusionFromPartitionNC,
-# function(cgr,part)
-#    local obj;
-
-#    obj:=rec(
-#    	     cgr := cgr,
-#    	     partition := Immutable(ShortLexSorted(part)));
-#    return Objectify(NewType(RFusionsFamily(cgr), IsRFusionOfCgr and IsRFusionOfCgrRep), obj);
-# end);
 
 InstallMethod( StablePartitionFromCompletePartialStablePartition,
-        "for partial R-fusions",
-        [IsPartialRFusion and IsPartialRFusionRep],
+"for a partial regular fusion in PartialRegularFusionRep",
+[IsPartialRegularFusion and IsPartialRegularFusionRep],
 function(cpfus)
     local obj;
     
@@ -54,186 +29,74 @@ function(cpfus)
     obj:=rec(
    	      cgr := cpfus!.cgr,
    	      partition := Immutable(ShortLexSorted(cpfus!.part.classes)));
-    return Objectify(NewType(RFusionsFamily(cpfus!.cgr), IsRFusionOfCgr and IsRFusionOfCgrRep), obj);
+    return Objectify(NewType(RegularFusionsFamily(cpfus!.cgr), IsRegularFusion and IsColorPartitionRep), obj);
 end);
 
 
-InstallOtherMethod(AsPartition,
-        "for R-fusions in RFusionOfCgrRep",
-        [IsRFusionOfCgr and IsRFusionOfCgrRep],
-function(f)
-    local res;
-    res:=Set(f!.partition, ShallowCopy);
-    MakeImmutable(res);
-    return res;
-end);
-
-InstallMethod(RainbowOfRFusion,
-        "for R-fusions in RFusionOfCgrRep",
-        [IsRFusionOfCgr and IsRFusionOfCgrRep],
-function(f)
-   return f!.cgr;
-end);
-
-InstallMethod(RankOfRFusion,
-		"for R-fusions of rainbows",
-		[IsRFusionOfCgr and IsRFusionOfCgrRep],
-function(fusion)
-   return Length(fusion!.partition);
-end);
-
-InstallOtherMethod(Rank,
-		"for R-fusions of rainbow",
-		[IsRFusionOfCgr],
-function(fusion)
-   return RankOfRFusion(fusion);
-end);
-
-InstallMethod(OrderOfRFusion,
-        "for R-fusions of rainbows",
-        [IsRFusionOfCgr],
-function(fusion)
-   return OrderOfCocoObject(RainbowOfRFusion(fusion));
-end);
-
-InstallOtherMethod(Order,
-        "for R-fusions of rainbows",
-        [IsRFusionOfCgr],
-function(fusion)
-   return OrderOfRFusion(fusion);
-end);
-
-InstallMethod(PartitionOfRFusion,
-        "for R-fusions of rainbows",
-        [IsRFusionOfCgr and IsRFusionOfCgrRep],
-function(fusion)
-    return fusion!.partition;
-end);
-
-# InstallMethod(SubOrbitsOfCocoOrbit,
-#         "for all R-fusion orbits",
-#         [IsPermGroup, IsRFusionOrbit],
-# function(grp,orb)
-#     local   ug,  cosreps,  stab,  rep,  nrep;
-
-
-#     ug:=UnderlyingGroupOfCocoOrbit(orb);
-
-#     if not IsSubgroup(ug,grp) then
-#         Error("SubOrbitsOfCocoOrbit: The given group is not a subgroup of the underlying group of the good set orbit!");
-#     fi;
-#     stab:=StabilizerOfCanonicalRepresentative(orb);
-#     cosreps:=List(DoubleCosetsNC(ug,stab, grp), Representative);
-#     rep:=CanonicalRepresentativeOfCocoOrbit(orb);
-#     nrep:=RFusionOrbitNC(grp,rep, Intersection(stab,grp));
-
-#     return Set(cosreps, x->OnCocoOrbits(nrep,x));
-# end);
-
-# InstallMethod(SubOrbitsWithInvariantPropertyOfCocoOrbit,
-#         "for R-fusion orbits",
-#         [IsPermGroup, IsRFusionOrbit, IsFunction],
-# function(grp,orb,func)
-#     local   ug,  cosreps,  stab,  rep,  nrep,  res;
-
-#     ug:=UnderlyingGroupOfCocoOrbit(orb);
-
-#     if not IsSubgroup(ug,grp) then
-#         Error("SubOrbitsWithInvariantPropertyOfCocoOrbit: The given group is not a subgroup of the underlying group of the good set orbit!");
-#     fi;
-
-#     stab:=StabilizerOfCanonicalRepresentative(orb);
-#     cosreps:=List(DoubleCosetsNC(ug,stab,grp), Representative); 
-#     rep:=CanonicalRepresentativeOfCocoOrbit(orb);
-#     nrep:=RFusionOrbitNC(grp,rep, Intersection(stab,grp));
-#     cosreps:=Filtered(cosreps, r->func(OnJFusions(CanonicalRepresentativeOfCocoOrbit(nrep),r)));
-#     res:=List(cosreps, x->OnCocoOrbits(nrep,x));
-#     return Set(res);
-# end);
 
 #########################################################################################
 
 InstallMethod(ViewString,
-        "for R-fusions of rainbows",
-        [IsRFusionOfCgr],
+"for a regular fusion",
+[IsRegularFusion],
 function(x)
-    return Concatenation("<R-fusion of order ", String(OrderOfCocoObject(RainbowOfRFusion(x))), " and rank ", String(RankOfRFusion(x)), ">");
+    return Concatenation("<Regular fusion of order ", String(Order(x)), " and rank ", String(Rank(x)), ">");
 end);
 
 InstallMethod(ViewString,
-        "for R-fusion orbits",
-        [IsRFusionOrbit],
-        function(x)
+"for a regular fusion orbit",
+[IsRegularFusionOrbit],
+function(x)
     local res;
     
     res:="<";
     if IsMutable(x) then
         Append(res,"mutable ");
     fi;
-    Append(res, Concatenation("RFusionOrbit of length ", String(Size(x)),">"));
+    Append(res, Concatenation("RegularFusionOrbit of length ", String(Size(x)),">"));
     return res;
 end);
 
-
-InstallOtherMethod(\<,
-        "for R-fusions of rainbows",
-        IsIdenticalObj,
-        [IsRFusionOfCgr,IsRFusionOfCgr],
-function(fs1,fs2)
-    local   p1,  p2,  i;
-    if RankOfRFusion(fs1)<>RankOfRFusion(fs2) then
-        return RankOfRFusion(fs1)<RankOfRFusion(fs2);
-    else
-        p1:=AsPartition(fs1);
-        p2:=AsPartition(fs2);
-        for i in [1..Length(p1)] do
-            if Length(p1[i])<>Length(p2[i]) then
-                return Length(p1[i])<Length(p2[i]);
-            elif p1[i]<>p2[i] then
-                return p1[i]<p2[i];
-            fi;
-        od;
-    fi;
-    return false;
-end);
-
-InstallOtherMethod(\=,
-        "for R-fusions of rainbows",
-        IsIdenticalObj,
-        [IsRFusionOfCgr,IsRFusionOfCgr],
-function(fs1,fs2)
-    return PartitionOfRFusion(fs1)=PartitionOfRFusion(fs2);
-end);
-
-InstallGlobalFunction(RFusionOrbitsFromRegularSetOrbits,
+InstallOtherMethod(HomogeneousRegularFusionOrbits,
+"for a stable rainbow and a list of regular set orbits",
+[IsRainbow and IsStableRainbow, IsList],
 function(cgr,gsorbits)
     local pfus, iter,max;
+    
+    if not ForAll(gsorbits, IsRegularSetOrbit) then
+        ErrorNoReturn("HomogeneousRegularFusionOrbits: expecting a list of regular set orbits");
+    fi;
+    if not ForAll(gsorbits, gso->IsIdenticalObj(FamilyObj(Representative(gso)),FamilyObj(Representative(gsorbits[1])))) then
+        ErrorNoReturn("HomogeneousRegularFusionOrbits: regular set orbits are incompatible");
+    fi;
     
     if gsorbits=[] then
         max:=0;
     else
         max:=Maximum(List(gsorbits, x->Size(Representative(x))));
+        if not IsIdenticalObj(cgr,UnderlyingCgrOfColorSet(Representative(gsorbits[1]))) then
+            ErrorNoReturn("HomogeneousRegularFusionOrbits: regular set orbits are incompatible");
+        fi;
     fi;
     
-    pfus:=EmptyPartialRFusion(cgr, max);
+    pfus:=EmptyPartialRegularFusion(cgr, max);
 
     iter:=IteratorOfPartialStablePartitionOrbits(pfus,gsorbits);
     
     return AllStablePartitionOrbits(iter);
 end);
 
-
-InstallMethod(RFusionOrbitsFamilyOp,
-        "for color graphs and permutation groups",
-        [IsColorGraph, IsPermGroup],
-function(T,g)
-    return NewFamily("RFusionOrbitsFam", IsRFusionOrbit);
+InstallMethod(RegularFusionOrbitsFamilyOp,
+"for a color graph and a permutation groups",
+[IsColorGraph, IsPermGroup],
+function(cgr,g)
+    return NewFamily("RegularFusionOrbitsFam", IsRegularFusionOrbit);
 end);
 
 
-# RFusionOrbit(<group>, <Rfusion> [,<stab>] )
+# RegularFusionOrbit(<group>, <Rfusion> [,<stab>] )
 # <stab> is supposed to be a subgroup of the stabilizer of <fusion> in <group>
-InstallGlobalFunction(RFusionOrbit,
+InstallGlobalFunction(RegularFusionOrbit,
 function(arg)
     local group,fusion,stab, can,xstab,nstab;
 
@@ -245,95 +108,70 @@ function(arg)
         stab:=arg[3];
     fi;
 
-    can:=SetsSetsCanonifiers(group, stab, PartitionOfRFusion(fusion));
+    can:=SetsSetsCanonifiers(group, stab, UnderlyingPartitionOfColorPartition(fusion));
     nstab:=ClosureGroup(stab, List(can, x->can[1]*x^(-1)));
-    Assert(1, nstab=Stabilizer(group, PartitionOfRFusion(OnRFusions(fusion,can[1])),OnSetsSets));
+    Assert(1, nstab=Stabilizer(group, UnderlyingPartitionOfColorPartition(OnRegularFusions(fusion,can[1])),OnSetsSets));
     
 
-    return RFusionOrbitNC(group, OnRFusions(fusion,can[1]), nstab^can[1]);
+    return RegularFusionOrbitNC(group, OnRegularFusions(fusion,can[1]), nstab^can[1]);
 end);
 
 
-# RFusionOrbitNC(<group>, <Jfusion> [,<stab>])
+# RegularFusionOrbitNC(<group>, <Jfusion> [,<stab>])
 # <Rfusion> is a R-fusion that is assumed to be minimal (rev-lex wise) in its orbit
 # the minimality property is not checked
 # <stab> is supposed to be the full (SetsSets-wise) stabilizer of <Rfusion> in <group>
-InstallGlobalFunction(RFusionOrbitNC,
-function(arg)
-    local group,fusion,stab,res;
+InstallGlobalFunction(RegularFusionOrbitNC,
+function(group,fusion,stab)
+    local res;
 
-    group:=arg[1];
-    fusion:=arg[2];
-    if Length(arg)=2 then
-        stab:=Stabilizer(group,AsPartition(fusion), OnSetsSets);
-    else
-        stab:=arg[3];
-    fi;
 
     res:=rec(
-            group:=group,
-            rep:=fusion,
-            stab:=stab);
-   return Objectify(NewType(RFusionOrbitsFamily(RainbowOfRFusion(fusion),group), IsRFusionOrbit and IsCocoOrbitRep), res);
+              group:=group,
+              rep:=fusion,
+              stab:=stab);
+    return Objectify(NewType(RegularFusionOrbitsFamily(UnderlyingCgrOfColorPartition(fusion),group), IsRegularFusionOrbit and IsCocoOrbitRep), res);
 end);
 
-InstallMethod(OnRFusions,
-        "for R-fusions in RFusionOfCgrRep",
-        [IsRFusionOfCgr and IsRFusionOfCgrRep, IsPerm],
+InstallMethod(OnRegularFusions,
+"for a regular fusion in ColorPartitionRep and a permutation",
+[IsRegularFusion and IsColorPartitionRep, IsPerm],
 function(fusion, g)
     local res;
     res:=rec(
-                   cgr:=fusion!.cgr,
-             partition:=MakeImmutable(ShortLexSorted(OnSetsSets(Set(fusion!.partition),g)))
-    );
-
-    return Objectify(NewType(RFusionsFamily(fusion!.cgr), IsRFusionOfCgr and IsRFusionOfCgrRep), res);
-end);
-
-InstallOtherMethod(ColorGraphByFusion,
-        "for color graphs and for an R-fusion",
-        [IsColorGraph, IsRFusionOfCgr],
-function(cgr,fusion)
-    local res;
-
-    if not IsIdenticalObj(RFusionsFamily(cgr), FamilyObj(fusion)) then
-        Error("The given fusion must belong to the given color graph!");
-    fi;
-    res:= ColorGraphByFusion(cgr, PartitionOfFusion(fusion));
-    SetIsRainbow(res,true);
-    SetIsHomogeneous(res,true);
-    SetIsStableRainbow(res,true);
+              cgr:=fusion!.cgr,
+              partition:=MakeImmutable(ShortLexSorted(OnSetsSets(Set(fusion!.partition),g)))
+             );
     
-    return res;
+    return Objectify(NewType(RegularFusionsFamily(fusion!.cgr), IsRegularFusion and IsColorPartitionRep), res);
 end);
 
-InstallMethod(HomogeneousRFusionOrbits,
-        "for stable rainbows",
-        [IsColorGraph and IsRainbow and IsStableRainbow],
+
+InstallMethod(HomogeneousRegularFusionOrbits,
+"for a stable rainbow",
+[IsColorGraph and IsRainbow and IsStableRainbow],
 function(cgr)
     local gsorbs,rforb;
     
     gsorbs:=HomogeneousRegularSetOrbits(cgr);
-    rforb:=RFusionOrbitsFromRegularSetOrbits(cgr,gsorbs);
-    return rforb;
-    
+    rforb:=HomogeneousRegularFusionOrbits(cgr,gsorbs);
+    return rforb;  
 end);
 
-InstallOtherMethod(HomogeneousRFusionOrbits,
-        "for a stable rainbow and a permutation group",
-        [IsColorGraph and IsRainbow and IsStableRainbow, IsPermGroup],
+InstallOtherMethod(HomogeneousRegularFusionOrbits,
+"for a stable rainbow and a permutation group",
+[IsColorGraph and IsRainbow and IsStableRainbow, IsPermGroup],
 function(cgr,g)
-    
     local gsorbs,rforb;
     
     gsorbs:=HomogeneousRegularSetOrbits(cgr,g);
-    rforb:=RFusionOrbitsFromRegularSetOrbits(cgr,gsorbs);
+    rforb:=HomogeneousRegularFusionOrbits(cgr,gsorbs);
     return rforb;
 end);
 
 InstallMethod(OnCocoOrbits,
-        "for all R-fusion orbits",
-        [IsRFusionOrbit, IsPerm],
+"for a regular fusion orbit and a permutation",
+[IsRegularFusionOrbit, IsPerm],
 function(orb,perm)
     local   grp,  rep,  stab,  nrep;
     
@@ -345,22 +183,16 @@ function(orb,perm)
     rep:=CanonicalRepresentativeOfCocoOrbit(orb);
     stab:=StabilizerOfCanonicalRepresentative(orb);
 
-    nrep:=OnRFusions(rep,perm);
-    return RFusionOrbit(grp,nrep,Stabilizer(grp,AsPartition(nrep),OnSetsSets));
+    nrep:=OnRegularFusions(rep,perm);
+
+    return RegularFusionOrbitNC(grp,nrep,Stabilizer(grp,AsPartition(nrep),OnSetsSets));
 end);
 
 InstallMethod(ActionOfCocoOrbit,
-        "for all R-fusion orbits",
-        [IsRFusionOrbit],
+"for a regular fusion orbit",
+[IsRegularFusionOrbit],
 function(orb)
-    return OnRFusions;
-end);
-
-InstallOtherMethod(PartitionOfFusion,
-        "for R-fusions of rainbows",
-        [IsRFusionOfCgr],
-function(fusion)
-    return PartitionOfRFusion(fusion);
+    return OnRegularFusions;
 end);
 
 RegisterStandardInfoRFusion@JOCO:=function(node)
@@ -458,12 +290,11 @@ RegisterStandardInfoRFusion@JOCO:=function(node)
     fi;
 end;
 
-StringRFusionInfo:=function(cgr,lcgr)
+InstallGlobalFunction(StringRegularFusionInfo,
+function(cgr,lcgr)
     local  proper, long, cisomap, map, i, cgrr, ord, nodes, node, 
            outp, res, ninf, str, maxlength, scgr, mrg, idx, v, mcgr, 
            isproper, index, mnode, cisorep;
-    
-        
     
     long:=ValueOption("long");
     if long=fail then
@@ -512,8 +343,8 @@ StringRFusionInfo:=function(cgr,lcgr)
     SetPrintFormattingStatus(res,false);
 
 
-    PrintTo(res,"JOCO - Information about a List of Rainbows schemes\n",
-                "---------------------------------------------------\n");
+    PrintTo(res,"JOCO - Information about a List of Rainbows\n",
+                "-------------------------------------------\n");
     node:=NewCocoNode(cgr);
     RegisterStandardInfo@COCO2P(node);
     ninf:=node!.nodeInfo;
@@ -608,33 +439,33 @@ StringRFusionInfo:=function(cgr,lcgr)
 
     CloseStream(res);
     return outp;
-end;
+end);
 
 
 InstallMethod(ConstructorOfCocoOrbit,
-        "for all R-fusion orbits",
-        [IsRFusionOrbit],
+"for a  regular fusion orbit",
+[IsRegularFusionOrbit],
 function(orb)
-    return RFusionOrbit;
+    return RegularFusionOrbit;
 end);
 
 InstallMethod(ConstructorOfCocoOrbitNC,
-        "for all R-fusion orbits",
-        [IsRFusionOrbit],
+"for a regular fusion orbit",
+[IsRegularFusionOrbit],
 function(orb)
-    return RFusionOrbitNC;
+    return RegularFusionOrbitNC;
 end);
 
 InstallMethod(ConstructorOfStablePartitionOrbit,
-"for all RFusions",
-[IsRFusionOfCgr],
+"for a regular Fusion",
+[IsRegularFusion],
 function(rfus)
-    return RFusionOrbit;
+    return RegularFusionOrbit;
 end);
 
 InstallMethod(ConstructorOfStablePartitionOrbitNC,
-"for all RFusions",
-[IsRFusionOfCgr],
+"for a regular fusion",
+[IsRegularFusion],
 function(rfus)
-    return RFusionOrbitNC;
+    return RegularFusionOrbitNC;
 end);

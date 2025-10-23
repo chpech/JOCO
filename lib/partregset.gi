@@ -10,7 +10,7 @@ DeclareRepresentation("IsPartialRegularSetRep",
 
 
 InstallMethod(PartialRegularSetsFamily,
-"for color graphs",
+"for a color graph",
 [IsColorGraph],
 function(cgr)
    local fam;
@@ -19,22 +19,22 @@ function(cgr)
 end);
 
 InstallMethod(PartialRegularSetOrbitFamilyOp,
-        "for color graphs and permutation groups",
-        [IsColorGraph, IsPermGroup],
+"for a color graph and a permutation group",
+[IsColorGraph, IsPermGroup],
 function(cgr,g)
     return NewFamily("PartialRegularSetOrbitFam", IsPartialStableSetOrbit);
 end);
 
 InstallMethod(GetPartialStableSetOrbitFamily,
-"for partial regular sets in PartialRegularSetRep and a permutation group",
+"for a partial regular set in PartialRegularSetRep and a permutation group",
 [IsPartialRegularSet and IsPartialRegularSetRep, IsPermGroup],
 function(prset,grp)  
     return PartialRegularSetOrbitFamily(prset!.cgr,grp);
 end);
 
 InstallMethod( ViewString,
-        "for partial regular sets in PartialRegularSetRep",
-        [IsPartialRegularSet and IsPartialRegularSetRep],
+"for a partial regular set in PartialRegularSetRep",
+[IsPartialRegularSet and IsPartialRegularSetRep],
 function(prs)
     local cgr,s,res;
     
@@ -51,9 +51,16 @@ function(prs)
     return Concatenation(res,"partial regular set ", String(s), ">");
 end);
 
+InstallMethod(ConstructorOfStableSetOrbit,
+"for a regular set",
+[IsRegularSet],
+function(orb)
+    return RegularSetOrbit;
+end);
+
 InstallMethod(IsCompletePartialStableSet,
-    "for partial regular sets in PartialRegularSetRep",
-    [IsPartialRegularSet and IsPartialRegularSetRep],
+"for a partial regular set in PartialRegularSetRep",
+[IsPartialRegularSet and IsPartialRegularSetRep],
 function(prs)
     local set;
     
@@ -68,7 +75,7 @@ end);
 
 
 InstallMethod(ExtendedPartialStableSet,
-"for symmetric partial regular sets in PartialRegularSetRep",
+"for a symmetric partial regular set in PartialRegularSetRep and a positive integer",
 [IsSymPartialRegularSet and IsPartialRegularSetRep, IsPosInt],
 function(cand,pt)
     local  clr, ndom, obj;
@@ -99,8 +106,8 @@ function(cand,pt)
 end);
 
 InstallMethod(EmptySymPartialRegularSet,
-        "for regular rainbows",
-        [IsColorGraph and IsRainbow and IsRegularColorGraph],
+"for a regular rainbow",
+[IsColorGraph and IsRainbow and IsRegularColorGraph],
 function(cgr)
     local aaut,rclr,clr,sclr,aclr,imap,map, i, j,act,cand;
     
@@ -134,8 +141,8 @@ end);
 
 
 InstallMethod(ExtendedPartialStableSet,
-    "for asymmetric partial regular sets in PartialRegularSetRep",
-    [IsAsymPartialRegularSet and IsPartialRegularSetRep, IsPosInt],
+"for an asymmetric partial regular set in PartialRegularSetRep and a positive integer",
+[IsAsymPartialRegularSet and IsPartialRegularSetRep, IsPosInt],
 function(cand,pt)
     local  cgr, clr, ipt, ndom, obj;
     
@@ -169,8 +176,8 @@ end);
 
 
 InstallMethod(EmptyAsymPartialRegularSet,
-        "for homogeneous WL-stable color graphs",
-        [IsColorGraph and IsRainbow and IsRegularColorGraph],
+"for a regular rainbow",
+[IsColorGraph and IsRainbow and IsRegularColorGraph],
 function(cgr)
     local imap,map,i,grp,act,cand;
     
@@ -193,15 +200,6 @@ function(cgr)
     
     return Objectify(NewType(PartialRegularSetsFamily(cgr), IsAsymPartialRegularSet and IsPartialRegularSetRep), cand);
 end);
-
-
-
-
-##############################################################################
-#
-# homogeneous symmetric regular set candidates for inhomogeneous CCs
-#
-##############################################################################
 
 DeclareRepresentation("IsSymPartialRegularSetBlkRep",
         IsPartialRegularSetRep,
@@ -228,8 +226,8 @@ DeclareRepresentation("IsSymPartialRegularSetBlkRep",
 
 
 InstallMethod(IsCompletePartialStableSet,
-    "for symmetric partial regular sets in SymPartialRegularSetBlkRep",
-    [IsSymPartialRegularSet and IsSymPartialRegularSetBlkRep],
+"for a symmetric partial regular set in SymPartialRegularSetBlkRep",
+[IsSymPartialRegularSet and IsSymPartialRegularSetBlkRep],
 function(cand)
     local a,b,block;
     
@@ -251,13 +249,9 @@ function(cand)
     return true;
 end);
 
-
-
-
-
 InstallMethod(ExtendedPartialStableSet,
-    "for symmetric partial regular sets in SymPartialRegularSetBlk",
-    [IsSymPartialRegularSet and IsSymPartialRegularSetBlkRep, IsPosInt],
+"for a symmetric partial regular set in SymPartialRegularSetBlk and a positive integer",
+[IsSymPartialRegularSet and IsSymPartialRegularSetBlkRep, IsPosInt],
 function(cand,pt)
     local clr,t,npgs,color,icolor,sb,fb,i,b,j,a,block,sd,sbinfr,fbinfr,sq,bm,k,kmts,
           ksb,kfb,ncand,ent,blkIdx,ba,bb,bc,bbl;                
@@ -402,12 +396,12 @@ function(cand,pt)
 end);
 
 InstallMethod(EmptySymPartialRegularSet,
-        "for inhomogeneous WL-stable color graphs",
-        [IsColorGraph and IsWLStableColorGraph],
+"for a well-fibred J-stable color graphs",
+[IsColorGraph and IsJStableColorGraph and IsWellFibredRainbow],
 function(cgr)
     local tensor,mat,vec,perm,blocks,startBlock,finishBlock,rclr,clr,nof,imap,a,sclr,aclr,b,map,i,j,domdegreelist,cand,sb,bclr,idxBlk;
     
-    tensor:=StructureConstantsOfColorGraph(cgr);
+    tensor:=JStructureConstantsOfColorGraph(cgr);
     if not IsBlockedTensorRep(tensor) then
         TryNextMethod();
         
@@ -517,8 +511,8 @@ DeclareRepresentation("IsAsymPartialRegularSetBlkRep",
 
 
 InstallMethod(IsCompletePartialStableSet,
-    "for asymmetric partial regular sets in AsymPartialRegularSetBlkRep",
-    [IsAsymPartialRegularSet and IsAsymPartialRegularSetBlkRep],
+"for an asymmetric partial regular set in AsymPartialRegularSetBlkRep",
+[IsAsymPartialRegularSet and IsAsymPartialRegularSetBlkRep],
 function(cand)
     local a,b,block;
     
@@ -550,8 +544,8 @@ end);
 
 
 InstallMethod(ExtendedPartialStableSet,
-    "for asymmetric partial regular sets in AsymPartialRegularSetBlkRep and positive integers",
-    [IsAsymPartialRegularSet and IsAsymPartialRegularSetBlkRep, IsPosInt],
+"for an asymmetric partial regular set in AsymPartialRegularSetBlkRep and a positive integer",
+[IsAsymPartialRegularSet and IsAsymPartialRegularSetBlkRep, IsPosInt],
 function(cand,pt)
     local clr,t,bm,npgs,color,sb,fb,sd,i,j,k,kmts,a,b,block,md,sq,icolor,ksb,kfb,sbinfr,ent,blkIdx,ba,bb,bc,bbl;
     
@@ -665,12 +659,12 @@ end);
 
 
 InstallMethod(EmptyAsymPartialRegularSet,
-        "for inhomogeneous WL-stable color graphs",
-        [IsColorGraph and IsWLStableColorGraph],
+"for an inhomogeneous J-stable well-fibred color graph",
+[IsColorGraph and IsJStableColorGraph and IsWellFibredRainbow],
 function(cgr)
     local tensor,mat,vec,perm,blocks,startBlock,finishBlock,nof,imap,a,b,map,i,clr,cand,sb,fb,domrowdegs,domcoldegs;
     
-    tensor:=StructureConstantsOfColorGraph(cgr);
+    tensor:=JStructureConstantsOfColorGraph(cgr);
     if not IsBlockedTensorRep(tensor) then
         TryNextMethod();
         ErrorNoReturn("This is not supposed to happen!");
@@ -678,7 +672,6 @@ function(cgr)
     
     mat:=List(tensor!.blocks, a->List(tensor!.blocks, Length));
     vec:=List(mat,Sum);
-    # perm:=();
     perm:=SortingPerm(vec);
     blocks:=tensor!.blocks;
     blocks:=Permuted(List(tensor!.blocks, x->Permuted(x,perm)),perm);
@@ -746,9 +739,3 @@ function(cgr)
 end);
 
 
-InstallMethod(ConstructorOfStableSetOrbit,
-        "for all regular sets",
-        [IsRegularSet],
-function(orb)
-    return RegularSetOrbit;
-end);

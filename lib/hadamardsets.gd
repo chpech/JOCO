@@ -4,7 +4,7 @@ DeclareAttribute( "HadamardSetsFamily", IsColorGraph );
 DeclareOperation("HadamardSet", [IsColorGraph, IsList]);
 
 
-DeclareOperation( "UnderlyingCgrOfHadamardSet", [IsHadamardSet] ); 
+# DeclareOperation( "UnderlyingCgrOfHadamardSet", [IsHadamardSet] ); 
 DeclareOperation( "OnHadamardSets", [IsHadamardSet, IsPerm] );    
 
 ################################################################################
