@@ -11,7 +11,7 @@ function(filter, cgr, set)
     return res;
     
 end);
-InstallTrueMethod(IsArcRegularSet, IsRegularSet and IsJStableSet);
+InstallTrueMethod(IsJArcRegularSet, IsRegularSet and IsJStableSet);
 
 InstallMethod(OnRegularSets,
 "for a J-stable set and a permutation",
@@ -22,7 +22,7 @@ end);
 
 InstallMethod(ViewString,
 "for a J-stable set",
-[IsRegularSet and IsArcRegularSet and IsJStableSet],
+[IsRegularSet and IsJArcRegularSet and IsJStableSet],
 function(x) 
     return Concatenation("<", "JStableSet: ", String(AsSet(x)), ">");
 end);
@@ -70,10 +70,10 @@ function(cgr)
     
     t:=JStructureConstantsOfColorGraph(cgr);
     
-    if HasHomogeneousSymArcRegularSetOrbits(cgr) then
-        return Filtered(HomogeneousSymArcRegularSetOrbits(cgr), x->IsJStableSet(Representative(x)));
+    if HasHomogeneousSymJArcRegularSetOrbits(cgr) then
+        return Filtered(HomogeneousSymJArcRegularSetOrbits(cgr), x->IsJStableSet(Representative(x)));
     else
-        iter:=IteratorOfPartialStableSetOrbits(g, EmptySymPartialArcRegularSet(cgr));
+        iter:=IteratorOfPartialStableSetOrbits(g, EmptySymPartialJArcRegularSet(cgr));
     fi;
     act:= ActionOfPartialStableSetOrbitIterator(iter);
     if act = fail then 
@@ -86,9 +86,12 @@ function(cgr)
     symarsets:=[];
     
     for sorb in iter do
+        if iter!.state<>fail and Length(iter!.state.M)<=COCOInfoGSSize then
+            Info(InfoCOCO,1,iter!.state.M,"\n");
+        fi;
         
         rep:=Representative(sorb);
-        
+
         if IsCompletePartialStableSet(rep) then
             gs:=StableSetFromPartialStableSet(rep);
             if gs <> fail then 
@@ -102,7 +105,7 @@ function(cgr)
             fi;
         fi;
     od;
-    SetHomogeneousSymArcRegularSetOrbits(cgr,symarsets);
+    SetHomogeneousSymJArcRegularSetOrbits(cgr,symarsets);
     
     return res;
 end);
@@ -118,10 +121,10 @@ function(cgr)
     
     t:=JStructureConstantsOfColorGraph(cgr);
     
-    if HasHomogeneousAsymArcRegularSetOrbits(cgr) then
-        return Filtered(HomogeneousAsymArcRegularSetOrbits(cgr), x->IsJStableSet(Representative(x)));
+    if HasHomogeneousAsymJArcRegularSetOrbits(cgr) then
+        return Filtered(HomogeneousAsymJArcRegularSetOrbits(cgr), x->IsJStableSet(Representative(x)));
     else
-        iter:=IteratorOfPartialStableSetOrbits(g, EmptyAsymPartialArcRegularSet(cgr));
+        iter:=IteratorOfPartialStableSetOrbits(g, EmptyAsymPartialJArcRegularSet(cgr));
     fi;
     act:= ActionOfPartialStableSetOrbitIterator(iter);
     if act = fail then 
@@ -134,7 +137,10 @@ function(cgr)
     asymarsets:=[];
     
     for sorb in iter do
-        
+        if iter!.state<>fail and Length(iter!.state.M)<=COCOInfoGSSize then
+            Info(InfoCOCO,1,iter!.state.M,"\n");
+        fi;
+
         rep:=Representative(sorb);
         
         if IsCompletePartialStableSet(rep) then
@@ -150,7 +156,7 @@ function(cgr)
             fi;
         fi;
     od;
-    SetHomogeneousAsymArcRegularSetOrbits(cgr,asymarsets);
+    SetHomogeneousAsymJArcRegularSetOrbits(cgr,asymarsets);
     
     return res;
 end);

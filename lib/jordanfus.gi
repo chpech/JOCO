@@ -31,181 +31,11 @@ function(cpfus)
     return Objectify(NewType(JordanFusionsFamily(cpfus!.cgr), IsJordanFusion and IsColorPartitionRep), obj);
 end);
 
-# InstallGlobalFunction(JFusionFromPartition,
-# function(arg)
-#    local tensor,set,part,res;
-
-#    tensor:=arg[1];
-#    part:=arg[2];
-#    if not IsJStablePartition(tensor,part) then
-#        return fail;
-#    fi;
-#    return JFusionFromPartitionNC(tensor,part);
-# end);
-
-# InstallGlobalFunction(JFusionFromPartitionNC,
-# function(tensor,part)
-#    local obj;
-
-#    obj:=rec(
-#    			   tensor := tensor,
-#    			partition := Immutable(ShortLexSorted(part)));
-#    return Objectify(NewType(JFusionsFamily(tensor), IsJFusionOfTensor and IsJFusionOfTensorRep), obj);
-# end);
-
-# InstallOtherMethod(AsPartition,
-#         "for J-fusions in JFusionOfTensorRep",
-#         [IsJFusionOfTensor and IsJFusionOfTensorRep],
-# function(f)
-#     local res;
-#     res:=Set(f!.partition, ShallowCopy);
-#     MakeImmutable(res);
-#     return res;
-# end);
-
-# InstallMethod(TensorOfJFusion,
-#         "for J-fusions in JFusionOfTensorRep",
-#         [IsJFusionOfTensor and IsJFusionOfTensorRep],
-# function(f)
-#    return f!.tensor;
-# end);
-
-# InstallMethod(RankOfJFusion,
-# 		"for J-fusions of structure constants tensors",
-# 		[IsJFusionOfTensor and IsJFusionOfTensorRep],
-# function(fusion)
-#    return Length(fusion!.partition);
-# end);
-
-# InstallOtherMethod(Rank,
-# 		"for J-fusions of structure constants tensors",
-# 		[IsJFusionOfTensor],
-# function(fusion)
-#    return RankOfJFusion(fusion);
-# end);
-
-# InstallMethod(OrderOfJFusion,
-#         "for J-fusions of structure constants tensors",
-#         [IsJFusionOfTensor],
-# function(fusion)
-#    return OrderOfCocoObject(TensorOfJFusion(fusion));
-# end);
-
-# InstallOtherMethod(Order,
-#         "for J-fusions of structure constants tensors",
-#         [IsJFusionOfTensor],
-# function(fusion)
-#    return OrderOfJFusion(fusion);
-# end);
-
-# InstallMethod(PartitionOfJFusion,
-#         "for J-fusions of structure constants tensors",
-#         [IsJFusionOfTensor and IsJFusionOfTensorRep],
-# function(fusion)
-#     return fusion!.partition;
-# end);
-
-
-# InstallMethod(SubOrbitsOfCocoOrbit,
-#         "for all J-fusion orbits",
-#         [IsPermGroup, IsJFusionOrbit],
-# function(grp,orb)
-#     local   ug,  cosreps,  stab,  rep,  nrep;
-
-
-#     ug:=UnderlyingGroupOfCocoOrbit(orb);
-
-#     if not IsSubgroup(ug,grp) then
-#         Error("SubOrbitsOfCocoOrbit: The given group is not a subgroup of the underlying group of the good set orbit!");
-#     fi;
-#     stab:=StabilizerOfCanonicalRepresentative(orb);
-#     cosreps:=List(DoubleCosetsNC(ug,stab, grp), Representative);
-#     rep:=CanonicalRepresentativeOfCocoOrbit(orb);
-#     nrep:=JFusionOrbitNC(grp,rep, Intersection(stab,grp));
-
-#     return Set(cosreps, x->OnCocoOrbits(nrep,x));
-# end);
-
-# InstallMethod(SubOrbitsWithInvariantPropertyOfCocoOrbit,
-#         "for J-fusion orbits",
-#         [IsPermGroup, IsJFusionOrbit, IsFunction],
-# function(grp,orb,func)
-#     local   ug,  cosreps,  stab,  rep,  nrep,  res;
-
-#     ug:=UnderlyingGroupOfCocoOrbit(orb);
-
-#     if not IsSubgroup(ug,grp) then
-#         Error("SubOrbitsWithInvariantPropertyOfCocoOrbit: The given group is not a subgroup of the underlying group of the good set orbit!");
-#     fi;
-
-#     stab:=StabilizerOfCanonicalRepresentative(orb);
-#     cosreps:=List(DoubleCosetsNC(ug,stab,grp), Representative); 
-#     rep:=CanonicalRepresentativeOfCocoOrbit(orb);
-#     nrep:=JFusionOrbitNC(grp,rep, Intersection(stab,grp));
-#     cosreps:=Filtered(cosreps, r->func(OnJFusions(CanonicalRepresentativeOfCocoOrbit(nrep),r)));
-#     res:=List(cosreps, x->OnCocoOrbits(nrep,x));
-#     return Set(res);
-# end);
-
-#########################################################################################
-
 InstallMethod(ViewString,
 "for a Jordan fusion",
 [IsJordanFusion],
 function(x)
     return Concatenation("<Jordan fusion of order ", String(Order(x)), " and rank ", String(Rank(x)), ">");
-end);
-
-InstallMethod(ViewString,
-"for a Jordan fusion orbit",
-[IsJordanFusionOrbit],
-function(x)
-    local res;
-    
-    res:="<";
-    if IsMutable(x) then
-        Append(res,"mutable ");
-    fi;
-    Append(res, Concatenation("JordanFusionOrbit of length ", String(Size(x)),">"));
-    return res;
-end);
-
-
-# InstallOtherMethod(\<,
-#         "for J-fusions of tensors",
-#         IsIdenticalObj,
-#         [IsJFusionOfTensor,IsJFusionOfTensor],
-# function(fs1,fs2)
-#     local   p1,  p2,  i;
-#     if RankOfJFusion(fs1)<>RankOfJFusion(fs2) then
-#         return RankOfJFusion(fs1)<RankOfJFusion(fs2);
-#     else
-#         p1:=AsPartition(fs1);
-#         p2:=AsPartition(fs2);
-#         for i in [1..Length(p1)] do
-#             if Length(p1[i])<>Length(p2[i]) then
-#                 return Length(p1[i])<Length(p2[i]);
-#             elif p1[i]<>p2[i] then
-#                 return p1[i]<p2[i];
-#             fi;
-#         od;
-#     fi;
-#     return false;
-# end);
-
-# InstallOtherMethod(\=,
-#         "for J-fusions of tensors",
-#         IsIdenticalObj,
-#         [IsJFusionOfTensor,IsJFusionOfTensor],
-# function(fs1,fs2)
-#     return PartitionOfJFusion(fs1)=PartitionOfJFusion(fs2);
-# end);
-
-InstallMethod(JordanFusionOrbitsFamilyOp,
-"for a color graph and a permutation group",
-[IsColorGraph, IsPermGroup],
-function(tensor,g)
-    return NewFamily("JordanFusionOrbitsFam", IsJordanFusionOrbit);
 end);
 
 InstallOtherMethod(HomogeneousJordanFusionOrbits,
@@ -233,60 +63,13 @@ function(cgr,gsorbits)
         fi;
     fi;
     
-    ### till here it is correct
+   
     pfus:=EmptyPartialJordanFusion(cgr,max);
     
     iter:=IteratorOfPartialStablePartitionOrbits(pfus,gsorbits);
     
     return AllStablePartitionOrbits(iter);
     
-end);
-
-InstallMethod(JordanFusionOrbitsFamilyOp,
-"for a color graph and a permutation groups",
-[IsColorGraph, IsPermGroup],
-function(cgr,g)
-    return NewFamily("JordanFusionOrbitsFam", IsJordanFusionOrbit);
-end);
-
-
-# JordanFusionOrbit(<group>, <Jfusion> [,<stab>] )
-# <stab> is supposed to be a subgroup of the stabilizer of <fusion> in <group>
-InstallGlobalFunction(JordanFusionOrbit,
-function(arg)
-    local group,fusion,stab, can,xstab,nstab;
-
-    group:=arg[1];
-    fusion:=arg[2];
-    if Length(arg)=2 then
-        stab:=Stabilizer(group,AsPartition(fusion), OnSetsSets);
-    else
-        stab:=arg[3];
-    fi;
-
-    can:=SetsSetsCanonifiers(group, stab, UnderlyingPartitionOfColorPartition(fusion));
-    nstab:=ClosureGroup(stab, List(can, x->can[1]*x^(-1)));
-
-
-    return JordanFusionOrbitNC(group, OnJordanFusions(fusion,can[1]), nstab^can[1]);
-end);
-
-
-
-# JordanFusionOrbitNC(<group>, <Jfusion> ,<stab>)
-# <Jfusion> is a J-fusion that is assumed to be minimal (rev-lex wise) in its orbit
-# the minimality property is not checked
-# <stab> is supposed to be the full (SetsSets-wise) stabilizer of <Jfusion> in <group>
-InstallGlobalFunction(JordanFusionOrbitNC,
-function(group,fusion,stab)
-    local res;
-
-
-    res:=rec(
-            group:=group,
-            rep:=fusion,
-            stab:=stab);
-   return Objectify(NewType(JordanFusionOrbitsFamily(UnderlyingCgrOfColorPartition(fusion),group), IsJordanFusionOrbit and IsCocoOrbitRep), res);
 end);
 
 # <g> must be from JAut(<fusion!.cgr>)
@@ -325,280 +108,6 @@ function(cgr,grp)
     return gsorbs;
 end);
 
-InstallMethod(OnCocoOrbits,
-"for a Jordan fusion orbit and a permutation",
-[IsJordanFusionOrbit, IsPerm],
-function(orb,perm)
-    local   grp,  rep,  stab,  nrep;
-    
-    if perm=() then
-        return orb;
-    fi;
-    
-    grp:=UnderlyingGroupOfCocoOrbit(orb);
-    rep:=CanonicalRepresentativeOfCocoOrbit(orb);
-    stab:=StabilizerOfCanonicalRepresentative(orb);
-
-    nrep:=OnJordanFusions(rep,perm);
-    return JordanFusionOrbitNC(grp,nrep,Stabilizer(grp,AsPartition(nrep),OnSetsSets));
-end);
-
-
-InstallMethod(ActionOfCocoOrbit,
-"for a Jordan fusion orbit",
-[IsJordanFusionOrbit],
-function(orb)
-    return OnJordanFusions;
-end);
-
-
-# InstallOtherMethod(PartitionOfFusion,
-#         "for J-fusions of structure constants tensors",
-#         [IsJFusionOfTensor],
-# function(fusion)
-#     return PartitionOfJFusion(fusion);
-# end);
-
-# RegisterStandardInfo@JOCO:=function(node)
-#     local cgr,tensor,ppolord,qpolord,krein,i,key,ord,srg,val,fvc,prmstr,identification;
-    
-#     cgr:=node!.cgr;
-    
-    
-        
-#     RegisterInfoCocoNode(node,rec(name:="order:",
-#                                   getter:=node->OrderOfColorGraph(node!.cgr)));
-#     RegisterInfoCocoNode(node,rec(name:="rank:",
-#                                   getter:=node->RankOfColorGraph(node!.cgr)));
-#     if not IsUndirectedColorGraph(cgr) then
-#         RegisterInfoCocoNode(node,rec(name:="sym. rank:",
-#                                       getter:=node->Length(Filtered([1..Rank(node!.cgr)], i->i<=i^ColorMates(node!.cgr)))));
-#     fi;
-
-#     if RankOfColorGraph(cgr)>=3 then
-#         if IsHomogeneous(cgr) then 
-#             RegisterInfoCocoNode(node,rec(name:="valencies:", 
-#                                           toStr:=StringMultiset@COCO2P,
-#                                           getter:=node->OutValencies(node!.cgr)));
-#         else
-#             RegisterInfoCocoNode(node,rec(name:="# of fibres:",
-#                                           getter:=node->NumberOfFibres(node!.cgr)));
-#         fi;
-#     fi;
-#     if IsHomogeneous(cgr) and RankOfColorGraph(cgr)>3 then
-#         RegisterInfoCocoNode(node,rec(name:="primitive:",
-#                                       getter:=node->IsPrimitiveColorGraph(node!.cgr)));
-#         RegisterInfoCocoNode(node,rec(name:="symmetric:",
-#                                       getter:=node->IsUndirectedColorGraph(node!.cgr)));
-#     fi;
-    
-#     if IsJStableColorGraph(cgr) and IsHomogeneous(cgr) and IsUndirectedColorGraph(cgr) then
-#         RegisterInfoCocoNode(node,rec(name:="proper:",
-#                                       getter:=node->IsUndirectedColorGraph(node!.cgr) and 
-#                                               Rank(ColorGraphBySymmetrization(ColorGraphByWLStabilization(node!.cgr)))
-#                                               <>Rank(node!.cgr)));
-#     fi;
-
-#     if RankOfColorGraph(cgr)>2  then
-#         RegisterInfoCocoNode(node,rec(name:="order(Aut):",
-#                                       toStr:=StringPP,
-#                                       tester:=node->HasAutGroupOfCocoObject(node!.cgr),
-#                                       getter:=node->Order(AutGroupOfCocoObject(node!.cgr))));
-#         RegisterInfoCocoNode(node,rec(name:="Aut:",
-#                                       tester:=node->HasAutGroupOfCocoObject(node!.cgr) and HasStructureDescription(AutGroupOfCocoObject(node!.cgr)),
-#                                       getter:=node->StructureDescription(AutGroupOfCocoObject(node!.cgr):short)));
-#         RegisterInfoCocoNode(node,rec(name:="order(cAut/Aut):", 
-#                                       toStr:=StringPP,
-#                                       tester:=node->HasColorAutomorphismGroupOnColors(node!.cgr),
-#                                       getter:=node->Order(ColorAutomorphismGroupOnColors(node!.cgr))));
-#         RegisterInfoCocoNode(node,rec(name:="cAut/Aut:",
-#                                       tester:=node->HasColorAutomorphismGroupOnColors(node!.cgr),
-#                                       getter:=node->StructureDescription(ColorAutomorphismGroupOnColors(node!.cgr):short)));
-#         if IsJStableColorGraph(cgr) then
-#             RegisterInfoCocoNode(node,rec(name:="[aAut:cAut/Aut]:", 
-#                                           toStr:=StringPP, 
-#                                           tester:=node->HasAlgebraicAutomorphismGroup(node!.cgr) and HasColorAutomorphismGroupOnColors(node!.cgr),
-#                                           getter:=node->Order(AlgebraicAutomorphismGroup(node!.cgr))/Order(ColorAutomorphismGroupOnColors(node!.cgr))));
-#             RegisterInfoCocoNode(node,rec(name:="aAut:", 
-#                                           tester:=node->HasAlgebraicAutomorphismGroup(node!.cgr),
-#                                           getter:=node->StructureDescription(AlgebraicAutomorphismGroup(node!.cgr):short)));
-#         fi;
-#     fi;
-# end;
-
-
-
-
-# StringJFusionInfo:=function(cgr,lcgr)
-#     local  proper, long, cisomap, map, i, cgrr, ord, nodes, node, 
-#            outp, res, ninf, str, maxlength, scgr, mrg, idx, v, mcgr, 
-#            isproper, index, mnode, cisorep;
-    
-        
-    
-#     proper:=ValueOption("proper");
-#     if proper=fail then
-#         proper:=false;
-#     fi;
-#     long:=ValueOption("long");
-#     if long=fail then
-#         long:=false;
-#     fi;
-
-#     cisomap:=ValueOption("cisomap");
-#     if cisomap=fail then
-#         cisomap:=false;
-#     fi;
-    
-#     Perform(lcgr, IsJStableColorGraph);
-    
-#     map:=MapReps(lcgr, IsColorIsomorphicColorGraph);
-    
-    
-#     for i in [1..Length(lcgr)] do
-#         cgrr:=lcgr[i];
-#         if Rank(cgrr)>2 and (Rank(cgrr)>3 or IsPrimitive(JStructureConstantsOfColorGraph(cgrr))) then
-#             ord:=PrimePowersInt(Size(AutomorphismGroup(cgrr)));
-#             ord:=ord{[2,4..Length(ord)]};
-#             if ForAll(ord, x->x<=12) then
-# #            if RemInt(Size(AutomorphismGroup(cgrr)),2^12)<>0 then
-#                 StructureDescription(AutomorphismGroup(cgrr):short);
-#             fi;
-#         fi;Info(InfoCOCO,1,".");
-#     od;
-#     Info(InfoCOCO,1,"|");
-    
-#     nodes:=[];
-#     for i in [1..Length(lcgr)] do
-#         node:=NewCocoNode(lcgr[i]);
-#         node!.index:=i;
-#         node!.ucgr:=cgr;
-#         RegisterInfoCocoNode(node, rec(name:="Number:", value:=String(node!.index)));
-#         RegisterStandardInfo@JOCO(node);
-        
-#         Add(nodes,node);
-#         Info(InfoCOCO,1,".");
-#     od;
-#     Info(InfoCOCO,1,"|");
-    
-    
-#     outp:="";
-#     res:=OutputTextString(outp,true);
-#     SetPrintFormattingStatus(res,false);
-
-
-#     PrintTo(res,"JOCO - Information about a List of Jordan schemes\n",
-#                 "-------------------------------------------------\n");
-#     node:=NewCocoNode(cgr);
-#     RegisterStandardInfo@COCO2P(node);
-#     ninf:=node!.nodeInfo;
-
-#     ComputeAllInfos(node);
-#     for str in infoOptions@COCO2P.disabled do
-#         ComputeInfo(node,str);
-#     od;
-#     AppendTo(res, NodeInfoString(node));
-#     maxlength:=Maximum(ninf.maxlength, 20);
-#     AppendTo(res,String("Color Reps: ",-maxlength),"\n");
-#     AppendTo(res,"   ", StringCocoIndented(StringCocoColorReps(cgr),3));
-    
-#     if long and Rank(node!.cgr)>2 and not ( Rank(node!.cgr)=3 and not IsPrimitive(node!.cgr)) then
-#         if not IsTransitive(AutomorphismGroup(node!.cgr),[1..OrderOfColorGraph(cgr)]) then
-#             AppendTo(res, String("Orbits of Aut: ",-maxlength));
-#             AppendTo(res, StringCocoOrbReps@COCO2P(AutomorphismGroup(node!.cgr),[1..OrderOfColorGraph(cgr)]));
-#         fi;
-#         AppendTo(res, String("Generators of Aut: ",-maxlength),"\n");
-#         AppendTo(res, StringCocoGenerators@COCO2P(AutomorphismGroup(node!.cgr), OrderOfColorGraph(cgr)));
-        
-#         scgr:=ColorGraph(AutomorphismGroup(node!.cgr),[1..OrderOfColorGraph(cgr)],OnPoints,true);
-#         if not IsSchurian(node!.cgr) then
-#             AppendTo(res, String("Merging in Cgr(Aut): ",-maxlength),"\n");
-#             mrg:=Set([1..Rank(node!.cgr)], i->Filtered([1..Rank(scgr)], j->ArcColorOfColorGraph(node!.cgr,ColorRepresentative(scgr,j))=i));
-#             AppendTo(res, StringCocoMerging@COCO2P(mrg));
-#         fi;
-#     fi;
-#     AppendTo(res, "-------------------------------------------------\n");
-    
-#     PrintTo(res, String("Number of Jordan schemes: ",-maxlength), Length(nodes),"\n");
-#     PrintTo(res, String("               primitive: ",-maxlength), Length(Filtered(nodes, x->IsPrimitive(JStructureConstantsOfColorGraph(x!.cgr)))),"\n");
-#     PrintTo(res,  "-------------------------------------------------\n");
-    
-    
-    
-#     idx:=0;
-    
-#     for v in [1..Length(nodes)] do
-#         node:=nodes[v];
-#         ninf:=node!.nodeInfo;
-#         mcgr:=ColorGraphByWLStabilization(node!.cgr);
-#         isproper:=Rank(ColorGraphBySymmetrization(mcgr))<>Rank(node!.cgr);
-        
-#         if proper then
-#             if not isproper then
-#                 continue;
-#             fi;
-#         fi;
-       
-#         idx:=idx+1;
-
-#         maxlength:=Maximum(ninf.maxlength, 20);
-#         if proper then
-#             AppendTo(res,String("Index: ",-maxlength), idx,"\n");
-#         fi;
-#         index:=IndexOfCocoNode(node);
-        
-#         AppendTo(res, NodeInfoString(node));
-#         mrg:=List([1..Rank(node!.cgr)], x->Filtered([1..Rank(cgr)], y->ArcColorOfColorGraph(node!.cgr,ColorRepresentative(cgr,y))=x));
-#         mrg:=List(mrg, x->Set(x, y->Set([y,y^ColorMates(cgr)])));
-#         AppendTo(res, String("Merging in sym(Cgr): ", -maxlength),"\n");
-#         AppendTo(res, "   ", StringCocoIndented(StringCocoListListsSets(mrg-1),3));
-        
-        
-#         if isproper then
-#             AppendTo(res, String("WL-stabilization: ",-maxlength),"\n");
-            
-#             mnode:=NewCocoNode(mcgr);
-#             RegisterStandardInfo@COCO2P(mnode);
-
-#             ComputeAllInfos(mnode);
-#             for str in infoOptions@COCO2P.disabled do
-#                 ComputeInfo(mnode,str);
-#             od;
-#             AppendTo(res, "   ",StringCocoIndented(NodeInfoString(mnode),3));
-#         fi;
-        
-
-
-#         if cisomap then
-#             cisorep:=map[index];
-#             if cisorep<>index then
-#                 AppendTo(res, String("C-isomorphic to: ",-maxlength), "#",cisorep,"\n");
-#             fi;
-#         fi;
-#         if long and Rank(node!.cgr)>2 and not (Rank(node!.cgr)=3 and not IsPrimitive(JStructureConstantsOfColorGraph(node!.cgr))) then
-#             if not IsTransitive(AutomorphismGroup(node!.cgr),[1..OrderOfColorGraph(cgr)]) then
-#                 AppendTo(res, String("Orbits of Aut: ",-maxlength));
-#                 AppendTo(res, StringCocoOrbReps@COCO2P(AutomorphismGroup(node!.cgr),[1..OrderOfColorGraph(cgr)]));
-#             fi;
-#             AppendTo(res, String("Generators of Aut: ",-maxlength),"\n");
-#             AppendTo(res, StringCocoGenerators@COCO2P(AutomorphismGroup(node!.cgr), OrderOfColorGraph(cgr)));
-            
-#             scgr:=ColorGraph(AutomorphismGroup(node!.cgr),[1..OrderOfColorGraph(cgr)],OnPoints,true);
-#             AppendTo(res, String("Merging in Cgr(Aut): ",-maxlength),"\n");
-#             mrg:=Set([1..Rank(node!.cgr)], i->Filtered([1..Rank(mcgr)], j->ArcColorOfColorGraph(node!.cgr,ColorRepresentative(mcgr,j))=i));
-#             AppendTo(res, StringCocoMerging@COCO2P(mrg));
-#         fi;
-
-#         AppendTo(res,"\n");
-#     od;
-
-#     CloseStream(res);
-#     return outp;
-# end;
-
-
-
-
 InstallGlobalFunction(PosetOfFusionOrbits,
 function(cgr,lforb)
     local  order, linorder, runtime, tstart, tensor, aaut, caut, 
@@ -623,10 +132,18 @@ function(cgr,lforb)
         return fail;
     fi;
     
+    if not ForAll(lforb, IsRegularFusionOrbit) then
+        ErrorNoReturn("PosetOfFusionOrbits: expecting a list of regular fusion orbits");
+    fi;
+    
     if not ForAll(lforb, forb->IsIdenticalObj(FamilyObj(forb),FamilyObj(lforb[1]))) then
         ErrorNoReturn("PosetOfFusionOrbits: fusion orbits are incompatible");
     fi;
-
+    
+    if not IsIdenticalObj(cgr,UnderlyingCgrOfColorPartition(Representative(lforb[1]))) then
+        ErrorNoReturn("PosetOfFusionOrbits: fusion orbits are incompatible");
+    fi;
+    
     
     linorder:=function(x,y)
         return cautfusorbs[x]<cautfusorbs[y];
@@ -644,9 +161,6 @@ function(cgr,lforb)
     
     if IsWLStableColorGraph(cgr) then
         tensor:=StructureConstantsOfColorGraph(cgr);
-    # if not IsIdenticalObj(FusionFamily(tensor), FamilyObj(Representative(lforb[1]))) then
-    #     Error("The given fusion orbits must belong to the given color graph!");
-    # fi;
     
         aaut:=AutomorphismGroup(tensor);
         caut:=ColorAutomorphismGroupOnColors(cgr);
@@ -660,7 +174,7 @@ function(cgr,lforb)
     fi;
     
     
-    if UnderlyingGroupOfCocoOrbit(lforb[1])<>aaut then
+    if UnderlyingGroupOfCocoOrbit(lforb[1])<>aaut then # if it is a proper subgroup of aaut
         aautfusorbs:=Set(lforb, x->ConstructorOfCocoOrbit(x)(aaut,Representative(x)));
     else
         aautfusorbs:=Set(lforb);
@@ -717,7 +231,7 @@ InstallOtherMethod(DisplayString,
                    "for posets of fusion orbits",
                    [IsPosetOfFusionOrbits and IsPosetOfFusionOrbitsRep, IsList],10,
 function(pos, indices)
-    local  MapReps, jstable, wlstable, filt, proper, nonsch, long, 
+    local  MapRepsPoset, jstable, wlstable, filt, proper, nonsch, long, 
            schfiss, fvc, onlyfvc, cisomap, date, runtime, strucexp, i, 
            cgrr, ord, nodes, node, srg, value, outp, res, cgr, ninf, 
            str, maxlength, scgr, mrg, idx, v, mcgr, isproper, index, 
@@ -726,7 +240,7 @@ function(pos, indices)
            symfus, ideal,comma,cisoreps;
     
     
-    MapReps:=function(i)
+    MapRepsPoset:=function(i)
         local  list,fct, idx;
         
         list:=List(nodes, x->x!.cgr);
@@ -855,7 +369,32 @@ function(pos, indices)
     Perform(pos!.colorGraphs, IsRainbow);
     Perform(pos!.colorGraphs, IsJStableColorGraph);
     Perform(pos!.colorGraphs, IsWLStableColorGraph);
-
+    
+    
+    if Rank(pos!.cgr)>2 and (Rank(pos!.cgr)>3 or IsPrimitiveColorGraph(pos!.cgr)) then
+        ord:=PrimePowersInt(Size(AutomorphismGroup(pos!.cgr)));
+        ord:=ord{[2,4..Length(ord)]};
+        if ForAll(ord, x->x<=strucexp) then
+            StructureDescription(AutomorphismGroup(pos!.cgr):short);
+        fi;
+    fi;
+    
+    if IsJStableColorGraph(pos!.cgr) then
+        ord:=PrimePowersInt(Size(JAlgebraicAutomorphismGroup(pos!.cgr)));
+        ord:=ord{[2,4..Length(ord)]};
+        if ForAll(ord, x->x<=strucexp) then
+            StructureDescription(JAlgebraicAutomorphismGroup(pos!.cgr):short);
+        fi;
+        
+        if IsWLStableColorGraph(pos!.cgr) then 
+            ord:=PrimePowersInt(Size(AlgebraicAutomorphismGroup(pos!.cgr)));
+            ord:=ord{[2,4..Length(ord)]};
+            if ForAll(ord, x->x<=strucexp) then
+                StructureDescription(AlgebraicAutomorphismGroup(pos!.cgr):short);
+            fi;
+        fi;
+    fi;
+    
     for i in [1..Size(pos)] do
         cgrr:=pos!.colorGraphs[i];
         if Rank(cgrr)>2 and (Rank(cgrr)>3 or IsPrimitiveColorGraph(cgrr)) then
@@ -970,6 +509,13 @@ function(pos, indices)
     if runtime then
         PrintTo(res, String("                Runtime: ",-maxlength), ComputationTime(pos),"\n");
     fi;
+    if IsWLStableColorGraph(pos!.cgr) then
+        PrintTo(res, "Algebraic fusions are with respect to AAut!\n\n");
+    elif IsJStableColorGraph(pos!.cgr) then
+        PrintTo(res, "Algebraic fusions are with respect to JAut!\n\n");
+    else
+        PrintTo(res, "Algebraic fusions are with respect to CAut/Aut!\n\n");
+    fi;
     
     PrintTo(res, String("Number of fusion orbits: ",-maxlength), Length(nodes{indices}),"\n");
     PrintTo(res, String("              symmetric: ",-maxlength), Length(Filtered(nodes{indices}, x->IsSymmetricColorGraph(x!.cgr))),"\n");
@@ -1067,11 +613,7 @@ function(pos, indices)
             continue;
         fi;
         
-#        if not IsWLStableColorGraph(node!.cgr) then
-            mcgr:=ColorGraphByWLStabilization(node!.cgr);
- #       else
-#            mcgr:=node!.cgr;
-  #      fi;
+        mcgr:=ColorGraphByWLStabilization(node!.cgr);
         
 
         if IsJStableColorGraph(node!.cgr) then
@@ -1118,7 +660,7 @@ function(pos, indices)
         
         index:=IndexOfCocoNode(node);
         if cisoreps then
-            cisorep:=MapReps(index);
+            cisorep:=MapRepsPoset(index);
             if cisorep<>index then
                 continue;
             fi;
@@ -1147,8 +689,6 @@ function(pos, indices)
         if algtwins<>[] then
             AppendTo(res, String("Algebraic Twins: ",-maxlength), algtwins,"\n");
         fi;
-#        if not IsWLStableColorGraph(node!.cgr) or not IsSchurian(node!.cgr) then
-#            if IsTransitive(AutomorphismGroup(node!.cgr),[1..OrderOfColorGraph(cgr)]) then
         flt:=FilterInCocoPoset(pos, v);
                 
         jcl:=Filtered(flt, i->IsJStableColorGraph(pos!.colorGraphs[i]));
@@ -1160,13 +700,13 @@ function(pos, indices)
                 AppendTo(res, String("Symm. fus. in pos.: ",-maxlength),"#", symfus[1],"\n");
             fi;
         elif Length(symfus)>1 then
-            AppendTo(res, String("Symm. fus. in pos.: ",-maxlength), StringCocoList(symfus),"\n");
+            AppendTo(res, String("Symm. fus. in pos.: ",-maxlength), StringList@JOCO(symfus),"\n");
         else
             AppendTo(res, String("No symm. fus. in pos. ",-maxlength), "\n");
         fi;
         
         wcl:=Filtered(jcl, i->IsWLStableColorGraph(pos!.colorGraphs[i]));
-        if schfiss then # and IsWLStableColorGraph(node!.cgr) then 
+        if schfiss then 
             sch:=Filtered(wcl, i-> IsSchurian(pos!.colorGraphs[i]));
             sch:=MinimalElementsInCocoPoset(pos,sch);
             if Length(sch)=1 then
@@ -1174,7 +714,7 @@ function(pos, indices)
                     AppendTo(res, String("Sch. fiss. in pos.: ",-maxlength),"#", sch[1],"\n");
                 fi;
             elif Length(sch)>1 then
-                AppendTo(res, String("Sch. fiss. in pos.: ",-maxlength), StringCocoList(sch),"\n");
+                AppendTo(res, String("Sch. fiss. in pos.: ",-maxlength), StringList@JOCO(sch),"\n");
             fi;
         fi;
         jcl:=MinimalElementsInCocoPoset(pos,jcl);
@@ -1188,7 +728,7 @@ function(pos, indices)
                 AppendTo(res, String("J-fiss. in pos.: ",-maxlength), "#",jcl[1],"\n");
             fi;
         elif Length(jcl)>1 then
-            AppendTo(res, String("J-fiss. in pos.: ",-maxlength), StringCocoList(jcl),"\n");
+            AppendTo(res, String("J-fiss. in pos.: ",-maxlength), StringList@JOCO(jcl),"\n");
         fi;
         wcl:=MinimalElementsInCocoPoset(pos,wcl);
         showwlclosure:=true;
@@ -1200,7 +740,7 @@ function(pos, indices)
                 AppendTo(res, String("WL-fiss. in pos.: ",-maxlength),"#", wcl[1],"\n");
             fi;
         elif Length(wcl)>1 then
-            AppendTo(res, String("WL-fiss. in pos.: ",-maxlength), StringCocoList(wcl),"\n");
+            AppendTo(res, String("WL-fiss. in pos.: ",-maxlength), StringList@JOCO(wcl),"\n");
         fi;
         
 
@@ -1262,7 +802,7 @@ function(pos, indices)
         
             
         if cisomap then
-            cisorep:=MapReps(index);
+            cisorep:=MapRepsPoset(index);
             if cisorep<>index then
                 AppendTo(res, String("C-isomorphic to: ",-maxlength), "#",cisorep,"\n");
             fi;
@@ -1292,30 +832,16 @@ function(pos, indices)
 end);
 
 
-InstallMethod(ConstructorOfCocoOrbit,
-"for a  partial Jordan fusion orbit",
-[IsJordanFusionOrbit],
-function(orb)
-    return JordanFusionOrbit;
-end);
-
-InstallMethod(ConstructorOfCocoOrbitNC,
-"for a partial Jordan fusion",
-[IsJordanFusionOrbit],
-function(orb)
-    return JordanFusionOrbitNC;
-end);
-
 InstallMethod(ConstructorOfStablePartitionOrbit,
 "for a Jordan fusion",
 [IsJordanFusion],
 function(rfus)
-    return JordanFusionOrbit;
+    return RegularFusionOrbit;
 end);
 
 InstallMethod(ConstructorOfStablePartitionOrbitNC,
 "for a Jordan fusion",
 [IsJordanFusion],
 function(rfus)
-    return JordanFusionOrbitNC;
+    return RegularFusionOrbitNC;
 end);

@@ -310,5 +310,5 @@ InstallOtherMethod(Mates,
    "for tensors of J-structure constants",
    [IsTensor and IsTensorOfJC],
 function(tensor)
-    return ();
+    return (); # check this!
 end);

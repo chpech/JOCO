@@ -4,6 +4,6 @@ DeclareGlobalFunction( "StringCocoIndented" );
 DeclareGlobalFunction( "StringCocoColorReps" );
 DeclareGlobalFunction( "StringCocoTable" );
 DeclareGlobalFunction( "StringCocoListListsSets" );
-DeclareGlobalFunction( "StringCocoList" );
+DeclareGlobalFunction( "StringList@JOCO" );
 DeclareGlobalFunction( "StringCocoTuple" );
 COCORotorMod:=10000;

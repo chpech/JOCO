@@ -7,5 +7,3 @@ DeclareOperation( "EmptySymPartialArcRegularSet", [IsColorGraph] );
 
 DeclareAttribute( "PartialArcRegularSetsFamily",  IsColorGraph );
 KeyDependentOperation( "PartialArcRegularSetOrbitFamily", IsColorGraph, IsPermGroup, ReturnTrue );
-
-

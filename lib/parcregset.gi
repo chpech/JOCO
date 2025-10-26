@@ -53,14 +53,14 @@ end);
 
 
 InstallMethod(ConstructorOfStableSetOrbit,
-"for anarc regular set",
+"for an arc regular set",
 [IsRegularSet and IsArcRegularSet],
 function(orb)
     return RegularSetOrbit;
 end);
 
 InstallMethod(IsCompletePartialStableSet,
-"for a partial arc regular set in PartialArcRegularSetRep",
+"for a partial arc regular set in PartialJArcRegularSetRep",
 [IsPartialArcRegularSet and IsPartialArcRegularSetRep],
 function(pgs)
     local set,sqr;
@@ -79,7 +79,7 @@ function(pgs)
 end);
 
 InstallMethod(ExtendedPartialStableSet,
-"for a symmetric partial arc regular set in PartialArcRegularSetRep and a positive integer",
+"for a symmetric partial arc regular set in PartialJArcRegularSetRep and a positive integer",
 [IsSymPartialArcRegularSet and IsPartialArcRegularSetRep, IsPosInt],
 function(cand,pt)
     local tensor,ndom,obj,ent,sq,mates,i;
@@ -127,10 +127,10 @@ function(cand,pt)
 
     obj.domain:=ndom;
     
-    return Objectify(NewType(PartialArcRegularSetsFamily(cand!.cgr), IsSymPartialArcRegularSet and IsPartialArcRegularSetRep), obj);
+    return Objectify(NewType(PartialJArcRegularSetsFamily(cand!.cgr), IsSymPartialJArcRegularSet and IsPartialJArcRegularSetRep), obj);
 end);
 
-InstallMethod(EmptySymPartialArcRegularSet,
+InstallMethod(EmptySymPartialJArcRegularSet,
 "for a regular J-stable color graph",
 [IsColorGraph and IsJStableColorGraph and IsRegularColorGraph],
 function(cgr)
@@ -160,13 +160,13 @@ function(cgr)
               square:=ListWithIdenticalEntries(RankOfColorGraph(cgr),0)
               );
    
-   return Objectify(NewType(PartialArcRegularSetsFamily(cgr), IsSymPartialArcRegularSet and IsPartialArcRegularSetRep), cand);
+   return Objectify(NewType(PartialJArcRegularSetsFamily(cgr), IsSymPartialJArcRegularSet and IsPartialJArcRegularSetRep), cand);
 end);
 
 
 InstallMethod(ExtendedPartialStableSet,
-"for an asymmetric partial arc regular set in PartialArcRegularSetRep and a positive integer",
-[IsAsymPartialArcRegularSet and IsPartialArcRegularSetRep, IsPosInt],
+"for an asymmetric partial arc regular set in PartialJArcRegularSetRep and a positive integer",
+[IsAsymPartialJArcRegularSet and IsPartialJArcRegularSetRep, IsPosInt],
 function(cand,pt)
     local cgr,t,clr,ent,ipt,ndom,obj,sq,i;
     
@@ -213,10 +213,10 @@ function(cand,pt)
              square:=sq);
     
     
-   return Objectify(NewType(PartialArcRegularSetsFamily(cand!.cgr), IsAsymPartialArcRegularSet and IsPartialArcRegularSetRep), obj);
+   return Objectify(NewType(PartialJArcRegularSetsFamily(cand!.cgr), IsAsymPartialJArcRegularSet and IsPartialJArcRegularSetRep), obj);
 end);
 
-InstallMethod(EmptyAsymPartialArcRegularSet,
+InstallMethod(EmptyAsymPartialJArcRegularSet,
 "for a regular J-stable color graph",
 [IsColorGraph and IsJStableColorGraph and IsRegularColorGraph],
 function(cgr)
@@ -239,11 +239,11 @@ function(cgr)
               square:=ListWithIdenticalEntries(RankOfColorGraph(cgr),0)
               );
     
-    return Objectify(NewType(PartialArcRegularSetsFamily(cgr), IsAsymPartialArcRegularSet and IsPartialArcRegularSetRep), cand);
+    return Objectify(NewType(PartialJArcRegularSetsFamily(cgr), IsAsymPartialJArcRegularSet and IsPartialJArcRegularSetRep), cand);
 end);
 
-DeclareRepresentation("IsAsymPartialArcRegularSetBlkRep",
-        IsPartialArcRegularSetRep,
+DeclareRepresentation("IsAsymPartialJArcRegularSetBlkRep",
+        IsPartialJArcRegularSetRep,
         [ "cgr",
           "map",
           "imap",
@@ -274,7 +274,7 @@ DeclareRepresentation("IsAsymPartialArcRegularSetBlkRep",
           "maxlbd"
           ]);
 
-InstallMethod(EmptyAsymPartialArcRegularSet,
+InstallMethod(EmptyAsymPartialJArcRegularSet,
 "for well-fibred J-stable color graph",
 [IsColorGraph and IsJStableColorGraph and IsWellFibredRainbow],
 function(cgr)
@@ -364,13 +364,13 @@ function(cgr)
               k:=0,
               lbdIsForced:=false,
               lbd:=0);
-    return Objectify(NewType(PartialArcRegularSetsFamily(cgr), 
-           IsAsymPartialArcRegularSet and IsAsymPartialArcRegularSetBlkRep), cand);
+    return Objectify(NewType(PartialJArcRegularSetsFamily(cgr), 
+           IsAsymPartialJArcRegularSet and IsAsymPartialJArcRegularSetBlkRep), cand);
 end);
 
 InstallMethod(IsCompletePartialStableSet,
-"for an asymmetric partial arc regular set in AsymPartialArcRegularSetBlkRep",
-[IsAsymPartialArcRegularSet and IsAsymPartialArcRegularSetBlkRep],
+"for an asymmetric partial arc regular set in AsymPartialJArcRegularSetBlkRep",
+[IsAsymPartialJArcRegularSet and IsAsymPartialJArcRegularSetBlkRep],
 function(cand)
     local a,b,block;
     
@@ -403,7 +403,7 @@ end);
 
 InstallMethod(ExtendedPartialStableSet,
 "for an asymmetric partial arc regular set in AsymPartialarcRegularSetBlkRep",
-[IsAsymPartialArcRegularSet and IsAsymPartialArcRegularSetBlkRep, IsPosInt],
+[IsAsymPartialJArcRegularSet and IsAsymPartialJArcRegularSetBlkRep, IsPosInt],
 function(cand,pt)
     local  cgr, t, npgs, color, sb, fb, sblk, 
            a, b, block, sd, icolor, md, sbinfr, fbinfc, 
@@ -738,20 +738,20 @@ function(cand,pt)
         Assert(1,sq=ComplexProduct(t,npgs.set,OnSets(npgs.set,ColorMates(cgr))));
     fi;
     
-    Objectify(NewType(PartialArcRegularSetsFamily(cgr), IsAsymPartialArcRegularSet and IsAsymPartialArcRegularSetBlkRep), npgs);
+    Objectify(NewType(PartialJArcRegularSetsFamily(cgr), IsAsymPartialJArcRegularSet and IsAsymPartialJArcRegularSetBlkRep), npgs);
     return npgs;
 end);
 
 InstallMethod(GetPartialStableSetOrbitFamily,
-"for a partial arc regular set in PartialArcRegularSetRep and a permutation group",
-[IsPartialArcRegularSet and IsPartialArcRegularSetRep, IsPermGroup],
+"for a partial arc regular set in PartialJArcRegularSetRep and a permutation group",
+[IsPartialJArcRegularSet and IsPartialJArcRegularSetRep, IsPermGroup],
 function(prset,grp)  
-    return PartialArcRegularSetOrbitFamily(prset!.cgr,grp);
+    return PartialJArcRegularSetOrbitFamily(prset!.cgr,grp);
 end);
 
 InstallMethod( ViewString,
-"for a partial arc regular set in PartialArcRegularSetRep",
-[IsPartialArcRegularSet and IsPartialArcRegularSetRep],
+"for a partial arc regular set in PartialJArcRegularSetRep",
+[IsPartialJArcRegularSet and IsPartialJArcRegularSetRep],
 function(prs)
     local cgr,s,res;
     
@@ -769,10 +769,10 @@ function(prs)
 end);
 
 InstallMethod(StableSetFromPartialStableSet,
-"for a partial arc regular set in PartialArcRegularSetRep",
-[IsPartialArcRegularSet and IsPartialArcRegularSetRep],
+"for a partial arc regular set in PartialJArcRegularSetRep",
+[IsPartialJArcRegularSet and IsPartialJArcRegularSetRep],
 function(cand)
-    return RegularSet( IsArcRegularSet, cand!.cgr, cand!.set);
+    return RegularSet( IsJArcRegularSet, cand!.cgr, cand!.set);
 end);
 
 ##############################################################################
@@ -781,8 +781,8 @@ end);
 #
 ##############################################################################
 
-DeclareRepresentation("IsSymPartialArcRegularSetBlkRep",
-        IsPartialArcRegularSetRep,
+DeclareRepresentation("IsSymPartialJArcRegularSetBlkRep",
+        IsPartialJArcRegularSetRep,
         [ "tensor",
           "blocks",
           "perm",
@@ -808,7 +808,7 @@ DeclareRepresentation("IsSymPartialArcRegularSetBlkRep",
           "lbd"
           ]);
 
-InstallMethod(EmptySymPartialArcRegularSet,
+InstallMethod(EmptySymPartialJArcRegularSet,
 "for a well-fibred J-stable color graph",
 [IsColorGraph and IsJStableColorGraph and IsWellFibredRainbow],
 function(cgr)
@@ -887,13 +887,13 @@ function(cgr)
               lbdIsForced:=false,
               lbd:=0);
     
-    return Objectify(NewType(PartialArcRegularSetsFamily(cgr), 
-                             IsSymPartialArcRegularSet and IsSymPartialArcRegularSetBlkRep), cand);
+    return Objectify(NewType(PartialJArcRegularSetsFamily(cgr), 
+                             IsSymPartialJArcRegularSet and IsSymPartialJArcRegularSetBlkRep), cand);
 end);
 
 InstallMethod(IsCompletePartialStableSet,
-"for a symmetric partial arc regular set in SymPartialArcRegularSetBlkRep",
-[IsSymPartialArcRegularSet and IsSymPartialArcRegularSetBlkRep],
+"for a symmetric partial arc regular set in SymPartialJArcRegularSetBlkRep",
+[IsSymPartialJArcRegularSet and IsSymPartialJArcRegularSetBlkRep],
 function(cand)
     local a,b,block;
     
@@ -924,7 +924,7 @@ end);
 
 InstallMethod(ExtendedPartialStableSet,
 "for a symmetric partial arc regular set in SymPartialarcRegularSetBlkRep and a positive integer",
-[IsSymPartialArcRegularSet and IsSymPartialArcRegularSetBlkRep, IsPosInt],
+[IsSymPartialJArcRegularSet and IsSymPartialJArcRegularSetBlkRep, IsPosInt],
 function(cand,pt)
     local  cgr, t, npgs, color, icolor, sb, fb, i, a, j, b, block, sd, 
            sbinfr, fbinfr, k, kmts, ksb, kfb, 
@@ -1256,7 +1256,7 @@ function(cand,pt)
         od;
     fi;
     Assert(1,sq=ComplexProduct(t,npgs.set,npgs.set));
-    Objectify(NewType(PartialArcRegularSetsFamily(cgr), IsSymPartialArcRegularSet and IsSymPartialArcRegularSetBlkRep), npgs);
+    Objectify(NewType(PartialJArcRegularSetsFamily(cgr), IsSymPartialJArcRegularSet and IsSymPartialJArcRegularSetBlkRep), npgs);
     return npgs;
 end);
 

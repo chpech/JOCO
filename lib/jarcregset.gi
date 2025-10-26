@@ -1,39 +1,61 @@
+#############################################################################
+##
+##  arcregset.gi                  JOCO package
+##                                                              Mikhail Klin
+##                                                            Christian Pech
+##
+##  Implementation of arc regular sets 
+##
+#############################################################################
+## Let R be a regular relation (symmetric or asymmetric) of a set V
+## with o(u,v) we denote |{w | (u,w), (v,w) in R }|, and
+## with i(u,v) we denote |{w | (w,u), (w,v) in R }|.
+## in JOCO we call a set of colors arc-regular if 
+##      - it is symmetric or asymmetric,
+##      - it is regular,
+##      - there is a number lbd such that for all (u,v) in R we have
+##                 o(u,v) + i(u,v) = lbd.
+##
+## Arc regular sets may be enumerated in well-fibred J-stable color graphs.
+
+
+
 
 InstallMethod(RegularSet,
 "for arc regular sets",
-[ IsRegularSet and IsArcRegularSet, IsColorGraph, IsList ],
+[ IsRegularSet and IsJArcRegularSet, IsColorGraph, IsList ],
 function(filter, cgr, set)
    local res;
 
     res:=RegularSet(IsRegularSet, cgr,set);
-    SetIsArcRegularSet(res,true);
+    SetIsJArcRegularSet(res,true);
     
     return res;
     
 end);
 
 InstallMethod(StableSetFromPartialStableSet,
-"for a partial arc regular set in PartialArcRegularSetRep",
-[IsPartialArcRegularSet and IsPartialArcRegularSetRep],
+"for a partial arc regular set in PartialJArcRegularSetRep",
+[IsPartialJArcRegularSet and IsPartialJArcRegularSetRep],
 function(cand)
-    return RegularSet( IsRegularSet and IsArcRegularSet, cand!.cgr, cand!.set);
+    return RegularSet( IsRegularSet and IsJArcRegularSet, cand!.cgr, cand!.set);
 end);
 
 InstallMethod(OnRegularSets,
 "for an arc regular set and a permutation",
-[IsRegularSet and IsArcRegularSet and IsColorSetRep, IsPerm],
+[IsRegularSet and IsJArcRegularSet and IsColorSetRep, IsPerm],
 function(gs, g)
-    return RegularSet(IsRegularSet and IsArcRegularSet, gs!.cgr, MakeImmutable(OnSets(gs!.set,g)));
+    return RegularSet(IsRegularSet and IsJArcRegularSet, gs!.cgr, MakeImmutable(OnSets(gs!.set,g)));
 end);
 
 InstallMethod(ViewString,
 "for an arc regular set",
-[IsRegularSet and IsArcRegularSet],
+[IsRegularSet and IsJArcRegularSet],
 function(x) 
-    return Concatenation("<", "ArcRegularSet: ", String(AsSet(x)), ">");
+    return Concatenation("<", "JArcRegularSet: ", String(AsSet(x)), ">");
 end);
 
-InstallMethod(HomogeneousSymArcRegularSetOrbits,
+InstallMethod(HomogeneousSymJArcRegularSetOrbits,
 "for a J-stable color graph",
 [IsColorGraph and IsJStableColorGraph],
 function(cgr)
@@ -42,27 +64,27 @@ function(cgr)
     g:=JAlgebraicAutomorphismGroup(cgr);
     
     
-    iter:=IteratorOfPartialStableSetOrbits(g, EmptySymPartialArcRegularSet(cgr));
+    iter:=IteratorOfPartialStableSetOrbits(g, EmptySymPartialJArcRegularSet(cgr));
     allgsorb:=AllStableSetOrbits(iter);
     
     return allgsorb;
     
 end);
 
-InstallOtherMethod(HomogeneousSymArcRegularSetOrbits,
+InstallOtherMethod(HomogeneousSymJArcRegularSetOrbits,
 "for a J-stable color graph and a permutation group",
 [IsColorGraph and IsJStableColorGraph, IsPermGroup],
 function(cgr,g)
     local  iter, allgsorb;
     
-    iter:=IteratorOfPartialStableSetOrbits(g, EmptySymPartialArcRegularSet(cgr));
+    iter:=IteratorOfPartialStableSetOrbits(g, EmptySymPartialJArcRegularSet(cgr));
     allgsorb:=AllStableSetOrbits(iter);
     
     return allgsorb;
     
 end);
 
-InstallMethod(HomogeneousAsymArcRegularSetOrbits,
+InstallMethod(HomogeneousAsymJArcRegularSetOrbits,
 "for a J-stable color graph",
 [IsColorGraph and IsJStableColorGraph],
 function(cgr)
@@ -70,7 +92,7 @@ function(cgr)
     
     g:=JAlgebraicAutomorphismGroup(cgr);
     
-    iter:=IteratorOfPartialStableSetOrbits(g,EmptyAsymPartialArcRegularSet(cgr));
+    iter:=IteratorOfPartialStableSetOrbits(g,EmptyAsymPartialJArcRegularSet(cgr));
     
     agsorbs:=AllStableSetOrbits(iter);
     
@@ -78,18 +100,18 @@ function(cgr)
     
 end);
 
-InstallOtherMethod(HomogeneousAsymArcRegularSetOrbits,
+InstallOtherMethod(HomogeneousAsymJArcRegularSetOrbits,
 "for a J-stable color graph and a permutation group",
 [IsColorGraph and IsJStableColorGraph, IsPermGroup],
 function(cgr,g)
     local iter;
     
-    iter:=IteratorOfPartialStableSetOrbits(g,EmptyAsymPartialArcRegularSet(cgr));
+    iter:=IteratorOfPartialStableSetOrbits(g,EmptyAsymPartialJArcRegularSet(cgr));
     
     return AllStableSetOrbits(iter);
 end);
 
-InstallMethod(HomogeneousArcRegularSetOrbits,
+InstallMethod(HomogeneousJArcRegularSetOrbits,
 "for a J-stable color graph",
 [IsColorGraph and IsJStableColorGraph],
 function(cgr)
@@ -104,9 +126,9 @@ function(cgr)
     # if prim=fail then
     #     prim:=false;
     # fi;
-    lgs:=Set(HomogeneousSymArcRegularSetOrbits(cgr));
+    lgs:=Set(HomogeneousSymJArcRegularSetOrbits(cgr));
     if not sym then
-        lgs:=Union(lgs, HomogeneousAsymArcRegularSetOrbits(cgr));
+        lgs:=Union(lgs, HomogeneousAsymJArcRegularSetOrbits(cgr));
     fi;
     # if prim then
     #     lgs:=Filtered(lgs, x->ClosureSet(tensor, AsSet(Representative(x)))=[1..OrderOfTensor(tensor)]);
@@ -115,7 +137,7 @@ function(cgr)
     return lgs;
 end);
 
-InstallOtherMethod(HomogeneousArcRegularSetOrbits,
+InstallOtherMethod(HomogeneousJArcRegularSetOrbits,
 "for a J-stable color graph and a permutation group",
 [IsColorGraph and IsJStableColorGraph, IsPermGroup],
 function(cgr,g)
@@ -130,9 +152,9 @@ function(cgr,g)
     # if prim=fail then
     #     prim:=false;
     # fi;
-    lgs:=Set(HomogeneousSymArcRegularSetOrbits(cgr,g));
+    lgs:=Set(HomogeneousSymJArcRegularSetOrbits(cgr,g));
     if not sym then
-        lgs:=Union(lgs, HomogeneousAsymArcRegularSetOrbits(cgr,g));
+        lgs:=Union(lgs, HomogeneousAsymJArcRegularSetOrbits(cgr,g));
     fi;
     # if prim then
     #     lgs:=Filtered(lgs, x->ClosureSet(tensor, AsSet(Representative(x)))=[1..OrderOfTensor(tensor)]);
@@ -141,7 +163,7 @@ function(cgr,g)
     return lgs;
 end);
 
-InstallMethod(IsArcRegularSet,
+InstallMethod(IsJArcRegularSet,
 "for a regular set",
 [IsRegularSet],
 function(rset)

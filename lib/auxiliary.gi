@@ -226,7 +226,7 @@ function(mrg)
 end);
 
 
-InstallGlobalFunction(StringCocoList,
+InstallGlobalFunction(StringList@,
 function(s)
     local str,res,i;
     res:="";
