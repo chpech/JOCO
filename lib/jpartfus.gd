@@ -16,18 +16,4 @@ KeyDependentOperation( "PartialJordanFusionOrbitsFamily", IsColorGraph, IsPermGr
 DeclareOperation( "EmptyPartialJordanFusion", [IsColorGraph,IsInt] );
 DeclareGlobalFunction( "JRefinedPartition" );     # undocumented
 
-# DeclareOperation( "ExtendedPartialJFusion", [IsPartialJFusion, IsJGoodSet] );
-# DeclareProperty( "IsExtendiblePartialJFusion", IsPartialJFusion );
-# DeclareOperation( "IsJCompatibleWithPart", [IsPartialJFusion, IsJGoodSet] );
-# DeclareOperation( "TensorOfPartialJFusion", [IsPartialJFusion] );
-# DeclareAttribute( "IsCompletePartialJFusion", IsPartialJFusion );
-# DeclareOperation( "JFusionFromCompletePartialJFusion", [IsPartialJFusion ] );
-
-
-# DeclareCategory( "IsPartialJFusionOrbit", IsCocoOrbit );
-# DeclareGlobalFunction( "PartialJFusionOrbitNC" );
-
-# DeclareCategory( "IsIteratorOfPJFOrbits", IsIterator );
-# DeclareOperation( "IteratorOfPartialJFusionOrbits", [IsList] );
-# DeclareOperation( "AllJFusionOrbits", [IsIteratorOfPJFOrbits] );
 

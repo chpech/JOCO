@@ -1,28 +1,18 @@
 #############################################################################
 ##
-##  arcregset.gi                  JOCO package
+##  jarcregset.gi                 JOCO package
 ##                                                              Mikhail Klin
 ##                                                            Christian Pech
 ##
-##  Implementation of arc regular sets 
+##  Implementation of J-arc regular sets 
 ##
 #############################################################################
-## Let R be a regular relation (symmetric or asymmetric) of a set V
-## with o(u,v) we denote |{w | (u,w), (v,w) in R }|, and
-## with i(u,v) we denote |{w | (w,u), (w,v) in R }|.
-## in JOCO we call a set of colors arc-regular if 
-##      - it is symmetric or asymmetric,
-##      - it is regular,
-##      - there is a number lbd such that for all (u,v) in R we have
-##                 o(u,v) + i(u,v) = lbd.
-##
-## Arc regular sets may be enumerated in well-fibred J-stable color graphs.
 
 
 
 
 InstallMethod(RegularSet,
-"for arc regular sets",
+"for J-arc regular sets",
 [ IsRegularSet and IsJArcRegularSet, IsColorGraph, IsList ],
 function(filter, cgr, set)
    local res;
@@ -35,21 +25,21 @@ function(filter, cgr, set)
 end);
 
 InstallMethod(StableSetFromPartialStableSet,
-"for a partial arc regular set in PartialJArcRegularSetRep",
+"for a partial J-arc regular set in PartialJArcRegularSetRep",
 [IsPartialJArcRegularSet and IsPartialJArcRegularSetRep],
 function(cand)
     return RegularSet( IsRegularSet and IsJArcRegularSet, cand!.cgr, cand!.set);
 end);
 
 InstallMethod(OnRegularSets,
-"for an arc regular set and a permutation",
+"for a J-arc regular set and a permutation",
 [IsRegularSet and IsJArcRegularSet and IsColorSetRep, IsPerm],
 function(gs, g)
     return RegularSet(IsRegularSet and IsJArcRegularSet, gs!.cgr, MakeImmutable(OnSets(gs!.set,g)));
 end);
 
 InstallMethod(ViewString,
-"for an arc regular set",
+"for a J-arc regular set",
 [IsRegularSet and IsJArcRegularSet],
 function(x) 
     return Concatenation("<", "JArcRegularSet: ", String(AsSet(x)), ">");
@@ -167,7 +157,8 @@ InstallMethod(IsJArcRegularSet,
 "for a regular set",
 [IsRegularSet],
 function(rset)
-    local  cgr, set, m, iset, g, gor, lval, v, h, dom, hor, w, lx;
+    local  cgr, set, m, iset, g, gor, lval, v, h, domx, domy, hor, w, 
+           lx, ly;
     
     cgr:=UnderlyingCgrOfColorSet(rset);
     set:=AsSet(rset);
@@ -179,11 +170,13 @@ function(rset)
     
     for v in gor do
         h:=Stabilizer(g,v,OnPoints);
-        dom:=Neighbors(cgr,v,set);
-        hor:=StbcMinimalOrbitReps(Stbc(h), dom);
+        domx:=Neighbors(cgr,v,set);
+        domy:=Neighbors(cgr,v,iset);
+        hor:=StbcMinimalOrbitReps(Stbc(h), domx);
         for w in hor do
-            lx:=Intersection(dom, Neighbors(cgr,w,iset));
-            AddSet(lval,Length(lx));
+            lx:=Intersection(domx, Neighbors(cgr,w,set));
+            ly:=Intersection(domy, Neighbors(cgr,w,iset));
+            AddSet(lval,Length(lx)+Length(ly));
             if Length(lval)>1 then
                 return false;
             fi;

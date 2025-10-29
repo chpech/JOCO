@@ -74,14 +74,48 @@ InstallMethod(ExtendedPartialStablePartition,
 "for a partial regular fusion and a regular set",
 [IsPartialRegularFusion and IsPartialRegularFusionRep, IsRegularSet],
 function(pfusion,gs)
-    local  vdomain, rset, lclass, npart, pos, nppart, obj, ppart, 
+    local  vdomain, rset, arset, i, lclass, npart, pos, nppart, obj, ppart, 
            part, varpart, maxclasssize, nvarpart, npfusion;
     
-    vdomain:=pfusion!.varpart[1];
     rset:=AsSet(gs);
-    if not IsSubset(vdomain,rset) then
+    arset:=OnSets(rset, ColorMates(pfusion!.cgr));
+    
+    
+    # when new slice starts, then rset can be its first element only if it is smaller than
+    # OnSets(rset, ColorMates(pfusion!.cgr))
+    if pfusion!.ppart = [] or Length(rset) > Length(Last(pfusion!.ppart)) then 
+        if arset < rset then 
+            return fail;
+        fi;
+    fi;
+    
+    
+    i:=First([1..Length(pfusion!.varpart)], j->IsSubset(pfusion!.varpart[j],rset));
+    if i = fail then
         return fail;
     fi;
+    
+    vdomain:=pfusion!.varpart[i];
+    
+    if ForAny([1..i-1], j->Length(pfusion!.varpart[j]) <= Length(rset)) then
+       return fail;
+    fi;
+    
+     # when new slice starts, then rset can be its first element only if it is smaller than
+    # OnSets(rset, ColorMates(pfusion!.cgr))
+    if Length(vdomain) > Length(rset) and arset < rset then
+        return fail;
+    fi;
+    
+    
+    # if the mate of rset is smaller then its mate must come before in pfusion!.ppart
+    # the two tests before for the situation that slice is new could be replaced by 
+    # the following test, if it is placed n the beginning of the function
+    # however, checking that arset is in pfusion!.ppart takes more time
+    if arset < rset and not arset in pfusion!.ppart then
+        return fail;
+    fi;
+   
     
     if pfusion!.ppart<>[] then
         lclass:=Last(pfusion!.ppart);

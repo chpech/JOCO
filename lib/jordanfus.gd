@@ -19,7 +19,7 @@ DeclareAttribute( "HomogeneousJordanFusionOrbits", IsColorGraph and IsJStableCol
 
 
 
-DeclareCategory("IsPosetOfJFusionOrbits", IsCocoPoset);
+# DeclareCategory("IsPosetOfJFusionOrbits", IsCocoPoset);
 
 
 DeclareGlobalFunction( "PosetOfFusionOrbits" );

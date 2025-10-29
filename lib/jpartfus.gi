@@ -63,18 +63,45 @@ InstallMethod(ExtendedPartialStablePartition,
 "for a partial Jordan fusion in  PartialJordanFusionRep and a regular J-stable set",
 [IsPartialJordanFusion and IsPartialJordanFusionRep, IsRegularSet and IsJStableSet],
 function(pfusion,gs)
-    local  tensor, rset, class, lclass, npart, pos, nppart, obj, 
+    local  tensor, rset, arset, i, class, lclass, npart, pos, nppart, obj, 
            nvarpart, npfusion;
     
     tensor:=JStructureConstantsOfColorGraph(pfusion!.cgr);
     
     rset:=AsSet(gs);
+    arset:=OnSets(rset, ColorMates(pfusion!.cgr));
     
-    class:=pfusion!.varpart[1];
-    if not IsSubset(class,rset) then
+    # when new slice starts, then rset can be its first element only if it is smaller than
+    # OnSets(rset, ColorMates(pfusion!.cgr))
+    if pfusion!.ppart = [] or Length(rset) > Length(Last(pfusion!.ppart)) then 
+        if arset < rset then 
+            return fail;
+        fi;
+    fi;
+    
+    i:=First([1..Length(pfusion!.varpart)], j->IsSubset(pfusion!.varpart[j],rset));
+    if i = fail then
+        return fail;
+    fi;
+    class:=pfusion!.varpart[i];
+    if ForAny([1..i-1], j->Length(pfusion!.varpart[i]) <= Length(rset)) then
         return fail;
     fi;
     
+    # when new slice starts, then rset can be its first element only if it is smaller than
+    # OnSets(rset, ColorMates(pfusion!.cgr))
+    if Length(class) > Length(rset) and arset < rset then
+        return fail;
+    fi;
+    
+    # if the mate of rset is smaller then its mate must come before in pfusion!.ppart
+    # the two tests before for the situation that slice is new could be replaced by 
+    # the following test, if it is placed n the beginning of the function
+    # however, checking that arset is in pfusion!.ppart takes more time
+    if arset < rset and not arset in pfusion!.ppart then
+        return fail;
+    fi;
+
     if pfusion!.ppart<>[] then
         lclass:=Last(pfusion!.ppart);
         if Length(rset) < Length(lclass) then
@@ -106,7 +133,7 @@ function(pfusion,gs)
         obj:=rec( cgr:=pfusion!.cgr,
                   ppart:=nppart,
                   part:=npart,
-                  varpart:=pfusion!.varpart{[2..Length(pfusion!.varpart)]},
+                  varpart:= pfusion!.varpart{Difference([1..Length(pfusion!.varpart)],[i])},
                   maxclasssize:=pfusion!.maxclasssize);
     else # lif Length(gs)<Length(class) or (Length(gs)=Length(class) and AsSet(gs)<=class) then
         npart:=WLShallowCopyStablePartition(pfusion!.part);
@@ -115,7 +142,7 @@ function(pfusion,gs)
             return fail;
         fi;
         
-        npart:=JStabil(tensor, npart, AsSet(gs):sym);
+        npart:=JStabil(tensor, npart, AsSet(gs));
         if npart=fail then
             return fail;
         fi;
@@ -180,12 +207,6 @@ function(pfusion, gs)
     return false;
 end);
 
-# InstallMethod( TensorOfPartialJFusion,
-#         "for partial fusions",
-#         [IsPartialJFusion and IsPartialJFusionRep],
-# function(pfus)
-#     return pfus!.tensor;
-# end);
 
 InstallMethod( ViewString,
 "for a partial Jordan fusion",
@@ -249,248 +270,6 @@ function(group,pfus,stab)
     return Objectify(NewType(fam, IsPartialStablePartitionOrbit and IsPartialStablePartitionOrbitRep), res);
 end);
 
-# InstallMethod( ViewString,
-#         "for partial J-fusion orbits",
-#         [IsPartialJFusionOrbit],
-# function(pforb)
-#     return Concatenation("<partial J-fusion orbit of length ", String(Size(pforb)), ">");
-# end);
-
-###################################################################################
-# Iterators of partial J-fusion orbits
-
-# DeclareRepresentation( "IsPJFOrbitIterRep", IsComponentObjectRep, ["state"]);
-
-# PJFOrbitIteratorsFamily := NewFamily("PJFOrbitIteratorsFamily", 
-#                                       IsIteratorOfPJFOrbits);
-
-# InstallMethod(IteratorOfPartialJFusionOrbits,
-#     "for partial J-fusions",
-#     [IsList],
-# function(gsorb)
-#     local state,aaut,tensor,pfus;
-    
-    
-#     if gsorb= [] then
-#         state:=fail;
-#     else
-#         if not ForAll(gsorb, IsJGoodSetOrbit) then
-#             ErrorNoReturn("IteratorOfPartialJFusionOrbits: expecting a list of J-good set orbits");
-#         fi;
-        
-#         if not ForAll(gsorb, gso->IsIdenticalObj(FamilyObj(gso),FamilyObj(gsorb[1]))) then
-#             ErrorNoReturn("IteratorOfJPartialFusionOrbits: J-good sets are incompatible");
-#         fi;
-#         aaut:=UnderlyingGroupOfCocoOrbit(gsorb[1]);
-#         tensor:=TensorOfJGoodSet(Representative(gsorb[1]));
-#         pfus:=EmptyPartialJFusion(tensor, Maximum(List(gsorb, x->Size(Representative(x)))));
-        
-#         state:=rec( pfus:=pfus,
-#                     G:=aaut,         # the group under which we enumerate orbits
-#                     GS:=aaut,        # the SetsSetsStabilizer of the finished slices
-#                     H:=aaut,         # the SetsSetsStabilizer of the current slice
-#                     slice:=[],       # the current slice
-#                     orbits:=Set(gsorb),   # compatible H-orbit representatives of good sets
-#                     orbidx:=1,
-#                     linkback:=fail
-#                     );
-#     fi;
-    
-#     return Objectify(NewType(PJFOrbitIteratorsFamily,
-#                    IsIteratorOfPJFOrbits and IsPJFOrbitIterRep and IsMutable),
-#                    rec(state:=state));
-# end);
-
-
-# InstallMethod( NextIterator,
-#         "for iterators of partial J-fusions",
-#         [IsIteratorOfPJFOrbits and IsPJFOrbitIterRep and IsMutable],
-# function(iter)
-#     local NextState, pfus,grp,stab;
-        
-#     NextState:=function(state)
-#         local gsorb,gs,ags,npfus,nH,nextstate,norbits,xnorbits;
-        
-#         if state=fail then 
-#             return fail; 
-#         fi;        
-        
-#         if state.orbidx>Length(state.orbits) then
-#             return NextState(state.linkback);
-#         fi;
-        
-#         repeat
-#             gsorb:=state.orbits[state.orbidx];
-#             gs:=CanonicalRepresentativeOfCocoOrbit(gsorb);
-#             state.orbidx:=state.orbidx+1;
-            
-#             if state.slice=[] then
-#                 ags:=OnJGoodSets(gs, Mates(TensorOfJGoodSet(gs)));
-#                 if AsSet(ags)<AsSet(gs) then
-#                     nH:=();
-#                     continue;
-#                 fi;
-#                 npfus:=ExtendedPartialJFusion(state.pfus,gs);
-#                 if npfus=fail then
-#                     nH:=();
-#                     continue;
-#                 fi;
-#                 nH:=StabilizerOfCanonicalRepresentative(gsorb);
-#                 xnorbits:=Filtered(state.orbits, 
-#                                    x->Length(Representative(x))>=Length(gs));
-#                 norbits:=Union(List(xnorbits, 
-#                    x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, 
-#                       y->IsJCompatibleWithPart(npfus,y))));
-# #                Assert(1,norbits=Union(List(xnorbits, x->Filtered(SubOrbitsOfCocoOrbit(nH,x),y->IsCompatibleWithPart(npfus,Representative(y))))));
-                
-#                 norbits:=Filtered(norbits, x->Representative(x)>gs);
-# #                Assert(1, npfus!.varpart=[] or 2*Length(npfus!.varpart[1])>Order(npfus!.tensor) or npfus!.varpart[1] in Set(norbits, x->AsSet(Representative(x))));
-                
-#                 nextstate:=rec( pfus:=npfus,
-#                                 G:=state.G,
-#                                 GS:=state.G,
-#                                 H:=nH,
-#                                 slice:=[AsSet(gs)],
-#                                 orbits:=norbits,
-#                                 orbidx:=1,
-#                                 linkback:=state);
-#             elif Length(state.slice[1])<Length(gs) then
-#                 ags:=OnJGoodSets(gs, Mates(TensorOfJGoodSet(gs)));
-#                 if AsSet(ags)<AsSet(gs) then
-#                     nH:=();
-#                     continue;
-#                 fi;
-#                 npfus:=ExtendedPartialJFusion(state.pfus,gs);
-#                 if npfus=fail then
-#                     nH:=();
-#                     continue;
-#                 fi;
-#                 nH:=StabilizerOfCanonicalRepresentative(gsorb);
-#                 xnorbits:=Filtered(state.orbits, 
-#                                    x->Length(Representative(x))>=Length(gs));
-#                 norbits:=Union(List(xnorbits, 
-#                    x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, 
-#                       y->IsJCompatibleWithPart(npfus,y))));
-# #                Assert(1, norbits=Union(List(xnorbits, x->Filtered(SubOrbitsOfCocoOrbit(nH,x), y->IsCompatibleWithPart(npfus,Representative(y))))));
-                
-#                 norbits:=Filtered(norbits, x->Representative(x)>gs);                
-# #                Assert(1, npfus!.varpart=[] or 2*Length(npfus!.varpart[1])>Order(npfus!.tensor) or npfus!.varpart[1] in Set(norbits, x->AsSet(Representative(x))));
-
-#                 nextstate:=rec( pfus:=npfus,
-#                                 G:=state.G,
-#                                 GS:=state.H,
-#                                 H:=nH,
-#                                 slice:=[AsSet(gs)],
-#                                 orbits:=norbits,
-#                                 orbidx:=1,
-#                                 linkback:=state);
-#             else
-# #                Assert(1, Length(gs)>=Length(state.slice[1]));
-#                 ags:=OnJGoodSets(gs, Mates(TensorOfJGoodSet(gs)));
-#                 if AsSet(ags)<AsSet(gs) then
-#                     if not AsSet(ags) in state.slice then
-#                         nH:=();
-#                         continue;
-#                     fi;
-#                 fi;
-                
-#                 npfus:=ExtendedPartialJFusion(state.pfus,gs);
-#                 if npfus=fail then
-#                     nH:=();
-#                     continue;
-#                 fi;
-#                 nH:=SetsSetsReducibilityTestOneCard(state.GS, StabilizerOfCanonicalRepresentative(gsorb),state.slice,AsSet(gs));
-#                 if IsPerm(nH) then
-#                     continue;
-#                 fi;
-#                 norbits:=Union(List(state.orbits, 
-#                    x->SubOrbitsWithInvariantPropertyOfCocoOrbit(StabilizerOfCanonicalRepresentative(gsorb), x, 
-#                         y->IsJCompatibleWithPart(npfus,y))));
-# #                Assert(1,norbits=Union(List(state.orbits, x->Filtered(SubOrbitsOfCocoOrbit(StabilizerOfCanonicalRepresentative(gsorb),x),y->IsCompatibleWithPart(npfus,Representative(y))))));
-
-#                 norbits:=Set(norbits, x->JGoodSetOrbit(nH, CanonicalRepresentativeOfCocoOrbit(x),
-#                     ClosureGroup(StabilizerOfCanonicalRepresentative(x), Stabilizer(nH, AsSet(CanonicalRepresentativeOfCocoOrbit(x)),OnTuples))));
-#                 norbits:=Filtered(norbits, x->Representative(x)>gs);               
-# #                Assert(1,npfus!.varpart=[] or 2*Length(npfus!.varpart[1])>Order(npfus!.tensor) or npfus!.varpart[1] in Set(norbits, x->AsSet(Representative(x))));
-
-#                 nextstate:=rec( pfus:=npfus,
-#                                 G:=state.G,
-#                                 GS:=state.GS,
-#                                 H:=nH,
-#                                 slice:=Concatenation(state.slice,[AsSet(gs)]),
-#                                 orbits:=norbits,
-#                                 orbidx:=1,
-#                                 linkback:=state);
-#             fi;
-#         until not IsPerm(nH) or state.orbidx > Length(state.orbits);
-#         if IsPerm(nH) then
-#             return NextState(state.linkback);
-#         fi;
- 
-#         return nextstate;
-#     end;
-    
-#     if iter!.state=fail then
-#         return fail;
-#     fi;
-    
-#     pfus:=iter!.state.pfus;
-#     grp:=iter!.state.G;
-#     stab:=iter!.state.H;
-    
-#     iter!.state:=NextState(iter!.state);
-#     return PartialJFusionOrbitNC(grp,pfus,stab);
-# end);
-
-# InstallMethod( IsDoneIterator,
-#         "for partial J-fusion iterators",
-#         [IsIteratorOfPJFOrbits and IsPJFOrbitIterRep],
-# function(iter)
-#     return iter!.state=fail;
-# end);
-
-# COCOInfoPFUSSize:=5;
-# InstallMethod(AllJFusionOrbits,
-#         "for iterators of partial J-fusion orbits",
-#         [IsIteratorOfPJFOrbits and IsPJFOrbitIterRep],
-# function(iter)
-#     local res,pfus,fus,fusorb;
-    
-#     if IsDoneIterator(iter) then
-#         return [];
-#     fi;
-    
-#     res:=[];
-        
-#     while not IsDoneIterator(iter) do
-#         if Length(iter!.state.slice)<=COCOInfoPFUSSize then
-#             Info(InfoCOCO,1,iter!.state.slice,"\n");
-#         fi;
-#         if IsCompletePartialJFusion(iter!.state.pfus) then
-#             Info(InfoCOCO,1,"!");
-#             pfus:=iter!.state.pfus;
-#             fus:=JFusionFromCompletePartialJFusion(pfus);
-            
-#             fusorb:=JFusionOrbitNC(iter!.state.G, fus, iter!.state.H);
-#             Assert(1,iter!.state.H = Stabilizer(iter!.state.G, AsPartition(fus),OnSetsSets));
-# #            Assert(1, not fusorb in res);
-            
-#             Add(res, fusorb);
-#         fi;
-        
-#         NextIterator(iter);
-#     od;
-#     return res;
-# end);
-
-
-# InstallMethod( ViewString,
-#         "for partial J-fusion iterators",
-#         [IsIteratorOfPJFOrbits and IsPJFOrbitIterRep],
-# function(iter)
-#     return Concatenation("<partial J-fusion orbit iterator, current slice: ",
-#           String(iter!.state.slice), ">");
-# end);
 
 InstallGlobalFunction(JRefinedPartition,
 function(newPart,gs)
@@ -563,16 +342,3 @@ function(newPart,gs)
     # return repart(newPart,M,true);
 end);
 
-# InstallMethod(ConstructorOfCocoOrbit,
-#         "for all partial J-fusion orbits",
-#         [IsPartialJFusionOrbit],
-# function(orb)
-#     return PartialJFusionOrbit;
-# end);
-
-# InstallMethod(ConstructorOfCocoOrbitNC,
-#         "for all partial J-fusion orbits",
-#         [IsPartialJFusionOrbit],
-# function(orb)
-#     return PartialJFusionOrbitNC;
-# end);

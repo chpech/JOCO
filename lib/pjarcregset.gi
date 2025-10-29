@@ -26,14 +26,14 @@ function(cgr,g)
 end);
 
 InstallMethod(GetPartialStableSetOrbitFamily,
-"for a partial arc regular set in PartialJArcRegularSetRep and a permutation group",
+"for a partial J-arc regular set in PartialJArcRegularSetRep and a permutation group",
 [IsPartialJArcRegularSet and IsPartialJArcRegularSetRep, IsPermGroup],
 function(prset,grp)  
     return PartialJArcRegularSetOrbitFamily(prset!.cgr,grp);
 end);
 
 InstallMethod( ViewString,
-"for a partial arc regular set in PartialJArcRegularSetRep",
+"for a partial J-arc regular set in PartialJArcRegularSetRep",
 [IsPartialJArcRegularSet and IsPartialJArcRegularSetRep],
 function(prs)
     local cgr,s,res;
@@ -48,19 +48,19 @@ function(prs)
         Append(res,"symmetric ");
     fi;
 
-    return Concatenation(res,"partial arc regular set ", String(s), ">");
+    return Concatenation(res,"partial J-arc regular set ", String(s), ">");
 end);
 
 
 InstallMethod(ConstructorOfStableSetOrbit,
-"for anarc regular set",
+"for a J-arc regular set",
 [IsRegularSet and IsJArcRegularSet],
 function(orb)
     return RegularSetOrbit;
 end);
 
 InstallMethod(IsCompletePartialStableSet,
-"for a partial arc regular set in PartialJArcRegularSetRep",
+"for a partial J-arc regular set in PartialJArcRegularSetRep",
 [IsPartialJArcRegularSet and IsPartialJArcRegularSetRep],
 function(pgs)
     local set,sqr;
@@ -79,7 +79,7 @@ function(pgs)
 end);
 
 InstallMethod(ExtendedPartialStableSet,
-"for a symmetric partial arc regular set in PartialJArcRegularSetRep and a positive integer",
+"for a symmetric partial J-arc regular set in PartialJArcRegularSetRep and a positive integer",
 [IsSymPartialJArcRegularSet and IsPartialJArcRegularSetRep, IsPosInt],
 function(cand,pt)
     local tensor,ndom,obj,ent,sq,mates,i;
@@ -165,7 +165,7 @@ end);
 
 
 InstallMethod(ExtendedPartialStableSet,
-"for an asymmetric partial arc regular set in PartialJArcRegularSetRep and a positive integer",
+"for an asymmetric partial J-arc regular set in PartialJArcRegularSetRep and a positive integer",
 [IsAsymPartialJArcRegularSet and IsPartialJArcRegularSetRep, IsPosInt],
 function(cand,pt)
     local cgr,t,clr,ent,ipt,ndom,obj,sq,i;
@@ -369,7 +369,7 @@ function(cgr)
 end);
 
 InstallMethod(IsCompletePartialStableSet,
-"for an asymmetric partial arc regular set in AsymPartialJArcRegularSetBlkRep",
+"for an asymmetric partial J-arc regular set in AsymPartialJArcRegularSetBlkRep",
 [IsAsymPartialJArcRegularSet and IsAsymPartialJArcRegularSetBlkRep],
 function(cand)
     local a,b,block;
@@ -402,7 +402,7 @@ function(cand)
 end);
 
 InstallMethod(ExtendedPartialStableSet,
-"for an asymmetric partial arc regular set in AsymPartialarcRegularSetBlkRep",
+"for an asymmetric partial J-arc regular set in AsymPartialJArcRegularSetBlkRep",
 [IsAsymPartialJArcRegularSet and IsAsymPartialJArcRegularSetBlkRep, IsPosInt],
 function(cand,pt)
     local  cgr, t, npgs, color, sb, fb, sblk, 
@@ -743,14 +743,14 @@ function(cand,pt)
 end);
 
 InstallMethod(GetPartialStableSetOrbitFamily,
-"for a partial arc regular set in PartialJArcRegularSetRep and a permutation group",
+"for a partial J-arc regular set in PartialJArcRegularSetRep and a permutation group",
 [IsPartialJArcRegularSet and IsPartialJArcRegularSetRep, IsPermGroup],
 function(prset,grp)  
     return PartialJArcRegularSetOrbitFamily(prset!.cgr,grp);
 end);
 
 InstallMethod( ViewString,
-"for a partial arc regular set in PartialJArcRegularSetRep",
+"for a partial J-arc regular set in PartialJArcRegularSetRep",
 [IsPartialJArcRegularSet and IsPartialJArcRegularSetRep],
 function(prs)
     local cgr,s,res;
@@ -765,11 +765,11 @@ function(prs)
         Append(res,"symmetric ");
     fi;
 
-    return Concatenation(res,"partial arc regular set ", String(s), ">");
+    return Concatenation(res,"partial J-arc regular set ", String(s), ">");
 end);
 
 InstallMethod(StableSetFromPartialStableSet,
-"for a partial arc regular set in PartialJArcRegularSetRep",
+"for a partial J-arc regular set in PartialJArcRegularSetRep",
 [IsPartialJArcRegularSet and IsPartialJArcRegularSetRep],
 function(cand)
     return RegularSet( IsJArcRegularSet, cand!.cgr, cand!.set);
@@ -777,7 +777,7 @@ end);
 
 ##############################################################################
 #
-# homogeneous symmetric arc regular sets for inhomogeneous JCs
+# homogeneous symmetric J-arc regular sets for inhomogeneous JCs
 #
 ##############################################################################
 
@@ -892,7 +892,7 @@ function(cgr)
 end);
 
 InstallMethod(IsCompletePartialStableSet,
-"for a symmetric partial arc regular set in SymPartialJArcRegularSetBlkRep",
+"for a symmetric partial J-arc regular set in SymPartialJArcRegularSetBlkRep",
 [IsSymPartialJArcRegularSet and IsSymPartialJArcRegularSetBlkRep],
 function(cand)
     local a,b,block;
@@ -923,7 +923,7 @@ function(cand)
 end);
 
 InstallMethod(ExtendedPartialStableSet,
-"for a symmetric partial arc regular set in SymPartialarcRegularSetBlkRep and a positive integer",
+"for a symmetric partial J-arc regular set in SymPartialJArcRegularSetBlkRep and a positive integer",
 [IsSymPartialJArcRegularSet and IsSymPartialJArcRegularSetBlkRep, IsPosInt],
 function(cand,pt)
     local  cgr, t, npgs, color, icolor, sb, fb, i, a, j, b, block, sd, 

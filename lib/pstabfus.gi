@@ -154,6 +154,12 @@ function(iter)
             set:=CanonicalRepresentativeOfCocoOrbit(setorb);
             state.orbidx:=state.orbidx+1;
             
+            # if state.ppart!.ppart = [[2],[3],[4],[5,6],[7,8],[9,11],[10,12]]  
+            #    and state!.orbidx = 6 then
+            #     Error("brkx");
+            # fi;
+            
+            
             if state.orbitBounds[setorb!.type]<=0 then
                 nH:=();
                 continue;
@@ -181,7 +187,8 @@ function(iter)
                     Perform(norbits[i], function(x) x!.type:=xnorbits[i]!.type;end);
                 od;
                 norbits:=Concatenation(norbits);
-
+                norbits:=Filtered(norbits, x->Representative(x)>set);
+                
                 nextstate:=rec( allsorb:=state.allsorb,
                                 ppart:=nppart,
                                 maxrank:=state.maxrank,
@@ -195,6 +202,10 @@ function(iter)
                                 linkback:=state);
                 
             elif Length(state.slice[1])<Length(set) then
+                # if state.ppart!.ppart = [[2],[3],[4],[5,6],[7,8],[9,11],[10,12]]  
+                #    and state!.orbidx = 6 then
+                #     Error("brkx");
+                # fi;
                 nH:=StabilizerOfCanonicalRepresentative(setorb);
                 xnorbits:=Filtered(state.orbits, 
                                    x->Length(Representative(x))>=Length(set));
@@ -209,7 +220,8 @@ function(iter)
                     Perform(norbits[i], function(x) x!.type:=xnorbits[i]!.type;end);
                 od;
                 norbits:=Concatenation(norbits);
-            
+                norbits:=Filtered(norbits, x->Representative(x) > set);
+                
                 nextstate:=rec( allsorb:=state.allsorb,
                                 ppart:=nppart,
                                 maxrank:=state.maxrank,
@@ -222,8 +234,13 @@ function(iter)
                                 orbidx:=1,
                                 linkback:=state);
             else
+                # if state.ppart!.ppart = [[2],[3],[4],[5,6],[7,8],[9,11],[10,12]]  
+                #    and state!.orbidx = 6 then
+                #     Error("brkx");
+                # fi;
                 Info(InfoCOCO,2,"Checking irreducibility...");
-                nH:=SetsSetsReducibilityTestOneCard(state.GS, StabilizerOfCanonicalRepresentative(setorb),state.slice,AsSet(set));
+                nH:=SetsSetsReducibilityTestOneCard(state.GS, 
+                     StabilizerOfCanonicalRepresentative(setorb),state.slice,AsSet(set));
                 
                 Info(InfoCOCO,2,"done.\n");
                 
@@ -235,11 +252,18 @@ function(iter)
                 xnorbits:=Filtered(state.orbits, 
                                    x->Length(Representative(x))>=Length(set));
                 Info(InfoCOCO,2,"Computing suborbits...");
+                # norbits:=List(xnorbits, 
+                #               x->SubOrbitsWithInvariantPropertyOfCocoOrbit(
+                #                    Intersection(state.H,nH), x, 
+                #                  y->IsCompatibleWithPartialStablePartition(nppart,y)));
                 norbits:=List(xnorbits, 
-  x->SubOrbitsWithInvariantPropertyOfCocoOrbit(Intersection(state.H,nH), x, 
+                              x->SubOrbitsWithInvariantPropertyOfCocoOrbit(
+                                   StabilizerOfCanonicalRepresentative(setorb), x, 
                                  y->IsCompatibleWithPartialStablePartition(nppart,y)));
                 Info(InfoCOCO,2,"done.\n");
                               
+                Assert(1, IsSubgroup(nH, StabilizerOfCanonicalRepresentative(setorb)));
+                
                 for i in [1..Length(xnorbits)] do
                     Perform(norbits[i], function(x) x!.type:=xnorbits[i]!.type;end);
                 od;
@@ -247,12 +271,19 @@ function(iter)
                 norbits:=Concatenation(norbits);
                 
                 
+                
+                # norbits:=List(norbits, o->[
+                #    CopyStabChain(Stbc(StabilizerOfCanonicalRepresentative(o))),o]);
                 norbits:=List(norbits, o->[
                    CopyStabChain(Stbc(ClosureGroup(StabilizerOfCanonicalRepresentative(o), 
                       Stabilizer(nH, AsSet(CanonicalRepresentativeOfCocoOrbit(o)),
                                  OnTuples)))),o]);
-                norbits:=List(norbits, o->[o[1], SetCanonifiers(Stbc(nH), o[1],AsSet(Representative(o[2])):failIfNotCanonical),o[2]]);
+                norbits:=List(norbits, o->[o[1], 
+                             SetCanonifiers(Stbc(nH), o[1],
+                               AsSet(Representative(o[2])):failIfNotCanonical), o[2]]);
                 norbits:=Filtered(norbits, o->o[2]<>fail);
+                
+                
                 
                 
                 norbits:=List(norbits, 
@@ -262,6 +293,8 @@ function(iter)
                 
                 Perform(norbits, function(x) x[2]!.type:=x[1]!.type;end);
                 norbits:=List(norbits, x->x[2]);
+                
+                norbits:=Filtered(norbits,  x->Representative(x)>set);
                 
                 nextstate:=rec( allsorb:=state.allsorb,
                                 ppart:=nppart,
@@ -274,6 +307,10 @@ function(iter)
                                 orbits:=Set(norbits),
                                 orbidx:=1,
                                 linkback:=state);
+                # if state.ppart!.ppart = [[2],[3],[4],[5,6],[7,8],[9,11],[10,12]]  
+                #    and state!.orbidx = 6 then
+                #     Error("brkx");
+                # fi;
             fi;
                         
             nextstate.orbitBounds[setorb!.type]:=nextstate.orbitBounds[setorb!.type]-1;
@@ -339,13 +376,13 @@ function(iter)
         if  IsCompletePartialStablePartition(ppart) and 
             not PartialStablePartitionHasSmallerBase(ppart) then
             
-            Info(InfoCOCO,1,"!");
+            # Info(InfoCOCO,1,"!");
             part:=StablePartitionFromCompletePartialStablePartition(ppart);
             
             partorb:=ConstructorOfStablePartitionOrbitNC(part)(UnderlyingGroupOfCocoOrbit(pporb), part, 
                                       StabilizerOfCanonicalRepresentative(pporb));
-            Assert(1,StabilizerOfCanonicalRepresentative(pporb) = 
-                     Stabilizer(UnderlyingGroupOfCocoOrbit(pporb), Set(part),OnSetsSets));
+            # Assert(1,StabilizerOfCanonicalRepresentative(pporb) = 
+            #          Stabilizer(UnderlyingGroupOfCocoOrbit(pporb), Set(part),OnSetsSets));
             
             if flt(partorb) then
                 Info(InfoCOCO,1,"!");

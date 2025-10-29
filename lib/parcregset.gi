@@ -60,7 +60,7 @@ function(orb)
 end);
 
 InstallMethod(IsCompletePartialStableSet,
-"for a partial arc regular set in PartialJArcRegularSetRep",
+"for a partial arc regular set in PartialArcRegularSetRep",
 [IsPartialArcRegularSet and IsPartialArcRegularSetRep],
 function(pgs)
     local set,sqr;
@@ -79,7 +79,7 @@ function(pgs)
 end);
 
 InstallMethod(ExtendedPartialStableSet,
-"for a symmetric partial arc regular set in PartialJArcRegularSetRep and a positive integer",
+"for a symmetric partial arc regular set in PartialArcRegularSetRep and a positive integer",
 [IsSymPartialArcRegularSet and IsPartialArcRegularSetRep, IsPosInt],
 function(cand,pt)
     local tensor,ndom,obj,ent,sq,mates,i;
@@ -90,7 +90,7 @@ function(cand,pt)
        return fail;
     fi;
     
-    tensor:=JStructureConstantsOfColorGraph(cand!.cgr);
+    tensor:=StructureConstantsOfColorGraph(cand!.cgr);
     if not IsTensorRep(tensor) then
         Error("this is not supposed to happen");
     fi;
@@ -98,14 +98,17 @@ function(cand,pt)
     ent:=tensor!.entries;
     sq:=ShallowCopy(cand!.square);
     for i in cand!.set do
-        sq:=sq+2*ent[i][mates[1]];
+        sq:=sq+ent[i][mates[1]];
+        sq:=sq+ent[mates[1]][i];
     od;
     sq:=sq+ent[mates[1]][mates[1]];
     if Length(mates)=2 then
         for i in cand!.set do
-            sq:=sq + 2*ent[i][mates[2]];
+            sq:=sq+ent[i][mates[2]];
+            sq:=sq+ent[mates[2]][i];
         od;
-        sq:=sq + 2*ent[mates[1]][mates[2]];
+        sq:=sq+ent[mates[1]][mates[2]];
+        sq:=sq+ent[mates[2]][mates[1]];
         sq:=sq+ent[mates[2]][mates[2]];
     fi;
    
@@ -127,12 +130,12 @@ function(cand,pt)
 
     obj.domain:=ndom;
     
-    return Objectify(NewType(PartialJArcRegularSetsFamily(cand!.cgr), IsSymPartialJArcRegularSet and IsPartialJArcRegularSetRep), obj);
+    return Objectify(NewType(PartialArcRegularSetsFamily(cand!.cgr), IsSymPartialArcRegularSet and IsPartialArcRegularSetRep), obj);
 end);
 
-InstallMethod(EmptySymPartialJArcRegularSet,
-"for a regular J-stable color graph",
-[IsColorGraph and IsJStableColorGraph and IsRegularColorGraph],
+InstallMethod(EmptySymPartialArcRegularSet,
+"for a regular WL-stable color graph",
+[IsColorGraph and IsWLStableColorGraph and IsHomogeneous],
 function(cgr)
     local aaut,rclr,clr,sclr,aclr,imap,map, i, j,act,cand;
    
@@ -160,19 +163,19 @@ function(cgr)
               square:=ListWithIdenticalEntries(RankOfColorGraph(cgr),0)
               );
    
-   return Objectify(NewType(PartialJArcRegularSetsFamily(cgr), IsSymPartialJArcRegularSet and IsPartialJArcRegularSetRep), cand);
+   return Objectify(NewType(PartialArcRegularSetsFamily(cgr), IsSymPartialArcRegularSet and IsPartialArcRegularSetRep), cand);
 end);
 
 
 InstallMethod(ExtendedPartialStableSet,
-"for an asymmetric partial arc regular set in PartialJArcRegularSetRep and a positive integer",
-[IsAsymPartialJArcRegularSet and IsPartialJArcRegularSetRep, IsPosInt],
+"for an asymmetric partial arc regular set in PartialArcRegularSetRep and a positive integer",
+[IsAsymPartialArcRegularSet and IsPartialArcRegularSetRep, IsPosInt],
 function(cand,pt)
     local cgr,t,clr,ent,ipt,ndom,obj,sq,i;
     
 
     cgr:=cand!.cgr;
-    t:=JStructureConstantsOfColorGraph(cgr);
+    t:=StructureConstantsOfColorGraph(cgr);
     if not IsTensorRep(t) then
         Error("this is not supposed to happen");
     fi;
@@ -193,7 +196,8 @@ function(cand,pt)
     
     sq:=ShallowCopy(cand!.square);
     for i in cand!.set do
-        sq:=sq + 2*ent[i][clr];
+        sq:=sq+ent[i][clr];
+        sq:=sq+ent[clr][i];
     od;
     sq:=sq+ent[clr][clr];
     
@@ -213,12 +217,12 @@ function(cand,pt)
              square:=sq);
     
     
-   return Objectify(NewType(PartialJArcRegularSetsFamily(cand!.cgr), IsAsymPartialJArcRegularSet and IsPartialJArcRegularSetRep), obj);
+   return Objectify(NewType(PartialArcRegularSetsFamily(cand!.cgr), IsAsymPartialArcRegularSet and IsPartialArcRegularSetRep), obj);
 end);
 
-InstallMethod(EmptyAsymPartialJArcRegularSet,
-"for a regular J-stable color graph",
-[IsColorGraph and IsJStableColorGraph and IsRegularColorGraph],
+InstallMethod(EmptyAsymPartialArcRegularSet,
+"for a regular WL-stable color graph",
+[IsColorGraph and IsWLStableColorGraph and IsHomogeneous],
 function(cgr)
     local imap,map,i,grp,act,cand;
     
@@ -239,11 +243,11 @@ function(cgr)
               square:=ListWithIdenticalEntries(RankOfColorGraph(cgr),0)
               );
     
-    return Objectify(NewType(PartialJArcRegularSetsFamily(cgr), IsAsymPartialJArcRegularSet and IsPartialJArcRegularSetRep), cand);
+    return Objectify(NewType(PartialArcRegularSetsFamily(cgr), IsAsymPartialArcRegularSet and IsPartialArcRegularSetRep), cand);
 end);
 
-DeclareRepresentation("IsAsymPartialJArcRegularSetBlkRep",
-        IsPartialJArcRegularSetRep,
+DeclareRepresentation("IsAsymPartialArcRegularSetBlkRep",
+        IsPartialArcRegularSetRep,
         [ "cgr",
           "map",
           "imap",
@@ -266,7 +270,6 @@ DeclareRepresentation("IsAsymPartialJArcRegularSetBlkRep",
           "ridx",   # block rows from which colors are present in set
           "cidx",   # block columns from which colors a re present in set
           "fullrows",
-          "fullcols",
           "kIsForced",
           "k",
           "lbdIsForced",
@@ -274,15 +277,15 @@ DeclareRepresentation("IsAsymPartialJArcRegularSetBlkRep",
           "maxlbd"
           ]);
 
-InstallMethod(EmptyAsymPartialJArcRegularSet,
-"for well-fibred J-stable color graph",
-[IsColorGraph and IsJStableColorGraph and IsWellFibredRainbow],
+InstallMethod(EmptyAsymPartialArcRegularSet,
+"for WL-stable color graph",
+[IsColorGraph and IsWLStableColorGraph],
 function(cgr)
     local  tensor, mat, vec, perm, blocks, startBlock, finishBlock, 
            nof, imap, a, b, clr, map, i, domrowdegs, domcoldegs, sb, 
            fb, cand;
     
-    tensor:=JStructureConstantsOfColorGraph(cgr);
+    tensor:=StructureConstantsOfColorGraph(cgr);
     if not IsBlockedTensorRep(tensor) then
         Error("this is not supposed to happen");
         TryNextMethod();
@@ -300,7 +303,7 @@ function(cgr)
     imap:=[];
     
     for a in [1..nof] do
-        for b in [a..nof] do 
+        for b in [1..nof] do 
             if a=b then
                 clr:=Filtered(blocks[a][a], x->x^ColorMates(cgr)<>x);
                 SortBy(clr, i->-OutValencies(cgr)[i]);
@@ -308,7 +311,6 @@ function(cgr)
             else
                 clr:=ShallowCopy(blocks[a][b]);
                 SortBy(clr, i->-OutValencies(cgr)[i]);
-                clr:=Concatenation(List(clr, c->[c,c^ColorMates(cgr)]));
                 Append(imap, clr);
             fi;
         od;
@@ -339,9 +341,9 @@ function(cgr)
               perm:=perm,
               startBlock:=startBlock, # the block from which a color starts
               finishBlock:=finishBlock, # the block where a color finishes
-              # colors are added in a Gamma-shape
-              # the order of blocks is [1,1], [1,2], [2,1], ... [1,n], [n,1],
-              #                        [2,2], [2,3], [3,2], ... [2,n], [n,2],
+              # colors are added row by row
+              # the order of blocks is [1,1], [1,2], [1,3], ... [1,n-1], [1,n],
+              #                        [2,1], [2,2], [2,3], ... [2,n-1], [2,n],
               #                         ...
               #                                                        [n,n].
               currentRow:=0, # the row/column of blocks where currently colors are added
@@ -359,18 +361,17 @@ function(cgr)
               cidx:=[],
               square:=ListWithIdenticalEntries(RankOfColorGraph(cgr),0),
               fullrows:=[],
-              fullcols:=[],
               kIsForced:=false,
               k:=0,
               lbdIsForced:=false,
               lbd:=0);
-    return Objectify(NewType(PartialJArcRegularSetsFamily(cgr), 
-           IsAsymPartialJArcRegularSet and IsAsymPartialJArcRegularSetBlkRep), cand);
+    return Objectify(NewType(PartialArcRegularSetsFamily(cgr), 
+           IsAsymPartialArcRegularSet and IsAsymPartialArcRegularSetBlkRep), cand);
 end);
 
 InstallMethod(IsCompletePartialStableSet,
-"for an asymmetric partial arc regular set in AsymPartialJArcRegularSetBlkRep",
-[IsAsymPartialJArcRegularSet and IsAsymPartialJArcRegularSetBlkRep],
+"for an asymmetric partial arc regular set in AsymPartialArcRegularSetBlkRep",
+[IsAsymPartialArcRegularSet and IsAsymPartialArcRegularSetBlkRep],
 function(cand)
     local a,b,block;
     
@@ -390,7 +391,7 @@ function(cand)
     fi;
     
     for b in [1..Length(cand!.blocks)] do
-        for a in [1..b] do # is ok for the second variant because AA* is symmetric
+        for a in [1..b] do # is ok for the because AA* is symmetric
             block:=cand!.blockingmat[a][b];
             if ForAny(block, x->cand!.square[x]<>cand!.maxlbd) then
                 return false;
@@ -402,17 +403,17 @@ function(cand)
 end);
 
 InstallMethod(ExtendedPartialStableSet,
-"for an asymmetric partial arc regular set in AsymPartialarcRegularSetBlkRep",
-[IsAsymPartialJArcRegularSet and IsAsymPartialJArcRegularSetBlkRep, IsPosInt],
+"for an asymmetric partial arc regular set in AsymPartialArcRegularSetBlkRep",
+[IsAsymPartialArcRegularSet and IsAsymPartialArcRegularSetBlkRep, IsPosInt],
 function(cand,pt)
-    local  cgr, t, npgs, color, sb, fb, sblk, 
-           a, b, block, sd, icolor, md, sbinfr, fbinfc, 
+    local  cgr, t, npgs, color, sb, fb,  
+           a, b, block, sd, icolor, md, fbinfc, 
            k, kmts, ksb, kfb, sq, bm, ent, blkIdx, bbl, 
            c, ba, bb, bc, i, j, ii, ij;
     
     cgr:=cand!.cgr;
     
-    t:=JStructureConstantsOfColorGraph(cgr);
+    t:=StructureConstantsOfColorGraph(cgr);
     
     npgs:=rec(
                cgr:=cand!.cgr,
@@ -429,47 +430,40 @@ function(cand,pt)
     sb:=cand!.startBlock[color];
     fb:=cand!.finishBlock[color];
     
-    sblk:=AsSortedList([sb,fb]);
     
-    if cand!.kIsForced and sblk[1]>cand!.currentRow then  
-        if ForAny([cand!.currentRow..sblk[1]-1], b->cand!.rowdegs[b] <> cand!.k) then
-            return nonextensible; 
-        fi;
-        if ForAny([cand!.currentRow..sblk[1]-1], b->cand!.coldegs[b] <> cand!.k) then
+    if cand!.kIsForced and sb>cand!.currentRow then  
+        if ForAny([cand!.currentRow..sb-1], b->cand!.rowdegs[b] <> cand!.k) then
             return nonextensible; 
         fi;
     fi;
     
-    npgs.currentRow:=sblk[1];
+    npgs.currentRow:=sb;
     
     npgs.fullrows:=ShallowCopy(cand!.fullrows);
-    npgs.fullcols:=ShallowCopy(cand!.fullcols);
     npgs.kIsForced:=cand!.kIsForced;
     npgs.k:=cand!.k;
     npgs.lbdIsForced:=cand!.lbdIsForced;
     npgs.lbd:=cand!.lbd;
     
     if not npgs.kIsForced then
-        if sblk[1] > 1 then
+        if sb > 1 then
             
             npgs.kIsForced:=true;
             npgs.k:=cand!.rowdegs[1];
             
-            npgs.fullrows:=Filtered([1..Length(cand!.blocks)], x->cand!.rowdegs[x]=npgs.k);
-            npgs.fullcols:=Filtered([1..Length(cand!.blocks)], x->cand!.coldegs[x]=npgs.k);
+            npgs.fullrows:=[1..sb-1];
             
             if npgs.k<cand!.rmaxdeg or npgs.k<cand!.cmaxdeg then
                 return nonextensible;
             fi;
-            if ForAny([2..sblk[1]-1], x->cand!.rowdegs[x]<>npgs.k) then
-                return nonextensible;
-            fi;
-            if ForAny([2..sblk[1]-1], x->cand!.coldegs[x]<>npgs.k) then
+            if ForAny([2..sb-1], x->cand!.rowdegs[x]<>npgs.k) then
                 return nonextensible;
             fi;
             
-            for a in Intersection(npgs.fullrows,npgs.fullcols) do
-                for b in Intersection(npgs.fullrows, npgs.fullcols) do   
+            for i in [1..Length(npgs.fullrows)] do
+                b:=npgs.fullrows[i];
+                for j in [1..i] do
+                    a:=npgs.fullrows[j];
                     block:=cand!.blockingmat[a][b];
                     if block<>[] then
                         npgs.lbdIsForced:=true;
@@ -485,8 +479,10 @@ function(cand,pt)
                 fi;
             od;
             if npgs.lbdIsForced then
-                for a in npgs.fullrows do
-                    for b in npgs.fullcols do
+                for i in [i..Length(npgs.fullrows)] do
+                    b:=npgs.fullrows[i];
+                    for j in [1..i] do
+                        a:=npgs.fullrows[j];
                         if ForAny(cand!.blockingmat[a][b], x->cand!.square[x]<>npgs.lbd) then
                             return nonextensible;
                         fi;
@@ -524,13 +520,8 @@ function(cand,pt)
         return fail;
     fi;
     
-    sbinfr:=npgs.kIsForced and npgs.rowdegs[sb]=npgs.k;
-    if sbinfr then
+    if npgs.kIsForced and npgs.rowdegs[sb]=npgs.k then
         AddSet(npgs.fullrows,sb);
-    fi;
-    fbinfc:=npgs.kIsForced and npgs.coldegs[fb]=npgs.k;
-    if fbinfc then
-        AddSet(npgs.fullcols,fb);
     fi;
     
     
@@ -549,7 +540,6 @@ function(cand,pt)
             if k<=pt or  
                kmts[1]=icolor or 
                ksb in npgs.fullrows or
-               kfb in npgs.fullcols or
                npgs.kIsForced and (sd[kmts[1]]+npgs.rowdegs[ksb]>npgs.k 
                                    or sd[kmts[2]]+npgs.coldegs[kfb]>npgs.k) 
             then
@@ -582,176 +572,99 @@ function(cand,pt)
     ent:=t!.entries;
     blkIdx:=t!.blkIdx;
     
-    if sb = fb then 
-        for a in Union(npgs.ridx,npgs.cidx) do
-            for b in Union(npgs.ridx,npgs.cidx) do
-                block:=bm[a][b];
-                bbl:=cand!.blocks[a][b];
-                if bbl = [] or a <> sb and b <> sb then
-                    continue;
-                fi;
+    for a in npgs!.ridx do
+        for b in npgs!.ridx do
+            block:=bm[a][b];
+            bbl:=cand!.blocks[a][b];
+            if bbl = [] or a <> sb and b <> sb then
+                continue;
+            fi;
+            if b = sb then # A C* 
                 c:=fb;
                 ba:=a/npgs.perm;
                 bb:=b/npgs.perm;
                 bc:=c/npgs.perm;
-                if a = sb and b = sb then  # color * icolor
-                    sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[icolor]];
-                fi;
-                if a in cand!.ridx and b = sb then # A icolor
-                    for i in cand!.blockingmat[a][c] do
-                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[i]][blkIdx[icolor]];
-                    od;
-                fi;
-                if a = fb and b in cand!.cidx and b<>sb  then # icolor A
-                    for j in cand!.blockingmat[c][b] do
-                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[icolor]][blkIdx[j]];
-                    od;
-                fi;
-                if a in cand!.cidx and b = fb then # A* color
-                    for i in cand!.blockingmat[c][a] do
-                        ii:=i^ColorMates(cgr);
-                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[ii]][blkIdx[color]];
-                    od;
-                fi;
-                if a =sb and b in cand!.ridx and b <> fb  then # color A*
-                    for j in cand!.blockingmat[b][c] do
-                        ij:=j^ColorMates(cgr);
-                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[ij]];
-                    od;
-                fi;
-                if block <> [] then
-                    npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
-                    
-                    if npgs.lbdIsForced  and npgs.maxlbd > npgs.lbd then
-                        return fail;
-                    fi;
-                    
-                    # check all new complete blocks of npgs
-                    if a in npgs.fullrows and a in npgs.fullcols and
-                       b in npgs.fullrows and b in npgs.fullcols and
-                       not ( a in cand!.fullrows and a in cand!.fullcols and
-                             b in cand!.fullrows and b in cand!.fullcols)
-                    then
-                        if not npgs.lbdIsForced then
-                            npgs.lbdIsForced := true;
-                            npgs.lbd:=sq[block[1]];
-                            if npgs.lbd <> npgs.maxlbd then
-                                return fail;
-                            fi;
-                            # if ForAny(block, x->sq[x]<>npgs.lbd) then
-                            #     return fail;
-                            # fi;
-                        fi;
-                        
-                        if ForAny(block, x->sq[x]<>npgs.lbd) then
-                            return fail;
-                        fi;
-                    fi;
-                fi;
-            od;
-        od;
-        Assert(1,sq=ComplexProduct(t,npgs.set,OnSets(npgs.set,ColorMates(cgr))));
-    else
-        for a in Union(npgs.ridx,npgs.cidx) do
-            for b in Union(npgs.ridx, npgs.cidx) do
-                block:=bm[a][b];
-                bbl:=cand!.blocks[a][b];
-                if bbl = [] or not a in [sb,fb] and  not b in [sb,fb] then
-                    continue;
-                fi;
-
+                for i in cand!.blockingmat[a][c] do
+                    sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[i]][blkIdx[icolor]];
+                od;
+            fi;
+            
+            if a = sb then # C A*
+                c:=fb;
                 ba:=a/npgs.perm;
                 bb:=b/npgs.perm;
-                if a = sb and b = sb then # c c*
-                    c:=fb;
-                    bc:=c/npgs.perm;
-                    sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[icolor]];
-                fi;
-                if a = fb and b = fb then # c* c
-                    c:=sb;
-                    bc:=c/npgs.perm;
-                    sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[icolor]][blkIdx[color]];
-                fi;
-                if a in cand!.ridx and b = sb then # A icolor
-                    c:=fb;
-                    bc:=c/npgs.perm;
-                    for i in cand!.blockingmat[a][c] do
-                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[i]][blkIdx[icolor]];
-                    od;
-                fi;
-                if a = fb and b in cand!.cidx then # icolor A
-                    c:=sb;
-                    bc:=c/npgs.perm;
-                    for j in cand!.blockingmat[c][b] do
-                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[icolor]][blkIdx[j]];
-                    od;
-                fi;
-                if a in cand!.cidx and b = fb then # A* color
-                    c:=sb;
-                    bc:=c/npgs.perm;
-                    for i in cand!.blockingmat[c][a] do
-                        ii:=i^ColorMates(cgr);
-                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[ii]][blkIdx[color]];
-                    od;
-                fi;
-                if a = sb and b in cand!.ridx then # color A*
-                    c:=fb;
-                    bc:=c/npgs.perm;
-                    for j in cand!.blockingmat[b][c] do
-                        ij:=j^ColorMates(cgr);
-                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[ij]];
-                    od;
-                fi;
-                
-                        
-                if block <> [] then
-                    npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
+                bc:=c/npgs.perm;
+                for j in cand!.blockingmat[b][c] do
+                    sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[j^ColorMates(cgr)]];
+                od;
+            fi;
+            if a = sb and b = sb then # C C*
+                c:=fb;
+                ba:=a/npgs.perm;
+                bb:=b/npgs.perm;
+                bc:=c/npgs.perm;
+                sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[icolor]];
+            fi;
+            if block <> [] then
+                npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
                     
-                    if npgs.lbdIsForced  and npgs.maxlbd > npgs.lbd then
-                        return fail;
-                    fi;
-                        
-                    # check all new complete blocks of npgs
-                    if a in npgs.fullrows and a in npgs.fullcols and
-                       b in npgs.fullrows and b in npgs.fullcols and
-                       not ( a in cand!.fullrows and a in cand!.fullcols and
-                             b in cand!.fullrows and b in cand!.fullcols)
-                    then
-                        if not npgs.lbdIsForced then
-                            npgs.lbdIsForced := true;
-                            npgs.lbd:=sq[block[1]];
-                            if npgs.lbd <> npgs.maxlbd then
-                                return fail;
-                            fi;
+                if npgs.lbdIsForced  and npgs.maxlbd > npgs.lbd then
+                    return fail;
+                fi;
+                    
+                # check all new complete blocks of npgs
+                if a in npgs.fullrows and b in npgs.fullrows and
+                   not ( a in cand!.fullrows and b in cand!.fullrows )
+                then
+                    if not npgs.lbdIsForced then
+                        npgs.lbdIsForced := true;
+                        npgs.lbd:=sq[block[1]];
+                        if npgs.lbd <> npgs.maxlbd then
+                            return fail;
+                        fi;
                             # if ForAny(block, x->sq[x]<>npgs.lbd) then
                             #     return fail;
                             # fi;
-                        fi;
-                        
-                        if ForAny(block, x->sq[x]<>npgs.lbd) then
+                    fi;
+                    
+                    if ForAny(block, x->sq[x]<>npgs.lbd) then
+                        return fail;
+                    fi;
+                    if not npgs.lbdIsForced then
+                        npgs.lbdIsForced := true;
+                        npgs.lbd:=sq[block[1]];
+                        if npgs.lbd <> npgs.maxlbd then
                             return fail;
                         fi;
+                        # if ForAny(block, x->sq[x]<>npgs.lbd) then
+                        #     return fail;
+                        # fi;
+                    fi;
+                    
+                    if ForAny(block, x->sq[x]<>npgs.lbd) then
+                        return fail;
                     fi;
                 fi;
-            od;
+            fi;
         od;
-        Assert(1,sq=ComplexProduct(t,npgs.set,OnSets(npgs.set,ColorMates(cgr))));
-    fi;
+    od;
     
-    Objectify(NewType(PartialJArcRegularSetsFamily(cgr), IsAsymPartialJArcRegularSet and IsAsymPartialJArcRegularSetBlkRep), npgs);
+    Assert(1,sq=ComplexProduct(t,npgs.set,OnSets(npgs.set,ColorMates(cgr))));
+    
+    Objectify(NewType(PartialArcRegularSetsFamily(cgr), IsAsymPartialArcRegularSet and IsAsymPartialArcRegularSetBlkRep), npgs);
     return npgs;
 end);
 
 InstallMethod(GetPartialStableSetOrbitFamily,
-"for a partial arc regular set in PartialJArcRegularSetRep and a permutation group",
-[IsPartialJArcRegularSet and IsPartialJArcRegularSetRep, IsPermGroup],
+"for a partial arc regular set in PartialArcRegularSetRep and a permutation group",
+[IsPartialArcRegularSet and IsPartialArcRegularSetRep, IsPermGroup],
 function(prset,grp)  
-    return PartialJArcRegularSetOrbitFamily(prset!.cgr,grp);
+    return PartialArcRegularSetOrbitFamily(prset!.cgr,grp);
 end);
 
 InstallMethod( ViewString,
-"for a partial arc regular set in PartialJArcRegularSetRep",
-[IsPartialJArcRegularSet and IsPartialJArcRegularSetRep],
+"for a partial arc regular set in PartialArcRegularSetRep",
+[IsPartialArcRegularSet and IsPartialArcRegularSetRep],
 function(prs)
     local cgr,s,res;
     
@@ -769,20 +682,20 @@ function(prs)
 end);
 
 InstallMethod(StableSetFromPartialStableSet,
-"for a partial arc regular set in PartialJArcRegularSetRep",
-[IsPartialJArcRegularSet and IsPartialJArcRegularSetRep],
+"for a partial arc regular set in PartialArcRegularSetRep",
+[IsPartialArcRegularSet and IsPartialArcRegularSetRep],
 function(cand)
-    return RegularSet( IsJArcRegularSet, cand!.cgr, cand!.set);
+    return RegularSet( IsArcRegularSet, cand!.cgr, cand!.set);
 end);
 
 ##############################################################################
 #
-# homogeneous symmetric arc regular sets for inhomogeneous JCs
+# homogeneous symmetric arc regular sets for inhomogeneous CCs
 #
 ##############################################################################
 
-DeclareRepresentation("IsSymPartialJArcRegularSetBlkRep",
-        IsPartialJArcRegularSetRep,
+DeclareRepresentation("IsSymPartialArcRegularSetBlkRep",
+        IsPartialArcRegularSetRep,
         [ "tensor",
           "blocks",
           "perm",
@@ -808,13 +721,13 @@ DeclareRepresentation("IsSymPartialJArcRegularSetBlkRep",
           "lbd"
           ]);
 
-InstallMethod(EmptySymPartialJArcRegularSet,
-"for a well-fibred J-stable color graph",
-[IsColorGraph and IsJStableColorGraph and IsWellFibredRainbow],
+InstallMethod(EmptySymPartialArcRegularSet,
+"for a WL-stable color graph",
+[IsColorGraph and IsWLStableColorGraph],
 function(cgr)
     local tensor,mat,vec,perm,blocks,startBlock,finishBlock,rclr,clr,nof,imap,a,sclr,aclr,b,map,i,j,domdegreelist,cand,sb,bclr,idxBlk;
     
-    tensor:=JStructureConstantsOfColorGraph(cgr);
+    tensor:=StructureConstantsOfColorGraph(cgr);
     if not IsBlockedTensorRep(tensor) then
         Error("this is not supposed to happen");
         TryNextMethod();
@@ -822,7 +735,6 @@ function(cgr)
     
     mat:=List(tensor!.blocks, a->List(tensor!.blocks, Length));
     vec:=List(mat,Sum);
-    # perm:=();
     perm:=SortingPerm(vec);
     blocks:=Permuted(List(tensor!.blocks, x->Permuted(x,perm)),perm);
     startBlock:=List([1..Order(tensor)], i->StartBlock(tensor,i)^perm);
@@ -887,13 +799,13 @@ function(cgr)
               lbdIsForced:=false,
               lbd:=0);
     
-    return Objectify(NewType(PartialJArcRegularSetsFamily(cgr), 
-                             IsSymPartialJArcRegularSet and IsSymPartialJArcRegularSetBlkRep), cand);
+    return Objectify(NewType(PartialArcRegularSetsFamily(cgr), 
+                             IsSymPartialArcRegularSet and IsSymPartialArcRegularSetBlkRep), cand);
 end);
 
 InstallMethod(IsCompletePartialStableSet,
-"for a symmetric partial arc regular set in SymPartialJArcRegularSetBlkRep",
-[IsSymPartialJArcRegularSet and IsSymPartialJArcRegularSetBlkRep],
+"for a symmetric partial arc regular set in SymPartialArcRegularSetBlkRep",
+[IsSymPartialArcRegularSet and IsSymPartialArcRegularSetBlkRep],
 function(cand)
     local a,b,block;
     
@@ -923,17 +835,16 @@ function(cand)
 end);
 
 InstallMethod(ExtendedPartialStableSet,
-"for a symmetric partial arc regular set in SymPartialarcRegularSetBlkRep and a positive integer",
-[IsSymPartialJArcRegularSet and IsSymPartialJArcRegularSetBlkRep, IsPosInt],
+"for a symmetric partial arc regular set in SymPartialArcRegularSetBlkRep and a positive integer",
+[IsSymPartialArcRegularSet and IsSymPartialArcRegularSetBlkRep, IsPosInt],
 function(cand,pt)
     local  cgr, t, npgs, color, icolor, sb, fb, i, a, j, b, block, sd, 
-           sbinfr, fbinfr, k, kmts, ksb, kfb, 
+           k, kmts, ksb, kfb, 
            sq, ent, blkIdx, bbl, c, ba, bb, bc, bm;
     
     cgr:=cand!.cgr;
     
-    t:=JStructureConstantsOfColorGraph(cgr);
-    
+    t:=StructureConstantsOfColorGraph(cgr);
     
     npgs:=rec(
               cgr:=cand!.cgr,
@@ -1055,20 +966,13 @@ function(cand,pt)
         return fail;
     fi;
     
-    sbinfr:=npgs.kIsForced and npgs.degreelist[sb]=npgs.k;
-    if sbinfr then
+    if npgs.kIsForced and npgs.degreelist[sb]=npgs.k then
         AddSet(npgs.fullrows,sb);
     fi;
     
-    if fb<>sb then
-        fbinfr:=npgs.kIsForced and npgs.degreelist[fb]=npgs.k;
-        if fbinfr then
-            AddSet(npgs.fullrows,fb);
-        fi;
-    else
-        fbinfr:=sbinfr;
+    if fb<>sb and  npgs.kIsForced and npgs.degreelist[fb]=npgs.k then
+        AddSet(npgs.fullrows,fb);
     fi;
-    
     if Length(npgs.set) = npgs.maxlength then
         npgs.domain:=[];
         npgs.domdegreelist:=ListWithIdenticalEntries(Length(cand!.domdegreelist), 0);
@@ -1109,7 +1013,7 @@ function(cand,pt)
         od;    
     fi;
     
-    # stating from here the field npgs.square is computed
+    # starting from here the field npgs.square is computed
 
     npgs.square:=ShallowCopy(cand!.square);
     npgs.maxlbd:=cand!.maxlbd;
@@ -1119,144 +1023,88 @@ function(cand,pt)
     blkIdx:=t!.blkIdx;
     bm:=npgs.blockingmat;
 
-    if sb=fb then
-        for a in npgs.ridx do
-            for b in npgs.ridx do
-                block:=bm[a][b];
-                bbl:=cand!.blocks[a][b];
-                if bbl = [] or a <> sb and b <> fb then
-                    continue;
-                fi;
-                c:=sb;
-                ba:=a/npgs.perm;
-                bb:=b/npgs.perm;
+    for a in npgs.ridx do
+        for b in npgs.ridx do
+            block:=bm[a][b];
+            bbl:=cand!.blocks[a][b];
+            if bbl = [] or not a in [sb,fb] and not b in [sb,fb]  then
+                continue;
+            fi;
+            ba:=a/npgs.perm;
+            bb:=b/npgs.perm;
+            if a = sb and b = sb then # C C*
+                c:=fb;
                 bc:=c/npgs.perm;
-                
-                if a=sb and b=fb then     # color * color
+                sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[icolor]];
+            fi;
+            if a = sb  then # C A*
+                c:=fb;
+                bc:=c/npgs.perm;
+                for j in cand!.blockingmat[b][c] do
+                    sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[j^ColorMates(cgr)]];
+                od;
+            fi;
+            if  b = sb then # A C*
+                c:=fb;
+                bc:=c/npgs.perm;
+                for i in cand!.blockingmat[a][c] do
+                    sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[i]][blkIdx[icolor]];
+                od;
+            fi;
+            if color <> icolor then 
+                if  b=fb  then # A C
+                    c:=sb;
+                    bc:=c/npgs.perm;
+                    for i in cand!.blockingmat[a][c] do
+                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[i]][blkIdx[color]];
+                    od;
+                fi;
+            
+                if a = sb and b = fb and sb = fb then # C C, C* C*
+                    c:=sb;
+                    bc:=c/npgs.perm;
                     sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[color]];
+                    sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[icolor]][blkIdx[icolor]];
                 fi;
-                if a in cand!.ridx and b=fb  then # A * color (part A color)
-                    for i in cand!.blockingmat[a][c] do
-                        sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[i]][blkIdx[color]];
+            
+                if a = fb then # C* A*
+                    c:=sb;
+                    bc:=c/npgs.perm;
+                    for j in cand!.blockingmat[b][c] do
+                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[icolor]][blkIdx[j^ColorMates(cgr)]];
                     od;
                 fi;
-                if a=sb and b in cand!.ridx and b <> fb then # A * color (part color A)
-                    for j in cand!.blockingmat[c][b] do
-                        sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[color]][blkIdx[j]];
-                    od;
+                if a = fb and b = fb then # C* C
+                    c:=sb;
+                    bc:=c/npgs.perm;
+                    sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[icolor]][blkIdx[color]];
                 fi;
-                if color <> icolor then
-                    if a=sb and b=sb then # color * icolor and icolor * icolor
-                        sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[color]][blkIdx[icolor]];
-                        sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[icolor]][blkIdx[icolor]];
-                    fi;
-                    if a in cand!.ridx and b = sb then # A * icolor (part A icolor)
-                        for i in cand!.blockingmat[a][c] do
-                            sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[i]][blkIdx[icolor]];
-                        od;
-                    fi;
-                    if b in cand!.ridx and a = fb and b<>sb then # A * icolor (part icolor A) 
-                        for j in cand!.blockingmat[c][b] do
-                            sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[icolor]][blkIdx[j]];
-                        od;
-                    fi;
-                fi;
-                if block <> [] then
-                    npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
+            fi;
+            
+            if block <> [] then
+                npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
                     
-                    if npgs.lbdIsForced  and npgs.maxlbd > npgs.lbd then
-                        return fail;
-                    fi;
+                if npgs.lbdIsForced  and npgs.maxlbd > npgs.lbd then
+                    return fail;
+                fi;
                         
-                    if a in npgs.fullrows and b in npgs.fullrows then
-                        if not npgs.lbdIsForced then
-                            npgs.lbdIsForced := true;
-                            npgs.lbd:=sq[block[1]];
-                            if npgs.lbd <> npgs.maxlbd then
-                                return fail;
-                            fi;
-                            if ForAny(block, x->sq[x]<>npgs.lbd) then
-                                return fail;
-                            fi;
+                if a in npgs.fullrows and b in npgs.fullrows then
+                    if not npgs.lbdIsForced then
+                        npgs.lbdIsForced := true;
+                        npgs.lbd:=sq[block[1]];
+                        if npgs.lbd <> npgs.maxlbd then
+                            return fail;
+                        fi;
+                        if ForAny(block, x->sq[x]<>npgs.lbd) then
+                            return fail;
                         fi;
                     fi;
                 fi;
-            od;
+            fi;
         od;
-        Assert(1,sq=ComplexProduct(t,npgs.set,npgs.set));
-    else
-        for a in npgs.ridx do
-            for b in npgs.ridx do
-                block:=bm[a][b];
-                bbl:=cand!.blocks[a][b];
-                if bbl = [] or a <> sb and a <> fb and b <> sb and b <> fb then
-                    continue;
-                fi;
-                ba:=a/npgs.perm;
-                bb:=b/npgs.perm;
-                if a = sb and b = sb then # color * icolor (part color icolor)
-                    c:=fb;
-                    bc:=c/npgs.perm;
-                    sq{bbl}:=sq{bbl} + 2*ent[ba][bb][bc][blkIdx[color]][blkIdx[icolor]];
-                fi;
-                if a = fb and b = fb then # color * icolor (part icolor color)
-                    c:=sb;
-                    bc:=c/npgs.perm;
-                    sq{bbl}:=sq{bbl} + 2*ent[ba][bb][bc][blkIdx[icolor]][blkIdx[color]];
-                fi;
-                if a in cand!.ridx and b = fb then # A * color (part A color)
-                    c:=sb;
-                    bc:=c/npgs.perm;
-                    for i in cand!.blockingmat[a][c] do
-                        sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[i]][blkIdx[color]];
-                    od;
-                fi;
-                if a = sb and b in cand!.ridx then # A * color (color part A)
-                    c:=fb;
-                    bc:=c/npgs.perm;
-                    for j in cand!.blockingmat[c][b] do
-                        sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[color]][blkIdx[j]];
-                    od;
-                fi;
-                if a in cand!.ridx and b = sb then # A * icolor (part A icolor)
-                    c:=fb;
-                    bc:=c/npgs.perm;
-                    for i in cand!.blockingmat[a][c] do
-                        sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[i]][blkIdx[icolor]];
-                    od;
-                fi;
-                if a = fb and b in cand!.ridx then # A * icolor (part icolor A) 
-                    c:=sb;
-                    bc:=c/npgs.perm;
-                    for j in cand!.blockingmat[c][b] do
-                        sq{bbl}:=sq{bbl}+2*ent[ba][bb][bc][blkIdx[icolor]][blkIdx[j]];
-                    od;
-                fi;
-                if block <> [] then
-                    npgs.maxlbd:=Maximum(npgs.maxlbd, Maximum(sq{block}));
-                    
-                    if npgs.lbdIsForced  and npgs.maxlbd > npgs.lbd then
-                        return fail;
-                    fi;
-                        
-                    if a in npgs.fullrows and b in npgs.fullrows then
-                        if not npgs.lbdIsForced then
-                            npgs.lbdIsForced := true;
-                            npgs.lbd:=sq[block[1]];
-                            if npgs.lbd <> npgs.maxlbd then
-                                return fail;
-                            fi;
-                            if ForAny(block, x->sq[x]<>npgs.lbd) then
-                                return fail;
-                            fi;
-                        fi;
-                    fi;
-                fi;
-            od;
-        od;
-    fi;
+    od;
     Assert(1,sq=ComplexProduct(t,npgs.set,npgs.set));
-    Objectify(NewType(PartialJArcRegularSetsFamily(cgr), IsSymPartialJArcRegularSet and IsSymPartialJArcRegularSetBlkRep), npgs);
+    Objectify(NewType(PartialArcRegularSetsFamily(cgr), IsSymPartialArcRegularSet and IsSymPartialArcRegularSetBlkRep), npgs);
     return npgs;
 end);
 

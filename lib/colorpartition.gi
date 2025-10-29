@@ -28,6 +28,13 @@ function(f)
     return res;
 end);
 
+InstallOtherMethod(PartitionOfFusion,
+        "for a color partition in ColorPartitionRep",
+        [IsColorPartition and IsColorPartitionRep],
+function(fusion)
+    return fusion!.partition;
+end);
+
 InstallOtherMethod(Rank,
 "for a color partition in ColorPartitionRep",
 [IsColorPartition and IsColorPartitionRep],

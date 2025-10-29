@@ -149,13 +149,24 @@ end);
 
 
 InstallOtherMethod(ColorGraphByFusion,
-        "for color graphs and for a J-fusion",
+        "for a color graph and a J-stable fusion",
         [IsColorGraph, IsJordanFusion],
 function(cgr,fusion)
     local res;
 
     res:= ColorGraphByFusion(cgr, UnderlyingPartitionOfColorPartition(fusion));
     SetIsJStableColorGraph(res,true);
+    return res;
+end);
+
+InstallOtherMethod(ColorGraphByFusion,
+        "for a color graph and a WL-stable-fusion",
+        [IsColorGraph, IsWLFusion],
+function(cgr,fusion)
+    local res;
+
+    res:= ColorGraphByFusion(cgr, UnderlyingPartitionOfColorPartition(fusion));
+    SetIsWLStableColorGraph(res,true);
     return res;
 end);
 
