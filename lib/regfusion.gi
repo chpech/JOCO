@@ -310,7 +310,7 @@ function(cgr,lcgr)
     
     map:=MapReps(lcgr, IsColorIsomorphicColorGraph);
     
-    
+    Info(InfoJOCO,1,"Computing structure descriptions for symmetry groups of color graphs.\n");
     for i in [1..Length(lcgr)] do
         cgrr:=lcgr[i];
         if Rank(cgrr)>2 and not (Rank(cgrr)=3 and not IsPrimitiveColorGraph(cgrr)) then
@@ -320,10 +320,11 @@ function(cgr,lcgr)
 #            if RemInt(Size(AutomorphismGroup(cgrr)),2^12)<>0 then
                 StructureDescription(AutomorphismGroup(cgrr):short);
             fi;
-        fi;Info(InfoCOCO,1,".");
+        fi;Info(InfoJOCO,1,".");
     od;
-    Info(InfoCOCO,1,"|");
+    Info(InfoJOCO,1,"\nDone computing structure descriptions for symmetry groups of color graphs.\n");
     
+    Info(InfoJOCO,1,"Generating COCO-nodes for the color graphs.\n");
     nodes:=[];
     for i in [1..Length(lcgr)] do
         node:=NewCocoNode(lcgr[i]);
@@ -333,10 +334,9 @@ function(cgr,lcgr)
         RegisterStandardInfoRFusion@JOCO(node);
         
         Add(nodes,node);
-        Info(InfoCOCO,1,".");
+        Info(InfoJOCO,1,".");
     od;
-    Info(InfoCOCO,1,"|");
-    
+    Info(InfoJOCO,1,"\nDone generating COCO-nodes for the color graphs.\n");
     
     outp:="";
     res:=OutputTextString(outp,true);
@@ -345,6 +345,7 @@ function(cgr,lcgr)
 
     PrintTo(res,"JOCO - Information about a List of Rainbows\n",
                 "-------------------------------------------\n");
+    Info(InfoJOCO,1,"Creating node and gathering infomration about cgr.\n");
     node:=NewCocoNode(cgr);
     RegisterStandardInfo@COCO2P(node);
     ninf:=node!.nodeInfo;
@@ -373,6 +374,8 @@ function(cgr,lcgr)
             AppendTo(res, StringCocoMerging@COCO2P(mrg));
         fi;
     fi;
+    Info(InfoJOCO,1,"\nDone creating node and gathering infomration about cgr.\n");
+    
     AppendTo(res, "-------------------------------------------------\n");
     
     PrintTo(res, String("Number of rainbows: ",-maxlength), Length(nodes),"\n");
@@ -382,7 +385,7 @@ function(cgr,lcgr)
     
     
     idx:=0;
-    
+    Info(InfoJOCO,1,"Gathering information about color graphs.\n");
     for v in [1..Length(nodes)] do
         node:=nodes[v];
         ninf:=node!.nodeInfo;
@@ -435,7 +438,9 @@ function(cgr,lcgr)
         fi;
 
         AppendTo(res,"\n");
+        Info(InfoJOCO,1,".");
     od;
+    Info(InfoJOCO,1,"\nDone gathering information about color graphs.\n");
 
     CloseStream(res);
     return outp;

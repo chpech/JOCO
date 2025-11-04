@@ -246,11 +246,9 @@ function(cand,pt)
     
     if cand!.fullrows <> [] and sblk[1]>cand!.currentRow then  
         if ForAny([cand!.currentRow..sblk[1]-1], b->cand!.rowdegs[b] <> -1) then
-            Info(InfoCOCO,2,"D");
             return nonextensible; 
         fi;
         if ForAny([cand!.currentRow..sblk[1]-1], b->cand!.coldegs[b] <> -1) then
-            Info(InfoCOCO,2,"E");
             return nonextensible; 
         fi;
     fi;
@@ -267,11 +265,9 @@ function(cand,pt)
             npgs.fullcols:=Filtered([1..Length(cand!.blocks)], x->cand!.coldegs[x]=-1);
             
             if ForAny([2..sblk[1]-1], x->cand!.rowdegs[x]<>-1 ) then
-                Info(InfoCOCO,2,"A");
                 return nonextensible;
             fi;
             if ForAny([2..sblk[1]-1], x->cand!.coldegs[x]<>-1) then
-                Info(InfoCOCO,2,"B");
                 return nonextensible;
             fi;
             
@@ -283,8 +279,6 @@ function(cand,pt)
                     fi;
                     
                     if ForAny(block, x->cand!.square[x]<>-2) then
-                        
-                        Info(InfoCOCO,2,"C");
                         return nonextensible;
                     fi;
                 od;
@@ -293,11 +287,6 @@ function(cand,pt)
         fi;
     fi;
     
-    # if cand!.square[color]<-2 then
-    #     Info(InfoCOCO,2,"1");
-        
-    #     return fail;
-    # fi;
     npgs.set:=Union(cand!.set, [color]);
     npgs.ridx:=Union(cand!.ridx,[sb]);
     npgs.cidx:=Union(cand!.cidx,[fb]);
@@ -320,7 +309,6 @@ function(cand,pt)
     md:=Minimum(npgs.rmindeg, npgs.cmindeg);
     
     if md<-1 then
-        Info(InfoCOCO,2,"2");
         return fail;
     fi;
     
@@ -357,8 +345,6 @@ function(cand,pt)
                 RemoveSet(npgs.domain,k);
                 if -2*npgs.domrowdegs[ksb]+npgs.rowdegs[ksb]>-1 or 
                    -2*npgs.domcoldegs[kfb]+npgs.coldegs[kfb]>-1 then
-                    Info(InfoCOCO,2,"3");
-                    
                     return fail;
                 fi;
             fi;
@@ -441,18 +427,12 @@ function(cand,pt)
                 if block <> [] then
                     npgs.minlbd:=Minimum(npgs.minlbd, Minimum(sq{block}));
                     
-                    # if npgs.minlbd < -2 then
-                    #     Info(InfoCOCO,2,"4");
-                    #     return fail;
-                    # fi;
-                    
                     # check all new complete blocks of npgs
                     if a in npgs.fullrows and a in npgs.fullcols and
                        b in npgs.fullrows and b in npgs.fullcols and
                        not ( a in cand!.fullrows and a in cand!.fullcols and
                              b in cand!.fullrows and b in cand!.fullcols) and
                            ForAny(block, x->sq[x]<>-2) then
-                        Info(InfoCOCO,2,"5");
                         return fail;
                     fi;
                 fi;
@@ -523,20 +503,12 @@ function(cand,pt)
                 if block <> [] then
                     npgs.minlbd:=Minimum(npgs.minlbd, Minimum(sq{block}));
                     
-                    # if npgs.minlbd < -2 then
-                    #     Info(InfoCOCO,2,"6");
-                    #     return fail;
-                    # fi;
-                        
                     # check all new complete blocks of npgs
                     if a in npgs.fullrows and a in npgs.fullcols and
                        b in npgs.fullrows and b in npgs.fullcols and
                        not ( a in cand!.fullrows and a in cand!.fullcols and
                              b in cand!.fullrows and b in cand!.fullcols) and 
                            ForAny(block, x->sq[x]<> -2) then
-                        
-                        
-                        Info(InfoCOCO,2,"7");
                         return fail;
                     fi;
                 fi;

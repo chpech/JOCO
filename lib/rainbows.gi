@@ -273,6 +273,20 @@ function(cgr)
    return List([1..Rank(cgr)], x->Length(Neighbors(cgr,reps[x][1],x)));
 end);
 
+InstallMethod(IsThin,
+"for a rainbow",
+[ IsColorGraph and IsRainbow ],
+function(cgr)
+    return IsSubset([0,1],Set(OutValencies(cgr)));
+end);
+
+InstallMethod(IsQuasithin,
+"for a rainbow",
+[ IsColorGraph and IsRainbow ],
+function(cgr)
+    return IsSubset([0,1,2],Set(OutValencies(cgr)));
+end);
+              
 InstallMethod(JAlgebraicAutomorphismGroup,
 	"for J-stabil color graphs",
 	[IsColorGraph and IsJStableColorGraph],

@@ -152,11 +152,7 @@ function(iter)
         if DomainOfPartialStableSet(state.cand) = [] then
             return NextState(state.linkback);
         fi;
-        
-#        if not IsExtendiblePartialStableSet(state.cand) then
-#            return NextState(state.linkback);
-#        fi;
-        
+                
         if state.orbidx>Length(state.orbreps) then
             return NextState(state.linkback);
         fi;
@@ -253,9 +249,10 @@ function(iter)
     res:=[];
     grp:=Source(iter!.state.act);
     
+    Info(InfoJOCO,1,"Computing orbits of stable sets.\n");
     while not IsDoneIterator(iter) do
         if Length(iter!.state.M)<=COCOInfoGSSize then
-            Info(InfoCOCO,1,iter!.state.M,"\n");
+            Info(InfoJOCO,2,iter!.state.M,"\n");
         fi;
         
         if IsCompletePartialStableSet(iter!.state.cand) then
@@ -268,12 +265,13 @@ function(iter)
                 stab:=Group(stab,());
 #                stab:=Group(PreImagesSet(iter!.state.act,gens),());            
                 Add(res, ConstructorOfStableSetOrbit(gs)(grp,gs, stab));
-                Info(InfoCOCO,1,"*");
+                Info(InfoJOCO,1,"*");
             fi;
         fi;
         
         NextIterator(iter);
     od;
+    Info(InfoJOCO,1,"Done computing orbits of stable sets.\n");
     return res;
 end);
 

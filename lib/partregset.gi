@@ -285,7 +285,14 @@ function(cand,pt)
         sb:=cand!.startBlock[color];
         fb:=cand!.finishBlock[color];
     fi;
-        
+    
+    
+    if cand!.kIsForced and sb > cand!.currentRow then  
+        if ForAny([cand!.currentRow..sb-1], b->cand!.degreelist[b] <> cand!.k) then
+            return nonextensible; 
+        fi;
+    fi;
+
     npgs.fullrows:=ShallowCopy(cand!.fullrows);
     npgs.kIsForced:=cand!.kIsForced;
     npgs.k:=cand!.k;
@@ -294,10 +301,10 @@ function(cand,pt)
             npgs.kIsForced:=true;
             npgs.k:=cand!.degreelist[1];
             if npgs.k<cand!.maxdeg then
-                return fail;
+                return nonextensible;
             fi;
             if ForAny([2..sb-1], x->cand!.degreelist[x]<>npgs.k) then
-                return fail;
+                return nonextensible;
             fi;
             
             npgs.fullrows:=Filtered([1..Length(cand!.blocks)], x->cand!.degreelist[x]=npgs.k);
@@ -573,6 +580,12 @@ function(cand,pt)
     sb:=cand!.startBlock[color];
     fb:=cand!.finishBlock[color];
     
+    if cand!.kIsForced and sb>cand!.currentRow then  
+        if ForAny([cand!.currentRow..sb-1], b->cand!.rowdegs[b] <> cand!.k) then
+            return nonextensible; 
+        fi;
+    fi;
+    
     npgs.currentRow:=sb;
     
     npgs.fullrows:=ShallowCopy(cand!.fullrows);
@@ -584,10 +597,10 @@ function(cand,pt)
             npgs.kIsForced:=true;
             npgs.k:=cand!.rowdegs[1];
             if npgs.k<cand!.rmaxdeg or npgs.k<cand!.cmaxdeg then
-                return fail;
+                return nonextensible;
             fi;
             if ForAny([2..sb-1], x->cand!.rowdegs[x]<>npgs.k) then
-                return fail;
+                return nonextensible;
             fi;
             npgs.fullrows:=[1..sb-1];
         fi;

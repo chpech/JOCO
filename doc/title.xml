@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This is an automatically generated file. -->
+<TitlePage>
+  <Title>
+    JOCO
+  </Title>
+  <Subtitle>
+    Computations in Jordan Configurations
+  </Subtitle>
+  <Version>
+    0.1
+  </Version>
+  <Author>
+    Mikhail Klin<Alt Only="LaTeX"><Br/></Alt>
+<Address>
+Department of Mathematics<Br/>
+Ben Gurion University of the Negev<Br/>
+P.O.B. 653<Br/>
+Be'er Sheva 84105<Br/>
+Israel<Br/>
+</Address>
+<Email>klin@math.bgu.ac.il</Email>
+<Homepage>https://www.researchgate.net/profile/Mikhail_Klin</Homepage>
+
+  </Author>
+  <Author>
+    Christian Pech<Alt Only="LaTeX"><Br/></Alt>
+<Address>
+</Address>
+<Email>cpech@freenet.de</Email>
+<Homepage>https://www.researchgate.net/profile/Christian_Pech2</Homepage>
+
+  </Author>
+  <Date>
+    4 October 2025
+  </Date>
+  </TitlePage>

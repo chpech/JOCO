@@ -927,7 +927,7 @@ InstallMethod(ExtendedPartialStableSet,
 [IsSymPartialJArcRegularSet and IsSymPartialJArcRegularSetBlkRep, IsPosInt],
 function(cand,pt)
     local  cgr, t, npgs, color, icolor, sb, fb, i, a, j, b, block, sd, 
-           sbinfr, fbinfr, k, kmts, ksb, kfb, 
+           k, kmts, ksb, kfb, 
            sq, ent, blkIdx, bbl, c, ba, bb, bc, bm;
     
     cgr:=cand!.cgr;
@@ -987,9 +987,9 @@ function(cand,pt)
                 return nonextensible;
             fi;
             
-            if ForAny([sb..Length(cand!.blocks)], x->cand!.degreelist[x]>npgs.k) then
-                return nonextensible;
-            fi;
+            # if ForAny([sb..Length(cand!.blocks)], x->cand!.degreelist[x]>npgs.k) then
+            #     return nonextensible;
+            # fi;
             
             for i in [1..Length(npgs.fullrows)] do
                 a:=npgs.fullrows[i];
@@ -1055,23 +1055,20 @@ function(cand,pt)
         return fail;
     fi;
     
-    sbinfr:=npgs.kIsForced and npgs.degreelist[sb]=npgs.k;
-    if sbinfr then
+    if npgs.kIsForced and npgs.degreelist[sb]=npgs.k then
         AddSet(npgs.fullrows,sb);
     fi;
     
-    if fb<>sb then
-        fbinfr:=npgs.kIsForced and npgs.degreelist[fb]=npgs.k;
-        if fbinfr then
+    if fb<>sb and npgs.kIsForced and npgs.degreelist[fb]=npgs.k then
             AddSet(npgs.fullrows,fb);
-        fi;
-    else
-        fbinfr:=sbinfr;
     fi;
-    
     if Length(npgs.set) = npgs.maxlength then
         npgs.domain:=[];
         npgs.domdegreelist:=ListWithIdenticalEntries(Length(cand!.domdegreelist), 0);
+        if ForAny(npgs.degreelist, x->x<> npgs.maxdeg) then
+            Info(InfoJOCO,1,"H");
+            return fail;
+        fi;
     else
         npgs.domain:=ShallowCopy(cand!.domain);
         npgs.domdegreelist:=ShallowCopy(cand!.domdegreelist);

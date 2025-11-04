@@ -77,6 +77,7 @@ function(pfusion,gs)
     # OnSets(rset, ColorMates(pfusion!.cgr))
     if pfusion!.ppart = [] or Length(rset) > Length(Last(pfusion!.ppart)) then 
         if arset < rset then 
+            Info(InfoJOCO,1,"1");
             return fail;
         fi;
     fi;
@@ -85,18 +86,25 @@ function(pfusion,gs)
     
     i:=First([1..Length(pfusion!.varpart)], j->IsSubset(pfusion!.varpart[j],rset));
     if i = fail then
+        Info(InfoJOCO,1,"2");
         return fail;
     fi;
     
     
     class:=pfusion!.varpart[i];
-    if ForAny([1..i-1], j->Length(pfusion!.varpart[j]) <= Length(rset)) then
+    if ForAny([1..i-1], j->Length(pfusion!.varpart[j]) < Length(rset) 
+                        or Length(pfusion!.varpart[j]) = Length(rset) 
+                        and pfusion!.varpart[j] < rset)  
+    then
+        
+        Info(InfoJOCO,1,"3");
        return fail;
     fi;
     
     # when new slice starts, then rset can be its first element only if it is smaller than
     # OnSets(rset, ColorMates(pfusion!.cgr))
     if Length(class) > Length(rset) and arset < rset then
+        Info(InfoJOCO,1,"4");
         return fail;
     fi;
     
@@ -106,23 +114,28 @@ function(pfusion,gs)
     # the following test, if it is placed n the beginning of the function
     # however, checking that arset is in pfusion!.ppart takes more time
     if arset < rset and not arset in pfusion!.ppart then
+        Info(InfoJOCO,1,"5");
         return fail;
     fi;
         
     if pfusion!.ppart<>[] then
         lclass:=Last(pfusion!.ppart);
         if Length(rset) < Length(lclass) then
+            Info(InfoJOCO,1,"6");
             return fail;
         fi;
         if Length(rset) = Length(lclass) and rset < lclass then
+            Info(InfoJOCO,1,"7");
             return fail;
         fi;
         if Length(class) <> Length(rset) then
             if Length(class)-Length(rset) < Length(lclass) then
+                Info(InfoJOCO,1,"8");
                 return fail;
             fi;
             if Length(class) - Length(rset) = Length(lclass) and
                Difference(class, rset) < lclass then
+                Info(InfoJOCO,1,"9");
                 return fail;
             fi;
         fi;
@@ -145,11 +158,13 @@ function(pfusion,gs)
         npart:=WLShallowCopyStablePartition(pfusion!.part);
         npart:=WLRefinedPartition@JOCO(npart,gs);
         if npart=fail then
+            Info(InfoJOCO,1,"A");
             return fail;
         fi;
         
         npart:=WLStabil(tensor, npart, AsSet(gs));
         if npart=fail then
+            Info(InfoJOCO,1,"B");
             return fail;
         fi;
         

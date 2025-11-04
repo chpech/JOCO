@@ -9,7 +9,7 @@ ReadPackage("joco", "lib/colorpartition.gd");
 ReadPackage("joco", "lib/rainbows.gd"); 
 ReadPackage("joco", "lib/jordanfus.gd"); 
 ReadPackage("joco", "lib/wlfusion.gd"); 
-ReadPackage("joco", "lib/jgoodsets.gd");
+#ReadPackage("joco", "lib/jgoodsets.gd");
 ReadPackage("joco", "lib/jpartfus.gd"); 
 ReadPackage("joco", "lib/wlpartfus.gd"); 
 ReadPackage("joco", "lib/colorsets.gd");

@@ -137,7 +137,7 @@ InstallMethod(EmptySymPartialArcRegularSet,
 "for a regular WL-stable color graph",
 [IsColorGraph and IsWLStableColorGraph and IsHomogeneous],
 function(cgr)
-    local aaut,rclr,clr,sclr,aclr,imap,map, i, j,act,cand;
+    local aaut,rclr,clr,sclr,aclr,imap,map, i, j,act,cand, maxlength, domain;
    
     rclr:=ReflexiveColors(cgr);
     clr:=Difference([1..RankOfColorGraph(cgr)], rclr);
@@ -154,12 +154,16 @@ function(cgr)
         od;
     od;
     
+    maxlength:=Int((RankOfColorGraph(cgr)-1)/2);
+    domain:=Filtered([1..Length(imap)], x->Length(imap[x])<=maxlength);
+    
+    
     cand:=rec(cgr:=cgr,
               map:=map,
               imap:=imap,
-              domain:=[1..Length(imap)],
+              domain:=domain,
               set:=[],               
-              maxlength:=Int((RankOfColorGraph(cgr)-1)/2),
+              maxlength:=maxlength,
               square:=ListWithIdenticalEntries(RankOfColorGraph(cgr),0)
               );
    
@@ -224,7 +228,7 @@ InstallMethod(EmptyAsymPartialArcRegularSet,
 "for a regular WL-stable color graph",
 [IsColorGraph and IsWLStableColorGraph and IsHomogeneous],
 function(cgr)
-    local imap,map,i,grp,act,cand;
+    local imap,map,i,grp,act,cand, maxlength, domain;
     
     imap:=Filtered([1..RankOfColorGraph(cgr)], x->x^ColorMates(cgr)<>x);
     map:=[];
@@ -233,13 +237,20 @@ function(cgr)
     od;
 
     imap:=List(imap, x->[x]);
-      
+    
+    maxlength:=Int((RankOfColorGraph(cgr)-1)/2);
+    if maxlength > 0 then
+        domain:=[1..Length(imap)];
+    else
+        domain:=[];
+    fi;
+    
     cand:=rec(cgr:=cgr,
               map:=map,
               imap:=imap,
-              domain:=[1..Length(imap)],
+              domain:=domain,
               set:=[],
-              maxlength:=Int((RankOfColorGraph(cgr)-1)/2),
+              maxlength:=maxlength,
               square:=ListWithIdenticalEntries(RankOfColorGraph(cgr),0)
               );
     
@@ -283,7 +294,7 @@ InstallMethod(EmptyAsymPartialArcRegularSet,
 function(cgr)
     local  tensor, mat, vec, perm, blocks, startBlock, finishBlock, 
            nof, imap, a, b, clr, map, i, domrowdegs, domcoldegs, sb, 
-           fb, cand;
+           fb, cand, maxlength, domain;
     
     tensor:=StructureConstantsOfColorGraph(cgr);
     if not IsBlockedTensorRep(tensor) then
@@ -323,9 +334,14 @@ function(cgr)
     clr:=Set(imap);
     imap:=List(imap, x->[x]);    
     
+    maxlength:=Int((RankOfColorGraph(cgr)-nof)/2);
+    domain:=Filtered([1..Length(imap)], x->Length(imap[x]) <= maxlength);
+    
+
     domrowdegs:=ListWithIdenticalEntries(nof,0);
     domcoldegs:=ListWithIdenticalEntries(nof,0);
-    for i in clr do
+    for i in Union(imap{domain}) do
+        
         sb:=startBlock[i];
         fb:=finishBlock[i];
         domrowdegs[sb]:=domrowdegs[sb]+OutValencies(cgr)[i];
@@ -336,7 +352,7 @@ function(cgr)
     cand:=rec(cgr:=cgr,
               map:=map,
               imap:=imap,
-              domain:=[1..Length(imap)],
+              domain:=domain,
               blocks:=blocks,
               perm:=perm,
               startBlock:=startBlock, # the block from which a color starts
@@ -348,7 +364,7 @@ function(cgr)
               #                                                        [n,n].
               currentRow:=0, # the row/column of blocks where currently colors are added
               set:=[],
-              maxlength:=Int((RankOfColorGraph(cgr)-nof)/2),
+              maxlength:=maxlength,
               blockingmat:=List([1..nof], a->List([1..nof], b->[])),
               rowdegs:=ListWithIdenticalEntries(nof,0),
               coldegs:=ListWithIdenticalEntries(nof,0),
@@ -529,6 +545,11 @@ function(cand,pt)
         npgs.domain:=[];
         npgs.domrowdegs:=ListWithIdenticalEntries(Length(cand!.domrowdegs), 0);
         npgs.domcoldegs:=ListWithIdenticalEntries(Length(cand!.domcoldegs), 0);
+        if ForAny(npgs.rowdegs, x->x <> npgs.rmaxdeg) or 
+           ForAny(npgs.coldegs, x->x <> npgs.camxdeg) 
+        then
+            return fail;
+        fi;
     else
         npgs.domain:=ShallowCopy(cand!.domain);
         npgs.domrowdegs:=ShallowCopy(cand!.domrowdegs);
@@ -622,20 +643,6 @@ function(cand,pt)
                         if npgs.lbd <> npgs.maxlbd then
                             return fail;
                         fi;
-                            # if ForAny(block, x->sq[x]<>npgs.lbd) then
-                            #     return fail;
-                            # fi;
-                    fi;
-                    
-                    if ForAny(block, x->sq[x]<>npgs.lbd) then
-                        return fail;
-                    fi;
-                    if not npgs.lbdIsForced then
-                        npgs.lbdIsForced := true;
-                        npgs.lbd:=sq[block[1]];
-                        if npgs.lbd <> npgs.maxlbd then
-                            return fail;
-                        fi;
                         # if ForAny(block, x->sq[x]<>npgs.lbd) then
                         #     return fail;
                         # fi;
@@ -644,6 +651,7 @@ function(cand,pt)
                     if ForAny(block, x->sq[x]<>npgs.lbd) then
                         return fail;
                     fi;
+                    
                 fi;
             fi;
         od;
@@ -725,7 +733,7 @@ InstallMethod(EmptySymPartialArcRegularSet,
 "for a WL-stable color graph",
 [IsColorGraph and IsWLStableColorGraph],
 function(cgr)
-    local tensor,mat,vec,perm,blocks,startBlock,finishBlock,rclr,clr,nof,imap,a,sclr,aclr,b,map,i,j,domdegreelist,cand,sb,bclr,idxBlk;
+    local tensor,mat,vec,perm,blocks,startBlock,finishBlock,rclr,clr,nof,imap,a,sclr,aclr,b,map,i,j,domdegreelist,cand,sb,bclr,idxBlk, maxlength,domain;
     
     tensor:=StructureConstantsOfColorGraph(cgr);
     if not IsBlockedTensorRep(tensor) then
@@ -769,8 +777,11 @@ function(cgr)
             map[j]:=i;
         od;
     od;
+    maxlength:=Int((RankOfColorGraph(cgr)-nof)/2);
+    domain:=Filtered([1..Length(imap)], x->Length(imap[x]) <= maxlength);
+    
     domdegreelist:=ListWithIdenticalEntries(nof,0);
-    for i in clr do
+    for i in Union(imap{domain}) do
        sb:=startBlock[i];
        domdegreelist[sb]:=domdegreelist[sb]+OutValencies(cgr)[i];
     od;
@@ -782,10 +793,10 @@ function(cgr)
               finishBlock:=finishBlock,
               map:=map,
               imap:=imap,
-              domain:=[1..Length(imap)],
+              domain:=domain,
               currentRow:=0,
               set:=[],
-              maxlength:=Int((RankOfColorGraph(cgr)-nof)/2),
+              maxlength:=maxlength,
               blockingmat:=List([1..nof], a->List([1..nof], b->[])),
               degreelist:=ListWithIdenticalEntries(nof,0),
               maxdeg:=0,
@@ -898,9 +909,9 @@ function(cand,pt)
                 return nonextensible;
             fi;
             
-            if ForAny([sb..Length(cand!.blocks)], x->cand!.degreelist[x]>npgs.k) then
-                return nonextensible;
-            fi;
+#            if ForAny([sb..Length(cand!.blocks)], x->cand!.degreelist[x]>npgs.k) then
+#                return nonextensible;
+#            fi;
             
             for i in [1..Length(npgs.fullrows)] do
                 a:=npgs.fullrows[i];
@@ -976,6 +987,9 @@ function(cand,pt)
     if Length(npgs.set) = npgs.maxlength then
         npgs.domain:=[];
         npgs.domdegreelist:=ListWithIdenticalEntries(Length(cand!.domdegreelist), 0);
+        if ForAny(npgs.degreelist, x->x<> npgs.maxdeg) then
+            return fail;
+        fi;
     else
         npgs.domain:=ShallowCopy(cand!.domain);
         npgs.domdegreelist:=ShallowCopy(cand!.domdegreelist);
@@ -996,7 +1010,7 @@ function(cand,pt)
                (npgs.kIsForced and ksb=kfb  and Length(kmts)=2 and sd[kmts[1]]+sd[kmts[2]]+npgs.degreelist[ksb]>npgs.k) or
                (npgs.kIsForced and ksb=kfb  and Length(kmts)=1 and sd[kmts[1]]+npgs.degreelist[ksb]>npgs.k) or
                (npgs.kIsForced and ksb<>kfb and sd[kmts[1]]+npgs.degreelist[ksb]>npgs.k) or
-               (npgs.kIsForced and ksb<>kfb and Length(kmts)=2 and sd[kmts[2]]+npgs.degreelist[ksb]>npgs.k)
+               (npgs.kIsForced and ksb<>kfb and Length(kmts)=2 and sd[kmts[2]]+npgs.degreelist[kfb]>npgs.k)
             then
                 npgs.domdegreelist[ksb]:=npgs.domdegreelist[ksb]-sd[kmts[1]];
                 RemoveSet(npgs.domain,k);
@@ -1012,6 +1026,8 @@ function(cand,pt)
             fi;
         od;    
     fi;
+    
+    Assert(1, ForAll([1..Length(npgs.blocks)], i->npgs.domdegreelist[i]+npgs.degreelist[i] >= npgs.maxdeg));
     
     # starting from here the field npgs.square is computed
 
@@ -1040,8 +1056,8 @@ function(cand,pt)
             if a = sb  then # C A*
                 c:=fb;
                 bc:=c/npgs.perm;
-                for j in cand!.blockingmat[b][c] do
-                    sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[j^ColorMates(cgr)]];
+                for j in cand!.blockingmat[c][b] do
+                    sq{bbl}:=sq{bbl}+ent[ba][bb][bc][blkIdx[color]][blkIdx[j]];
                 od;
             fi;
             if  b = sb then # A C*
@@ -1095,9 +1111,9 @@ function(cand,pt)
                         if npgs.lbd <> npgs.maxlbd then
                             return fail;
                         fi;
-                        if ForAny(block, x->sq[x]<>npgs.lbd) then
-                            return fail;
-                        fi;
+                    fi;
+                    if ForAny(block, x->sq[x]<>npgs.lbd) then
+                        return fail;
                     fi;
                 fi;
             fi;

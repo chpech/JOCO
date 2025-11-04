@@ -85,9 +85,11 @@ function(cgr)
     res:=[];
     symarsets:=[];
     
+    Info(InfoJOCO,1,"Computing orbits of symmetric J-stable sets.\n");
+    
     for sorb in iter do
         if iter!.state<>fail and Length(iter!.state.M)<=COCOInfoGSSize then
-            Info(InfoCOCO,1,iter!.state.M,"\n");
+            Info(InfoJOCO,2,iter!.state.M,"\n");
         fi;
         
         rep:=Representative(sorb);
@@ -100,11 +102,12 @@ function(cgr)
                 Add(symarsets,gsorb);
                 if IsJStableSet(Representative(gsorb)) then
                     Add(res, gsorb);
-                    Info(InfoCOCO,1,"*");
+                    Info(InfoJOCO,1,"*");
                 fi;
             fi;
         fi;
     od;
+    Info(InfoJOCO,1,"\nDone computing orbits of symmetric J-stable sets.\n");
     SetHomogeneousSymJArcRegularSetOrbits(cgr,symarsets);
     
     return res;
@@ -136,9 +139,10 @@ function(cgr)
     res:=[];
     asymarsets:=[];
     
+    Info(InfoJOCO,1,"Computing orbits of asymmetric J-stable sets.\n");
     for sorb in iter do
         if iter!.state<>fail and Length(iter!.state.M)<=COCOInfoGSSize then
-            Info(InfoCOCO,1,iter!.state.M,"\n");
+            Info(InfoJOCO,2,iter!.state.M,"\n");
         fi;
 
         rep:=Representative(sorb);
@@ -151,11 +155,12 @@ function(cgr)
                 Add(asymarsets,gsorb);
                 if IsJStableSet(Representative(gsorb)) then
                     Add(res, gsorb);
-                    Info(InfoCOCO,1,"*");
+                    Info(InfoJOCO,1,"*");
                 fi;
             fi;
         fi;
     od;
+    Info(InfoJOCO,1,"\nDone computing orbits of asymmetric J-stable sets.\n");
     SetHomogeneousAsymJArcRegularSetOrbits(cgr,asymarsets);
     
     return res;

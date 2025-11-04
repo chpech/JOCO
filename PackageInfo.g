@@ -50,11 +50,11 @@ License := "GPL-3.0",
 ##  <!ENTITY VERSION "0.1">
 ##  <!ENTITY RELEASEDATE "04 October 2025">
 ##  <#/GAPDoc>
-##IssueTrackerURL := "https://github.com/chpech/COCO2P/issues",
-##SourceRepository := rec(
-##    Type := "git",
-##    URL := "https://github.com/chpech/COCO2P",
-##),
+IssueTrackerURL := "https://github.com/chpech/JOCO/issues",
+SourceRepository := rec(
+    Type := "git",
+    URL := "https://github.com/chpech/JOCO",
+),
 
 PackageWWWHome := "https://github.com/chpech/joco/",
 
@@ -249,9 +249,9 @@ AbstractHTML := "The <span class=\"pkgname\">JOCO</span> package provides\
 # in case of several help books give a list of such records here:
 PackageDoc := rec(
   # use same as in GAP
-  BookName  := "JOCO",
+  BookName  := ~.PackageName,
   # format/extension can be one of .tar.gz, .tar.bz2, -win.zip, .zoo.
-                  ArchiveURLSubset := ["doc", "htm"],
+  ArchiveURLSubset := ["doc"],
   HTMLStart := "doc/chap0.html",
   PDFFile   := "doc/manual.pdf",
   # the path to the .six file used by GAP's help system
@@ -259,7 +259,7 @@ PackageDoc := rec(
   # a longer title of the book, this together with the book name should
   # fit on a single text line (appears with the '?books' command in GAP)
   # LongTitle := "Elementary Divisors of Integer Matrices",
-  LongTitle := "JOCO - A system for computing with Jordan configurations",
+  LongTitle := ~.Subtitle,
 ),
 
 
@@ -279,8 +279,7 @@ Dependencies := rec(
   # list of pairs [package name, version] as above,
   # these package are will be loaded if they are available,
   # but the current package will be loaded if they are not available
-  # SuggestedOtherPackages := [],
-#  SuggestedOtherPackages := [["xgap","0"]],
+  SuggestedOtherPackages := [],
 
   # *Optional*: a list of pairs as above, denoting those needed packages
   # that must be completely loaded before loading of the current package

@@ -174,6 +174,9 @@ function(cgr,lforb)
     fi;
     
     
+    if not IsSubgroup(aaut, UnderlyingGroupOfCocoOrbit(lforb[1])) then
+        ErrorNoReturn("PosetOfFusionOrbits: Underlying group of fusion orbits is incompatible!");
+    fi;
     if UnderlyingGroupOfCocoOrbit(lforb[1])<>aaut then # if it is a proper subgroup of aaut
         aautfusorbs:=Set(lforb, x->ConstructorOfCocoOrbit(x)(aaut,Representative(x)));
     else
@@ -183,6 +186,7 @@ function(cgr,lforb)
     
     cautfusorbs:=[];ltwins:=[];
     algebraicFusions:=[];
+    Info(InfoJOCO,1,"Computing algebraic fusions and algebraic twins.\n");
     for i in [1..Length(aautfusorbs)] do
         suborbs:=SubOrbitsOfCocoOrbit(caut,aautfusorbs[i]);
         twins:=[Length(cautfusorbs)+1..Length(cautfusorbs)+Length(suborbs)];
@@ -202,8 +206,9 @@ function(cgr,lforb)
                 Add(algebraicFusions,Length(cautfusorbs));
             fi;
         od;
-        Info(InfoCOCO,1,"*");
+        Info(InfoJOCO,1,"*");
     od;
+    Info(InfoJOCO,1,"\nDone computing algebraic fusions and algebraic twins.\n");
     
     poset:=CocoPosetByFunctions([1..Length(cautfusorbs)], order, linorder);
     poset!.algTwins:=Immutable(List(poset!.elements, x->List(ltwins[x],y->Position(poset!.elements,y))));
@@ -258,11 +263,6 @@ function(pos, indices)
             pos!.cisoMap[i]:=idx;
         fi;
         
-        if idx = i then
-            Info(InfoCOCO,1,"+");
-        else
-            Info(InfoCOCO,1,"-");
-        fi;
         return idx;
     end;
     
@@ -370,7 +370,7 @@ function(pos, indices)
     Perform(pos!.colorGraphs, IsJStableColorGraph);
     Perform(pos!.colorGraphs, IsWLStableColorGraph);
     
-    
+    Info(InfoJOCO,1,"Computing structure descriptions of symmetry groups of cgr.\n");
     if Rank(pos!.cgr)>2 and (Rank(pos!.cgr)>3 or IsPrimitiveColorGraph(pos!.cgr)) then
         ord:=PrimePowersInt(Size(AutomorphismGroup(pos!.cgr)));
         ord:=ord{[2,4..Length(ord)]};
@@ -394,7 +394,9 @@ function(pos, indices)
             fi;
         fi;
     fi;
+    Info(InfoJOCO,1,"Done computing structure descriptions of symmetry groups of cgr.\n");
     
+    Info(InfoJOCO,1,"Computing structure descriptions of symmetry groups of poset elements.\n");
     for i in [1..Size(pos)] do
         cgrr:=pos!.colorGraphs[i];
         if Rank(cgrr)>2 and (Rank(cgrr)>3 or IsPrimitiveColorGraph(cgrr)) then
@@ -426,10 +428,11 @@ function(pos, indices)
             fi;
         fi;
 
-        Info(InfoCOCO,1,".");
+        Info(InfoJOCO,1,".");
     od;
-    Info(InfoCOCO,1,"|");
+    Info(InfoJOCO,1,"\nDone computing structure descriptions of symmetry groups of poset elements.\n");
     
+    Info(InfoJOCO,1,"Creating COCO-nodes for poset elements.\n");
     nodes:=[];
     for i in [1..Size(pos)] do
         node:=NewCocoNode(pos!.colorGraphs[i]);
@@ -452,9 +455,9 @@ function(pos, indices)
         
         RegisterInfoCocoNode(node, rec(name:="algebraic:", value:=String(node!.index in node!.poset!.algebraicFusions)));
         Add(nodes,node);
-        Info(InfoCOCO,1,".");
+        Info(InfoJOCO,1,".");
     od;
-    Info(InfoCOCO,1,"|");
+    Info(InfoJOCO,1,"\nDone creating COCO-nodes for poset elements.\n");
     
     
     outp:="";
@@ -464,6 +467,7 @@ function(pos, indices)
 
     PrintTo(res,"JOCO - Information about a poset of FusionOrbits\n",
                 "------------------------------------------------\n");
+    Info(InfoJOCO,1,"Creating COCO-node cgr and gathering information about cgr.\n");
     cgr:=pos!.cgr;
     node:=NewCocoNode(cgr);
     RegisterStandardInfoRainbow@JOCO(node);
@@ -502,6 +506,8 @@ function(pos, indices)
             AppendTo(res, StringCocoMerging@COCO2P(mrg));
         fi;
     fi;
+    Info(InfoJOCO,1,"Done creating COCO-node cgr and gathering information about cgr.\n");
+    
     AppendTo(res, "-------------------------------------------------\n");
     if date then
         PrintTo(res, String("                   Date: ",-maxlength), TodayString@COCO2P(),"\n");
@@ -597,6 +603,7 @@ function(pos, indices)
     
     idx:=0;
     
+    Info(InfoJOCO,1 "Gathering info about fusion orbits,\n");
     for v in indices do
         node:=nodes[v];
         ninf:=node!.nodeInfo;
@@ -824,8 +831,9 @@ function(pos, indices)
         fi;
 
         AppendTo(res,"\n");
-        Info(InfoCOCO,1,".");
+        Info(InfoJOCO,1,".");
     od;
+    Info(InfoJOCO,1 "\nDone gathering info about fusion orbits,\n");
 
     CloseStream(res);
     return outp;

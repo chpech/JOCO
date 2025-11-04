@@ -5,6 +5,8 @@ DeclareAttribute( "VertexPartitionOfRainbow" , IsColorGraph and IsRainbow );
 DeclareProperty( "IsStableRainbow", IsColorGraph and IsRainbow );
 DeclareProperty( "IsWellFibredRainbow", IsColorGraph and IsRainbow );
 
+DeclareProperty("IsThin", IsColorGraph and IsRainbow );
+DeclareProperty("IsQuasithin", IsColorGraph and IsRainbow );
 
 
 DeclareAttribute( "RAlgebraicAutomorphismGroup", IsColorGraph and IsRainbow and IsStableRainbow );

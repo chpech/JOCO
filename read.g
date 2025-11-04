@@ -31,7 +31,7 @@ ReadPackage("joco", "lib/pstabfus.gi");
 ReadPackage("joco", "lib/jclosure.gi");
 ReadPackage("joco", "lib/jtensor.gi");
 ReadPackage("joco", "lib/rainbows.gi");
-ReadPackage("joco", "lib/jgoodsets.gi");
+#ReadPackage("joco", "lib/jgoodsets.gi");
 ReadPackage("joco", "lib/colorpartition.gi");
 #ReadPackage("joco", "lib/jfusion.gi");
 ReadPackage("joco", "lib/jpartfus.gi");
