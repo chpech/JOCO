@@ -258,15 +258,18 @@ function(iter)
     res:=[];
     grp:=iter!.G;
     
+    Info(InfoJOCO,1,"Computing set orbits.\n");
     repeat
         sorb:=NextIterator(iter);
         if sorb<>fail then
             if Length(Representative(sorb))<=COCOInfoGSSize then
-                Info(InfoCOCO,1,Representative(sorb),"\n");
+                Info(InfoJOCO,2,Representative(sorb),"\n");
             fi;
+            Info(InfoJOCO,1,".");
             Add(res,sorb);
         fi;
     until IsDoneIterator(iter);
+    Info(InfoJOCO,1,"\nDone computing set orbits.\n");
     return res;
 end);
 

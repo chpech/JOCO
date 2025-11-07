@@ -1,4 +1,23 @@
- InstallGlobalFunction(ColorGraphBySymmetrization,
+MakeDoc@:=function()
+    local  cp, info, path;
+
+    cp:=Filename(DirectoryCurrent(),"");
+    info:=PackageInfo("joco");
+    if info = [] then
+        ErrorNoReturn("MakeDoc@JOCO: Can not find the package directory of JOCO!");
+    fi;
+    info:=info[1];
+    path:=info.InstallationPath;
+    if not ChangeDirectoryCurrent(path) then
+        ErrorNoReturn("MakeDoc@JOCO: Can not change to package directory!");
+    fi;
+    Read("makedoc.g");
+    if not ChangeDirectoryCurrent(cp) then
+        ErrorNoReturn("MakeDoc@JOCO: Can not reset current path!");
+    fi;
+end;
+
+InstallGlobalFunction(ColorGraphBySymmetrization,
 function(cgr)
     return ColorGraph(KnownGroupOfAutomorphisms(cgr),[1..OrderOfColorGraph(cgr)],OnPoints,true,
                     function(u,v)

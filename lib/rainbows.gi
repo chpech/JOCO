@@ -127,7 +127,6 @@ function(cgr)
 end);
 
 
-# InstallTrueMethod(IsRainbow,IsColorGraph and IsSchurianCCRep);
 InstallTrueMethod(IsRainbow,IsColorGraph and IsWLStableColorGraph);
 InstallTrueMethod(IsRainbow,IsColorGraph and IsJStableColorGraph);
 InstallTrueMethod(IsStableRainbow, IsRainbow and IsRegularColorGraph);
@@ -138,8 +137,11 @@ InstallTrueMethod(IsRegularColorGraph, IsWLStableColorGraph and IsHomogeneous);
 InstallTrueMethod(IsRegularColorGraph, IsJStableColorGraph and IsUndirectedColorGraph);
 
 InstallTrueMethod(IsHomogeneous, IsRainbow and IsRegularColorGraph);
+InstallTrueMethod(IsWellFibredRainbow, IsWLStableColorGraph);
+InstallTrueMethod(IsWellFibredRainbow, IsJStableColorGraph and IsRegularColorGraph);
 
-
+                 
+                 
 InstallOtherMethod(ColorMates,
    "for WL-stable color graphs in SchurianCCRep",
    [IsColorGraph and IsRainbow],
@@ -213,17 +215,6 @@ InstallMethod(NumberOfFibres,
 		[IsColorGraph and IsRainbow],
 function(cgr)
    return Length(ReflexiveColors(cgr));
-end);
-
-InstallMethod(NumberOfWeakFibres,
-		"for Rainbows",
-		[IsColorGraph and IsRainbow],
-function(cgr)
-    local part;
-    
-    part:=Set([1..Rank(cgr)], i->Filtered([1..OrderOfColorGraph(cgr)], 
-                                          v->Length(Neighbors(cgr,v,i))<>0));
-    return Length(part);
 end);
 
 
@@ -855,7 +846,7 @@ function(node)
     if not IsHomogeneous(cgr) then 
         if not IsWLStableColorGraph(cgr) then 
             RegisterInfoCocoNode(node,rec(name:="# of weak fibres:",
-                                          getter:=node->NumberOfWeakFibres(node!.cgr)));
+                                          getter:=node->Length(VertexPartitionOfRainbow(node!.cgr))));
         fi;
     
         RegisterInfoCocoNode(node,rec(name:="# of fibres:",

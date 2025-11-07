@@ -149,16 +149,7 @@ Persons := [
     FirstNames    := "Mikhail",
     IsAuthor      := true,
     IsMaintainer  := false,
-    Email         := "klin@math.bgu.ac.il",
-    WWWHome       := "https://www.researchgate.net/profile/Mikhail_Klin",
-    PostalAddress := Concatenation( [
-            "Department of Mathematics\n",
-            "Ben Gurion University of the Negev\n",
-            "P.O.B. 653\n",
-            "Be'er Sheva 84105\n",
-            "Israel" ] ),
-    Place         := "Be'er Sheva",
-    Institution   := "Ben-Gurion University of the Negev"
+    Email         := "klinm@bgu.ac.il",
   ),
   rec(
     LastName      := "Pech",
@@ -166,10 +157,6 @@ Persons := [
     IsAuthor      := true,
     IsMaintainer  := true,
     Email         := "cpech@freenet.de",
-    WWWHome       := "https://www.researchgate.net/profile/Christian_Pech2",
-    PostalAddress := "",
-    Place         := "",
-    Institution   := ""
   )
 # provide such a record for each author and/or maintainer ...
 ],
@@ -248,19 +235,36 @@ AbstractHTML := "The <span class=\"pkgname\">JOCO</span> package provides\
 ##
 # in case of several help books give a list of such records here:
 PackageDoc := rec(
-  # use same as in GAP
   BookName  := ~.PackageName,
-  # format/extension can be one of .tar.gz, .tar.bz2, -win.zip, .zoo.
   ArchiveURLSubset := ["doc"],
   HTMLStart := "doc/chap0.html",
   PDFFile   := "doc/manual.pdf",
-  # the path to the .six file used by GAP's help system
   SixFile   := "doc/manual.six",
-  # a longer title of the book, this together with the book name should
-  # fit on a single text line (appears with the '?books' command in GAP)
-  # LongTitle := "Elementary Divisors of Integer Matrices",
   LongTitle := ~.Subtitle,
 ),
+AutoDoc := rec(
+    entities := rec(
+        VERSION := ~.Version,
+        DATE := ~.Date,
+        COCO := "<Package>coco2p</Package>",
+	JOCO := "<Package>joco</Package>",
+    ),
+),
+
+#PackageDoc := rec(
+#  # use same as in GAP
+#  BookName  := ~.PackageName,
+#  # format/extension can be one of .tar.gz, .tar.bz2, -win.zip, .zoo.
+#  ArchiveURLSubset := ["doc"],
+#  HTMLStart := "doc/chap0.html",
+#  PDFFile   := "doc/manual.pdf",
+#  # the path to the .six file used by GAP's help system
+#  SixFile   := "doc/manual.six",
+#  # a longer title of the book, this together with the book name should
+#  # fit on a single text line (appears with the '?books' command in GAP)
+#  # LongTitle := "Elementary Divisors of Integer Matrices",
+#  LongTitle := ~.Subtitle,
+#),
 
 
 ##  Are there restrictions on the operating system for this package? Or does

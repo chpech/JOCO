@@ -1066,7 +1066,6 @@ function(cand,pt)
         npgs.domain:=[];
         npgs.domdegreelist:=ListWithIdenticalEntries(Length(cand!.domdegreelist), 0);
         if ForAny(npgs.degreelist, x->x<> npgs.maxdeg) then
-            Info(InfoJOCO,1,"H");
             return fail;
         fi;
     else

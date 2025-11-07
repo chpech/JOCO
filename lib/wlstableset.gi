@@ -87,9 +87,10 @@ function(cgr)
     res:=[];
     symarsets:=[];
     
+    Info(InfoJOCO,1,"Computing orbits of symmetric  WL-stable sets.\n");
     for sorb in iter do
         if iter!.state<>fail and Length(iter!.state.M)<=COCOInfoGSSize then
-            Info(InfoCOCO,1,iter!.state.M,"\n");
+            Info(InfoJOCO,2,iter!.state.M,"\n");
         fi;
         
         rep:=Representative(sorb);
@@ -102,11 +103,12 @@ function(cgr)
                 Add(symarsets,gsorb);
                 if IsWLStableSet(Representative(gsorb)) then
                     Add(res, gsorb);
-                    Info(InfoCOCO,1,"*");
+                    Info(InfoJOCO,1,"*");
                 fi;
             fi;
         fi;
     od;
+    Info(InfoJOCO,1,"\nDone computing orbits of symmetric WL-stable sets.\n");
     SetHomogeneousSymArcRegularSetOrbits(cgr,symarsets);
     
     return res;
@@ -138,9 +140,10 @@ function(cgr)
     res:=[];
     asymarsets:=[];
     
+    Info(InfoJOCO,1,"Computing orbits of asymmetric WL-stable sets.\n");
     for sorb in iter do
         if iter!.state<>fail and Length(iter!.state.M)<=COCOInfoGSSize then
-            Info(InfoCOCO,1,iter!.state.M,"\n");
+            Info(InfoJOCO,2,iter!.state.M,"\n");
         fi;
 
         rep:=Representative(sorb);
@@ -153,11 +156,12 @@ function(cgr)
                 Add(asymarsets,gsorb);
                 if IsWLStableSet(Representative(gsorb)) then
                     Add(res, gsorb);
-                    Info(InfoCOCO,1,"*");
+                    Info(InfoJOCO,1,"*");
                 fi;
             fi;
         fi;
     od;
+    Info(InfoJOCO,1,"\nDone computing orbits of asymmetric WL-stable sets.\n");
     SetHomogeneousAsymArcRegularSetOrbits(cgr,asymarsets);
     
     return res;

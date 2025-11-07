@@ -355,44 +355,44 @@ end);
 IsConsistentState:=function(tstate)
     local  tGS, tpart, tH, torbits;
     if tstate.ppart!.ppart <> ShortLexSorted(tstate.ppart!.ppart) then
-        Info(InfoCOCO,1,"tstate.ppart is not shortLex ordered!");
+        Info(InfoJOCO,3,"tstate.ppart is not shortLex ordered!");
         return false;
     fi;
     
     if tstate.slice = [] then
         tGS:=Stabilizer(tstate.G, Set(tstate.ppart!.ppart), OnSetsSets);
         if tstate.GS <> tGS then
-            Info(InfoCOCO,1,"tstate.slice = [] but tstate.GS is not the stabilizer of tstate.ppart!");
+            Info(InfoJOCO,3,"tstate.slice = [] but tstate.GS is not the stabilizer of tstate.ppart!");
             return false;
         fi;
         if tstate.H <> tGS then
-            Info(InfoCOCO,1,"tstate.slice = [] but tstate.H is not the stabilizer of tstate.ppart!");
+            Info(InfoJOCO,3,"tstate.slice = [] but tstate.H is not the stabilizer of tstate.ppart!");
             return false;
         fi;
     else
         if not IsSet(tstate.slice) then
-            Info(InfoCOCO,1,"tstate.slice must be a set!");
+            Info(InfoJOCO,3,"tstate.slice must be a set!");
             return false;
         fi;
         tpart:=Difference(Set(tstate.ppart!.ppart), tstate.slice);
         tGS:=Stabilizer(tstate.G, tpart, OnSetsSets);
         tH:=Stabilizer(tGS, tstate.slice,OnSetsSets);
         if tGS <> tstate.GS then
-            Info(InfoCOCO,1,"tstate.slice <> [] but tstate.GS is not the stabilizer of the complete slices of tstate.ppart!");
+            Info(InfoJOCO,3,"tstate.slice <> [] but tstate.GS is not the stabilizer of the complete slices of tstate.ppart!");
             return false;
         fi;
         if tH <> tstate.H then
-            Info(InfoCOCO,1,"tstate.slice <> [] but tstate.H is not the stabilizer of tstate.ppart in tstate.GS!");
+            Info(InfoJOCO,3,"tstate.slice <> [] but tstate.H is not the stabilizer of tstate.ppart in tstate.GS!");
             return false;
         fi;
     fi;
     
     if tstate.H <> Stabilizer(tstate.G, Set(tstate.ppart!.ppart), OnSetsSets) then
-        Info(InfoCOCO,1,"tstate.H is not the stabilizer of tstate.ppart in tstate.G!");
+        Info(InfoJOCO,3,"tstate.H is not the stabilizer of tstate.ppart in tstate.G!");
         return false;
     fi;
     if List(tstate.orbits,Representative) <> ShortLexSorted(List(tstate.orbits, Representative)) then
-        Info(InfoCOCO,1,"tstate.orbits mut be shortLexSorted!");
+        Info(InfoJOCO,3,"tstate.orbits mut be shortLexSorted!");
         return false;
     fi;
     torbits:=Union(List(tstate.allsorb, AsSet));
@@ -400,15 +400,15 @@ IsConsistentState:=function(tstate)
     torbits:=Filtered(torbits, o->IsCompatibleWithPartialPartition(tstate.ppart,o));
     torbits:=ShortLexSorted(torbits);
     if torbits <> List(tstate.orbits,Representative) then
-        Info(InfoCOCO,1,"tstate.orbits is not consistent!\n");
-        Info(InfoCOCO,1,torbits,"\n");
-        Info(InfoCOCO,1,List(tstate.orbits,Representative),"\n");
+        Info(InfoJOCO,3,"tstate.orbits is not consistent!\n");
+        Info(InfoJOCO,3,torbits,"\n");
+        Info(InfoJOCO,3,List(tstate.orbits,Representative),"\n");
         
         return false;
     fi;
     if ForAny([1..Length(tstate.orbits)], i->Stabilizer(tstate.H, torbits[i],OnSets)
                                          <>StabilizerOfCanonicalRepresentative(tstate.orbits[i])) then
-        Info(InfoCOCO,1,"an element tstate.orbits has the wrong stabilizer!");
+        Info(InfoJOCO,3,"an element tstate.orbits has the wrong stabilizer!");
         return false;
     fi;
     return true;
@@ -432,8 +432,6 @@ function(iter)
            RankOfPartialPartition(state.ppart) > state.maxrank  or 
            RankOfPartialPartition(state.ppart) = state.maxrank and 
            IsCompletePartialPartition(state.ppart) then
-            Info(InfoCOCO,2,"*");
-            
             return NextState(state.linkback);
         fi;
 
@@ -463,12 +461,10 @@ function(iter)
                 xnorbits:=Filtered(state.orbits, 
                                    x->Length(Representative(x))>=Length(set));
             
-                Info(InfoCOCO,2,"Computing suborbits...");
                 norbits:=List(xnorbits, 
                               x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, 
                                  y->IsCompatibleWithPartialPartition(nppart,y)));
                 
-                Info(InfoCOCO,2,"done.\n");
                 
                 for i in [1..Length(xnorbits)] do
                     Perform(norbits[i], function(x) x!.type:=xnorbits[i]!.type;end);
@@ -500,11 +496,9 @@ function(iter)
                 xnorbits:=Filtered(state.orbits, 
                                    x->Length(Representative(x))>=Length(set));
             
-                Info(InfoCOCO,2,"Computing suborbits...");
                 norbits:=List(xnorbits, 
                               x->SubOrbitsWithInvariantPropertyOfCocoOrbit(nH, x, 
                                 y->IsCompatibleWithPartialPartition(nppart,y)));
-                Info(InfoCOCO,2,"done.\n");
                 
                 for i in [1..Length(xnorbits)] do
                     Perform(norbits[i], function(x) x!.type:=xnorbits[i]!.type;end);
@@ -525,14 +519,12 @@ function(iter)
                 Assert(1, IsConsistentState(nextstate));
                 Assert(1, ForAll(norbits, o->StabilizerOfCanonicalRepresentative(o) = Stabilizer(nextstate.H, Representative(o),OnSets)));
             else
-                Info(InfoCOCO,2,"Checking irreducibility...");
                 nH:=SetsSetsReducibilityTestOneCard(state.GS, StabilizerOfCanonicalRepresentative(setorb),state.slice,set);
                 if not IsPerm(nH) then
                     Assert(1, IsConsistentStabChain(Stbc(nH)));
                     Assert(1, IsReducedStabChain(Stbc(nH)));
                 fi;
                 
-                Info(InfoCOCO,2,"done.\n");
                 
                 if IsPerm(nH) then
                     continue;
@@ -542,11 +534,9 @@ function(iter)
                 
                 xnorbits:=Filtered(state.orbits, 
                                    x->Length(Representative(x))>=Length(set));
-                Info(InfoCOCO,2,"Computing suborbits...");
                 norbits:=List(xnorbits, 
   x->SubOrbitsWithInvariantPropertyOfCocoOrbit(Intersection(state.H,nH), x, 
                                  y->IsCompatibleWithPartialPartition(nppart,y)));
-                Info(InfoCOCO,2,"done.\n");
               
                 Assert(1, IsConsistentStabChain(Stbc(nH)));
                 
@@ -714,7 +704,8 @@ function(iter)
     fi;
     
     res:=[];
-        
+    
+    Info(InfoJOCO,1,"Computing partition orbits.\n");
     while not IsDoneIterator(iter) do
         pporb := NextIterator(iter);
 
@@ -723,7 +714,6 @@ function(iter)
         if  IsCompletePartialPartition(ppart) and 
             not HasSmallerBase(ppart) then
             
-            Info(InfoCOCO,1,"!");
             part:=PartitionFromCompletePartialPartition(ppart);
             
             partorb:=PartitionOrbitNC(UnderlyingGroupOfCocoOrbit(pporb), part, 
@@ -732,11 +722,12 @@ function(iter)
                      Stabilizer(UnderlyingGroupOfCocoOrbit(pporb), Set(part),OnSetsSets));
             
             if flt(partorb) then
-                Info(InfoCOCO,1,"!");
+                Info(InfoJOCO,1,"!");
                 Add(res, partorb);
             fi;
         fi;
     od;
+    Info(InfoJOCO,1,"\nDone computing partition orbits.\n");
     
     return res;
 end);

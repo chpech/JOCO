@@ -159,13 +159,14 @@ function(cgr,lforb)
         tstart:=NanosecondsSinceEpoch();
     fi;
     
-    if IsWLStableColorGraph(cgr) then
-        tensor:=StructureConstantsOfColorGraph(cgr);
-    
+    # check this mechanism! It is weak.
+    if  IsJStableColorGraph(cgr) then
+        tensor:=JStructureConstantsOfColorGraph(cgr);
         aaut:=AutomorphismGroup(tensor);
         caut:=ColorAutomorphismGroupOnColors(cgr);
-    elif IsJStableColorGraph(cgr) then
-        tensor:=JStructureConstantsOfColorGraph(cgr);
+    elif
+        IsWLStableColorGraph(cgr) then
+        tensor:=StructureConstantsOfColorGraph(cgr);
         aaut:=AutomorphismGroup(tensor);
         caut:=ColorAutomorphismGroupOnColors(cgr);
     else
@@ -394,7 +395,7 @@ function(pos, indices)
             fi;
         fi;
     fi;
-    Info(InfoJOCO,1,"Done computing structure descriptions of symmetry groups of cgr.\n");
+    Info(InfoJOCO,1,"\nDone computing structure descriptions of symmetry groups of cgr.\n");
     
     Info(InfoJOCO,1,"Computing structure descriptions of symmetry groups of poset elements.\n");
     for i in [1..Size(pos)] do
@@ -506,7 +507,7 @@ function(pos, indices)
             AppendTo(res, StringCocoMerging@COCO2P(mrg));
         fi;
     fi;
-    Info(InfoJOCO,1,"Done creating COCO-node cgr and gathering information about cgr.\n");
+    Info(InfoJOCO,1,"\nDone creating COCO-node cgr and gathering information about cgr.\n");
     
     AppendTo(res, "-------------------------------------------------\n");
     if date then
@@ -603,7 +604,7 @@ function(pos, indices)
     
     idx:=0;
     
-    Info(InfoJOCO,1 "Gathering info about fusion orbits,\n");
+    Info(InfoJOCO,1, "Gathering info about fusion orbits.\n");
     for v in indices do
         node:=nodes[v];
         ninf:=node!.nodeInfo;
@@ -833,7 +834,7 @@ function(pos, indices)
         AppendTo(res,"\n");
         Info(InfoJOCO,1,".");
     od;
-    Info(InfoJOCO,1 "\nDone gathering info about fusion orbits,\n");
+    Info(InfoJOCO,1, "\nDone gathering info about fusion orbits.\n");
 
     CloseStream(res);
     return outp;
