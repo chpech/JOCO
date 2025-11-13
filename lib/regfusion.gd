@@ -8,26 +8,30 @@
 ##
 #############################################################################
 
+#! @Chapter regfusion
+#! @Section Theory
+#! Let $(V,C,f)$ be a rainbow.
+#! We call a partition $\Pi=\{M_1,\dots,M_k\}$ of $C$ a __regular fusion__ of $(V,C,f)$ if
+#! * for some $r\in\{1,\dots,k\}$,  $M_r$ consists of all reflexive colors of $(V,C,f)$,
+#! * every other class of $\Pi$ is a regular set,
+#! * For every $i\in\{1,\dots,k\}$ there exists a $j\in\{1,\dots,k\}$ such that
+#!   $A_{M_i}^t=A_{M_j}$.
 
-DeclareCategory( "IsRegularFusion", IsColorPartition );
+#! @Section Properties
 
-DeclareAttribute( "RegularFusionsFamily", IsColorGraph );
-KeyDependentOperation( "RegularFusionOrbitsFamily", IsColorGraph, IsPermGroup, ReturnTrue );
-
-DeclareGlobalFunction( "StringRegularFusionInfo" );
-
-DeclareOperation( "OnRegularFusions", [IsRegularFusion, IsPerm] ); 
-
- 
-DeclareAttribute( "HomogeneousRegularFusionOrbits", IsColorGraph and IsRainbow and IsStableRainbow );
-
-DeclareCategory( "IsRegularFusionOrbit", IsCocoSetOrbit );
-DeclareGlobalFunction( "RegularFusionOrbit" );
-DeclareGlobalFunction( "RegularFusionOrbitNC" );
+#! @Description
+#! The property of a color partition to be a regular fusion 
+DeclareProperty( "IsRegularFusion", IsColorPartition );
 
 
-DeclareCategory("IsPosetOfRFusionOrbits", IsCocoPoset);
+#! @Section Orbits of regular fusions
 
-DeclareAttribute("RComputationTime", IsPosetOfRFusionOrbits);
+#! @Description
+#! Computes all orbits of regular fusions of <A>cgr</A> under <A>grp</A>. The group
+#! <A>grp</A> is expected to be a subgroup of `RAut(cgr)`. If <A>grp</A> is not given, then 
+#! it is taken to be equal to `RAut(cgr)`. If the option `:sym` is given, then only 
+#! regular fusions are computed whose classes are symmetric regular sets.
+#! @Arguments cgr[,grp] :sym
+DeclareAttribute( "RegularFusionOrbits", IsColorGraph and IsRainbow and IsStableRainbow );
 
-DeclareGlobalFunction( "PosetOfHomogeneousRegularFusionOrbits" ); 
+

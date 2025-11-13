@@ -1,7 +1,9 @@
 DeclareInfoClass("InfoJOCO");
 
 ReadPackage("joco", "lib/pstabset.gd");
+ReadPackage("joco", "lib/colorsets.gd");
 ReadPackage("joco", "lib/pstabfus.gd");
+ReadPackage("joco", "lib/pcolpart.gd");
 ReadPackage("joco", "lib/jclosure.gd"); 
 ReadPackage("joco", "lib/jtensor.gd");
 ReadPackage("joco", "lib/colorpartition.gd");
@@ -12,7 +14,6 @@ ReadPackage("joco", "lib/wlfusion.gd");
 #ReadPackage("joco", "lib/jgoodsets.gd");
 ReadPackage("joco", "lib/jpartfus.gd"); 
 ReadPackage("joco", "lib/wlpartfus.gd"); 
-ReadPackage("joco", "lib/colorsets.gd");
 ReadPackage("joco", "lib/regsets.gd");
 ReadPackage("joco", "lib/partregset.gd");
 ReadPackage("joco", "lib/pjarcregset.gd");
@@ -28,3 +29,5 @@ ReadPackage("joco", "lib/regfusion.gd");
 ReadPackage("joco", "lib/setorbits.gd");
 ReadPackage("joco", "lib/partorbits.gd");
 ReadPackage("joco", "lib/auxiliary.gd");
+ReadPackage("joco", "lib/schemesdb.gd");
+

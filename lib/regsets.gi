@@ -159,7 +159,7 @@ end);
 
 
 
-InstallMethod(HomogeneousSymRegularSetOrbits,
+InstallMethod(SymmetricRegularSetOrbits,
         "for stable rainbows",
         [IsColorGraph and IsRainbow and IsStableRainbow],
 function(cgr)
@@ -174,7 +174,7 @@ function(cgr)
     return Filtered(allgsorb,orb->AsSet(Representative(orb))<>[]);
 end);
 
-InstallOtherMethod(HomogeneousSymRegularSetOrbits,
+InstallOtherMethod(SymmetricRegularSetOrbits,
         "for a stable rainbow and a permutation group",
         [IsColorGraph and IsRainbow and IsStableRainbow, IsPermGroup],
 function(cgr,g)
@@ -186,7 +186,7 @@ function(cgr,g)
     return Filtered(allgsorb,orb->AsSet(Representative(orb))<>[]);
 end);
 
-InstallMethod(HomogeneousAsymRegularSetOrbits,
+InstallMethod(AsymmetricRegularSetOrbits,
         "for a stable rainbow",
         [IsColorGraph and IsRainbow and IsStableRainbow],
 function(cgr)
@@ -202,7 +202,7 @@ function(cgr)
     return Union(List(agsorbs, orb->SubOrbitsOfCocoOrbit(g,orb)));    
 end);
 
-InstallOtherMethod(HomogeneousAsymRegularSetOrbits,
+InstallOtherMethod(AsymmetricRegularSetOrbits,
         "for a stable rainbow and a permutation group",
         [IsColorGraph and IsRainbow and IsStableRainbow,IsPermGroup],
 function(cgr,g)
@@ -217,7 +217,7 @@ function(cgr,g)
     return Union(List(agsorbs, orb->SubOrbitsOfCocoOrbit(g,orb)));    
 end);
 
-InstallMethod(HomogeneousRegularSetOrbits,
+InstallMethod(RegularSetOrbits,
 "for stable rainbows",
 [IsColorGraph and IsRainbow and IsStableRainbow],
 function(cgr)
@@ -232,9 +232,9 @@ function(cgr)
     # if prim=fail then
     #     prim:=false;
     # fi;
-    lgs:=Set(HomogeneousSymRegularSetOrbits(cgr));
+    lgs:=Set(SymmetricRegularSetOrbits(cgr));
     if not sym then
-        lgs:=Union(lgs, HomogeneousAsymRegularSetOrbits(cgr));
+        lgs:=Union(lgs, AsymmetricRegularSetOrbits(cgr));
     fi;
     # if prim then
     #     lgs:=Filtered(lgs, x->ClosureSet(tensor, AsSet(Representative(x)))=[1..OrderOfTensor(tensor)]);
@@ -243,7 +243,7 @@ function(cgr)
     return lgs;
 end);
 
-InstallOtherMethod(HomogeneousRegularSetOrbits,
+InstallOtherMethod(RegularSetOrbits,
 "for a stable rainbow and a permutation group",
 [IsColorGraph and IsRainbow and IsStableRainbow, IsPermGroup],
 function(cgr,g)
@@ -258,9 +258,9 @@ function(cgr,g)
     # if prim=fail then
     #     prim:=false;
     # fi;
-    lgs:=Set(HomogeneousSymRegularSetOrbits(cgr,g));
+    lgs:=Set(SymmetricRegularSetOrbits(cgr,g));
     if not sym then
-        lgs:=Union(lgs, HomogeneousAsymRegularSetOrbits(cgr,g));
+        lgs:=Union(lgs, AsymmetricRegularSetOrbits(cgr,g));
     fi;
     # if prim then
     #     lgs:=Filtered(lgs, x->ClosureSet(tensor, AsSet(Representative(x)))=[1..OrderOfTensor(tensor)]);

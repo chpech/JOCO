@@ -28,6 +28,7 @@ end);
 
 ReadPackage("joco", "lib/pstabset.gi");
 ReadPackage("joco", "lib/pstabfus.gi");
+ReadPackage("joco", "lib/pcolpart.gi");
 ReadPackage("joco", "lib/jclosure.gi");
 ReadPackage("joco", "lib/jtensor.gi");
 ReadPackage("joco", "lib/rainbows.gi");
@@ -54,3 +55,5 @@ ReadPackage("joco", "lib/regfusion.gi");
 ReadPackage("joco", "lib/setorbits.gi");
 # ReadPackage("joco", "lib/partorbits.gi");
 ReadPackage("joco", "lib/auxiliary.gi");
+ReadPackage("joco", "lib/schemesdb.gi");
+

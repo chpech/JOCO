@@ -1,3 +1,4 @@
+#! @DoNotReadRestOfFile
 InstallMethod(RegularSet,
 "for WL-stable sets",
 [ IsRegularSet and IsWLStableSet, IsColorGraph, IsList ],

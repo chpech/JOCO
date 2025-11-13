@@ -3,11 +3,62 @@
 @Chapter Jordan
 @ChapterTitle J-stable color graphs
 
+@Chapter jtensor
+@ChapterTitle Tensors of intersection numbers of J-stable color graphs
+
+@Chapter jclosure
+@ChapterTitle Jordan-closure of partitions
+
+@Chapter Databases
+@ChapterTitle Databases
+
 @Chapter PStabSet
 @ChapterTitle Partial stable sets and stable sets
+
+@Chapter ColorSets
+@ChapterTitle Color sets
 
 @Chapter regsets
 @ChapterTitle Regular sets
 
+@Chapter ArcRegSet
+@ChapterTitle Arc regular sets
+
+@Chapter WLStableSet
+@ChapterTitle WL-stable sets
+
+@Chapter JArcRegSet
+@ChapterTitle J-arc regular sets
+
+@Chapter JStableSet
+@ChapterTitle J-stable sets
+
+@Chapter CoreHadamardSets
+@ChapterTitle Core Hadamard sets 
+
+@Chapter pstabfus
+@ChapterTitle Partial stable partitions and stable partitions
+
+@Chapter colorpartition
+@ChapterTitle Color partitions
+
+@Chapter regfusion
+@ChapterTitle Regular fusions
+
+@Chapter jordanfus
+@ChapterTitle Jordan fusions
+
+@Chapter wlfusion
+@ChapterTitle WL-stable fusions
+
 @Chapter partregset
 @ChapterTitle Partial regular sets
+
+@Chapter parcregset
+@ChapterTitle Partial arc-regular sets
+
+@Chapter pjarcregset
+@ChapterTitle Partial J-arc regular sets
+
+@Chapter setorbits
+@ChapterTitle Set orbits

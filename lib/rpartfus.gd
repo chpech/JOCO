@@ -9,12 +9,14 @@
 #############################################################################
 
 
-DeclareCategory( "IsPartialRegularFusion", IsCocoPartialStablePartition );
+DeclareCategory( "IsPartialRegularFusion", IsPartialColorPartition );
 DeclareAttribute( "PartialRegularFusionsFamily", IsColorGraph );
 KeyDependentOperation( "PartialRegularFusionOrbitsFamily", IsColorGraph, IsPermGroup, ReturnTrue );
 
 DeclareOperation( "EmptyPartialRegularFusion", [IsColorGraph,IsInt] );
 DeclareGlobalFunction( "RRefinedPartition" );     # undocumented
+
+DeclareGlobalFunction("PartialRegularFusion");
 
 # DeclareOperation( "ExtendedPartialRFusion", [IsPartialRFusion, IsRegularSet] );
 #DeclareProperty( "IsExtendiblePartialRFusion", IsPartialRFusion );

@@ -1,17 +1,6 @@
-# we are looking for sets M of colors of cgr with the property that the associated 
-# matrix H = H(M) = J - 2A(M) of order Order(cgr) satisfies 
-#                 HH^t = nI - (J-I) = (n+1)I - J, and 
-#                   HJ = JH = -J.
-# Here A(M) is the n x n matric that has A_{i,j} = 1 iff the color of the arc (i,j) 
-# in cgr is an element of M, and A_{i,j} = 0, otherwise.
-# note that M is allowed to contain reflexive colors.
-# If M is a Hadamard set of cgr, then adding a row and a column of ones to H(M),
-# we obtain a Hadamard matrix. It follows that n should be congruent 3 mod 4. 
-# Since we are working with the Jordan product, the first identity above translates to 
-#              H * H^t = 2nI - 2(J-I)
 
 
-DeclareRepresentation("IsPartialHadamardSetRep",
+DeclareRepresentation("IsPartialCHadamardSetRep",
         IsPartialStableSetRep,
         [ "cgr",
           "map",
@@ -21,8 +10,8 @@ DeclareRepresentation("IsPartialHadamardSetRep",
           "square"]);
 
                       
-DeclareRepresentation("IsPartialHadamardSetBlkRep",
-        IsPartialHadamardSetRep,
+DeclareRepresentation("IsPartialCHadamardSetBlkRep",
+        IsPartialCHadamardSetRep,
         [ "cgr",
           "map",
           "imap",
@@ -49,16 +38,16 @@ DeclareRepresentation("IsPartialHadamardSetBlkRep",
           ]);
 
 
-InstallMethod(PartialHadamardSetsFamily,
+InstallMethod(PartialCHadamardSetsFamily,
 "for color graphs",
 [IsColorGraph],
 function(cgr)
    local fam;
-   fam:=NewFamily("PartialHadamardSetsFam", IsPartialHadamardSet);
+   fam:=NewFamily("PartialCHadamardSetsFam", IsPartialCHadamardSet);
    return fam;
 end);
 
-InstallMethod(EmptyPartialHadamardSet,
+InstallMethod(EmptyPartialCHadamardSet,
         "for well-fibred J-stable color graphs",
         [IsColorGraph and IsJStableColorGraph and IsWellFibredRainbow],
 function(cgr)
@@ -148,14 +137,14 @@ function(cgr)
               square:=ListWithIdenticalEntries(RankOfColorGraph(cgr),2*OrderOfColorGraph(cgr)),
               fullrows:=[],
               fullcols:=[]);
-    return Objectify(NewType(PartialHadamardSetsFamily(cgr), 
-           IsPartialHadamardSet and IsPartialHadamardSetBlkRep), cand);
+    return Objectify(NewType(PartialCHadamardSetsFamily(cgr), 
+           IsPartialCHadamardSet and IsPartialCHadamardSetBlkRep), cand);
 end);
 
 
 InstallMethod(IsCompletePartialStableSet,
-    "for partial Hadamard sets in PartialHadamardSetBlkRep",
-    [IsPartialHadamardSet and IsPartialHadamardSetBlkRep],
+    "for partial CHadamard sets in PartialCHadamardSetBlkRep",
+    [IsPartialCHadamardSet and IsPartialCHadamardSetBlkRep],
 function(cand)
     local a,b,block;
     
@@ -215,8 +204,8 @@ end;
 
     
 InstallMethod(ExtendedPartialStableSet,
-"for partial Hadamard sets in PartialarcHadamardSetBlkRep",
-[IsPartialHadamardSet and IsPartialHadamardSetBlkRep, IsPosInt],
+"for partial CHadamard sets in PartialarcCHadamardSetBlkRep",
+[IsPartialCHadamardSet and IsPartialCHadamardSetBlkRep, IsPosInt],
 function(cand,pt)
     local  cgr, t, npgs, color, sb, fb, sblk, 
            a, b, block, sd, icolor, md, 
@@ -520,40 +509,40 @@ function(cand,pt)
     fi;
     
     
-    Objectify(NewType(PartialHadamardSetsFamily(cgr), IsPartialHadamardSet and IsPartialHadamardSetBlkRep), npgs);
+    Objectify(NewType(PartialCHadamardSetsFamily(cgr), IsPartialCHadamardSet and IsPartialCHadamardSetBlkRep), npgs);
     return npgs;
 end);
 
-InstallMethod(PartialHadamardSetOrbitsFamilyOp,
+InstallMethod(PartialCHadamardSetOrbitsFamilyOp,
         "for a color graph  and a permutation group",
         [IsColorGraph, IsPermGroup],
 function(cgr,g)
-    return NewFamily("PartialHadamardSetOrbitsFam", IsPartialStableSetOrbit);
+    return NewFamily("PartialCHadamardSetOrbitsFam", IsPartialStableSetOrbit);
 end);
 
 InstallMethod(GetPartialStableSetOrbitFamily,
-"for partial Hadamard sets in PartialHadamardSetRep and a permutation group",
-[IsPartialHadamardSet and IsPartialHadamardSetRep, IsPermGroup],
+"for partial CHadamard sets in PartialCHadamardSetRep and a permutation group",
+[IsPartialCHadamardSet and IsPartialCHadamardSetRep, IsPermGroup],
 function(prset,grp)  
-    return PartialHadamardSetOrbitsFamily(prset!.cgr,grp);
+    return PartialCHadamardSetOrbitsFamily(prset!.cgr,grp);
 end);
 
 InstallMethod( ViewString,
-        "for partial Hadamard sets in PartialHadamardSetRep",
-        [IsPartialHadamardSet and IsPartialHadamardSetRep],
+        "for partial CHadamard sets in PartialCHadamardSetRep",
+        [IsPartialCHadamardSet and IsPartialCHadamardSetRep],
 function(prs)
     local cgr,s;
     
     cgr:=prs!.cgr;
     s:=prs!.set;
 
-    return Concatenation("<partial Hadamard set ", String(s), ">");
+    return Concatenation("<partial CHadamard set ", String(s), ">");
 end);
 
 
 InstallMethod(ConstructorOfStableSetOrbit,
-        "for all Hadamard sets",
-        [IsHadamardSet],
+        "for all CHadamard sets",
+        [IsCHadamardSet],
 function(orb)
-    return HadamardSetOrbit;
+    return CHadamardSetOrbit;
 end);

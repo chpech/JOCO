@@ -9,11 +9,12 @@
 #############################################################################
 
 
-DeclareCategory( "IsPartialJordanFusion", IsCocoPartialStablePartition );
+DeclareCategory( "IsPartialJordanFusion", IsPartialColorPartition );
 DeclareAttribute( "PartialJordanFusionsFamily", IsColorGraph );
 KeyDependentOperation( "PartialJordanFusionOrbitsFamily", IsColorGraph, IsPermGroup, ReturnTrue );
 
 DeclareOperation( "EmptyPartialJordanFusion", [IsColorGraph,IsInt] );
-DeclareGlobalFunction( "JRefinedPartition" );     # undocumented
+
+DeclareGlobalFunction("PartialJordanFusion");
 
 

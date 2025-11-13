@@ -1,9 +1,9 @@
-DeclareCategory( "IsPartialHadamardSet", IsCocoPartialStableSet );
-DeclareOperation( "EmptyPartialHadamardSet", [IsColorGraph] );
+DeclareCategory( "IsPartialCHadamardSet", IsCocoPartialStableSet );
+DeclareOperation( "EmptyPartialCHadamardSet", [IsColorGraph] );
 
-DeclareAttribute( "PartialHadamardSetsFamily",  IsColorGraph );
+DeclareAttribute( "PartialCHadamardSetsFamily",  IsColorGraph );
 
 
 
-KeyDependentOperation( "PartialHadamardSetOrbitsFamily", IsColorGraph, IsPermGroup, ReturnTrue );;
+KeyDependentOperation( "PartialCHadamardSetOrbitsFamily", IsColorGraph, IsPermGroup, ReturnTrue );;
 

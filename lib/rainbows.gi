@@ -139,7 +139,11 @@ InstallTrueMethod(IsRegularColorGraph, IsJStableColorGraph and IsUndirectedColor
 InstallTrueMethod(IsHomogeneous, IsRainbow and IsRegularColorGraph);
 InstallTrueMethod(IsWellFibredRainbow, IsWLStableColorGraph);
 InstallTrueMethod(IsWellFibredRainbow, IsJStableColorGraph and IsRegularColorGraph);
+InstallTrueMethod(IsWellFibredRainbow, IsRainbow and IsRegularColorGraph);
 
+
+#InstallTrueMethod(IsJStableColorGraph, IsColorGraph and IsSchurianCCRep);
+InstallTrueMethod(IsJStableColorGraph, IsColorGraph and IsWLStableColorGraph);
                  
                  
 InstallOtherMethod(ColorMates,
@@ -178,13 +182,15 @@ InstallOtherMethod(ColorGraphByFusion,
 function(cgr,fusion)
     local res;
 
-    if not IsIdenticalObj(RegularFusionsFamily(cgr), FamilyObj(fusion)) then
+    if not IsIdenticalObj(ColorPartitionsFamily(cgr), FamilyObj(fusion)) then
         Error("The given fusion must belong to the given color graph!");
     fi;
     res:= ColorGraphByFusion(cgr, PartitionOfFusion(fusion));
     SetIsRainbow(res,true);
     SetIsHomogeneous(res,true);
     SetIsStableRainbow(res,true);
+    SetIsRegularColorGraph(res,true);
+    
     
     return res;
 end);
@@ -236,8 +242,6 @@ function(cgr)
 end);
 
 
-#InstallTrueMethod(IsJStableColorGraph, IsColorGraph and IsSchurianCCRep);
-InstallTrueMethod(IsJStableColorGraph, IsColorGraph and IsWLStableColorGraph);
 
 
 
@@ -679,7 +683,7 @@ function(node)
     cgr:=node!.cgr;
     
     if not IsRainbow(cgr) then  
-        ErrorNoReturn("RegisterStandardInfoRainbow@COCO2P(node): node!.cgr must be a rainbow!");
+        ErrorNoReturn("RegisterStandardInfoRainbow@JOCO(node): node!.cgr must be a rainbow!");
     fi;
             
     identification:=ValueOption("identification");

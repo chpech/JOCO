@@ -45,7 +45,7 @@ function(x)
     return Concatenation("<", "JArcRegularSet: ", String(AsSet(x)), ">");
 end);
 
-InstallMethod(HomogeneousSymJArcRegularSetOrbits,
+InstallMethod(SymmetricJArcRegularSetOrbits,
 "for a J-stable color graph",
 [IsColorGraph and IsJStableColorGraph],
 function(cgr)
@@ -61,7 +61,7 @@ function(cgr)
     
 end);
 
-InstallOtherMethod(HomogeneousSymJArcRegularSetOrbits,
+InstallOtherMethod(SymmetricJArcRegularSetOrbits,
 "for a J-stable color graph and a permutation group",
 [IsColorGraph and IsJStableColorGraph, IsPermGroup],
 function(cgr,g)
@@ -74,7 +74,7 @@ function(cgr,g)
     
 end);
 
-InstallMethod(HomogeneousAsymJArcRegularSetOrbits,
+InstallMethod(AsymmetricJArcRegularSetOrbits,
 "for a J-stable color graph",
 [IsColorGraph and IsJStableColorGraph],
 function(cgr)
@@ -90,7 +90,7 @@ function(cgr)
     
 end);
 
-InstallOtherMethod(HomogeneousAsymJArcRegularSetOrbits,
+InstallOtherMethod(AsymmetricJArcRegularSetOrbits,
 "for a J-stable color graph and a permutation group",
 [IsColorGraph and IsJStableColorGraph, IsPermGroup],
 function(cgr,g)
@@ -101,7 +101,7 @@ function(cgr,g)
     return AllStableSetOrbits(iter);
 end);
 
-InstallMethod(HomogeneousJArcRegularSetOrbits,
+InstallMethod(JArcRegularSetOrbits,
 "for a J-stable color graph",
 [IsColorGraph and IsJStableColorGraph],
 function(cgr)
@@ -116,9 +116,9 @@ function(cgr)
     # if prim=fail then
     #     prim:=false;
     # fi;
-    lgs:=Set(HomogeneousSymJArcRegularSetOrbits(cgr));
+    lgs:=Set(SymmetricJArcRegularSetOrbits(cgr));
     if not sym then
-        lgs:=Union(lgs, HomogeneousAsymJArcRegularSetOrbits(cgr));
+        lgs:=Union(lgs, AsymmetricJArcRegularSetOrbits(cgr));
     fi;
     # if prim then
     #     lgs:=Filtered(lgs, x->ClosureSet(tensor, AsSet(Representative(x)))=[1..OrderOfTensor(tensor)]);
@@ -127,7 +127,7 @@ function(cgr)
     return lgs;
 end);
 
-InstallOtherMethod(HomogeneousJArcRegularSetOrbits,
+InstallOtherMethod(JArcRegularSetOrbits,
 "for a J-stable color graph and a permutation group",
 [IsColorGraph and IsJStableColorGraph, IsPermGroup],
 function(cgr,g)
@@ -142,9 +142,9 @@ function(cgr,g)
     # if prim=fail then
     #     prim:=false;
     # fi;
-    lgs:=Set(HomogeneousSymJArcRegularSetOrbits(cgr,g));
+    lgs:=Set(SymmetricJArcRegularSetOrbits(cgr,g));
     if not sym then
-        lgs:=Union(lgs, HomogeneousAsymJArcRegularSetOrbits(cgr,g));
+        lgs:=Union(lgs, AsymmetricJArcRegularSetOrbits(cgr,g));
     fi;
     # if prim then
     #     lgs:=Filtered(lgs, x->ClosureSet(tensor, AsSet(Representative(x)))=[1..OrderOfTensor(tensor)]);

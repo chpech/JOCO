@@ -34,6 +34,9 @@
 #! The efficiency of this aproach depends strongly on the clever choice of $F'$
 #! Generally, the smaller is $F'$, the more efficient the approach becomes.
 
+
+#! @Section Properties
+
 #! @Description
 #! The abstract data type of stable sets. Other types like `IsColorSet` are derived from this type.
 DeclareCategory("IsCocoStableSet", IsObject );
@@ -51,6 +54,13 @@ DeclareOperation( "IsEmptyPartialStableSet", [IsCocoPartialStableSet] );
 
 
 #! @Description
+#! Returns `true` if the partial stable set <A>pgs</A> is complete, `false` otherwise.
+#! @Arguments pgs
+DeclareProperty( "IsCompletePartialStableSet", IsCocoPartialStableSet );
+
+#! @Section Functions for the inspection of partial stable sets
+
+#! @Description
 #! Returns the ordered partition $(M_1,\dots,M_k)$ for the type of partial stable sets that 
 #! <A>pgs</A> belongs to (see above...).
 #! @Arguments pgs
@@ -62,12 +72,8 @@ DeclareOperation( "IMapOfPartialStableSet", [IsCocoPartialStableSet] );
 #! @Arguments pgs
 DeclareOperation( "DomainOfPartialStableSet", [IsCocoPartialStableSet] );                            # internal
 
-#! @Description
-#! Returns `true` if the partial stable set <A>pgs</A> is complete, `false` otherwise.
-#! @Arguments pgs
-DeclareProperty( "IsCompletePartialStableSet", IsCocoPartialStableSet );
 
-
+#! @Section Constructors
 
 #! @Description
 #! `ExtendedPartialStableSet` extends the partial stable set <A>pgs</A> by one point from its domain.
@@ -80,8 +86,8 @@ DeclareProperty( "IsCompletePartialStableSet", IsCocoPartialStableSet );
 DeclareOperation( "ExtendedPartialStableSet", [IsCocoPartialStableSet, IsPosInt] );                  # internal
 
 
-#! @Description This operation translates from a datatype of partial stable sets to 
-#! the corresponding datatype of stable sets. Its input is a complete partial stable 
+#! @Description This operation translates from the data type of partial stable sets to 
+#! the corresponding data type of stable sets. Its input is a complete partial stable 
 #! set <A>pgs</A>. Its output is the corresponding stable set. 
 #! @Arguments pgs
 DeclareOperation( "StableSetFromPartialStableSet", [IsCocoPartialStableSet] );
@@ -96,7 +102,7 @@ DeclareGlobalName( "nonextensible" );
 #! @SectionTitle Orbits of (partial) stable sets 
 
 #! @Description
-#! The abstract data type of orbits of partial stable set orbits
+#! The abstract data type of orbits of partial stable sets
 DeclareCategory( "IsPartialStableSetOrbit", IsCocoOrbit );
 
 #! @Description 
@@ -136,7 +142,7 @@ DeclareCategory( "IsIteratorOfPartialStableSetOrbits", IsIterator );
 #! This operation gets as input a permutation group <A>G</A> and an empty partial stable set 
 #! <A>pgs</A> of some kind. It returns an iterator of all <A>G</A>-orbits of partial stable sets
 #! of this type. The group <A>G</A> needs to preserve the partition $\{M_1,\dots,M_k\}$ 
-#! (in action OnSetsSets) corresponding  to the kindtype  of partial stable sets that 
+#! (in action OnSetsSets) corresponding  to the type  of partial stable sets that 
 #! <A>pgs</A> belongs to (see above...). 
 #! @Arguments G,pgs
 DeclareOperation( "IteratorOfPartialStableSetOrbits", [IsPermGroup, IsCocoPartialStableSet] );                     # internal

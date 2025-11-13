@@ -45,17 +45,51 @@ DeclareOperation( "OnRegularSets", [IsRegularSet, IsPerm] );
 
 #! @Section Orbits of regular sets
 
+#! @Description
+#! The type of orbits of regular sets. This is derived from `IsCocoSetOrbit`.
 DeclareCategory( "IsRegularSetOrbit", IsCocoSetOrbit );
 
+#! @Description
+#! The families of orbits of regular sets for the color graph <A>cgr</A>. For every permutation 
+#! group <A>G</A> another family is created.
+#! @Arguments cgr,G
 KeyDependentOperation( "RegularSetOrbitsFamily", IsColorGraph, IsPermGroup, ReturnTrue );
 
-
+#! @BeginGroup constructurs
+#! @Description
+#! `RegularSetOrbitNC` expects as input a permutation group <A>group</A>, a reglar set <A>gs</A>,
+#! and a subgroup <A>stab</A> of <A>group</A>. It expects
+#! * <A>group</A> to be a subgroup of `RAut(UnderlyingCgrOfColorSet(gs))`,
+#! * `AsSet(gs)` be the smallest element of its orbit under <A>group</A> (in action `OnSets`),
+#! * <A>stab</A> to be the set-wise stabilizer of `AsSet(gs)` in <A>group</A>.
+#! None of this is checked. The function returns an object representing the orbit of <A>gs</A> 
+#! under <A>group</A> with respect to the action `OnRegularSets`.
+#!
+#! `RegularSetOrbit gets the same kind of input like `RegularSetOrbitNC. However, its expectations
+#! on this input are weaker. It expects:
+#! * <A>group</A> to be a subgroup of `RAut(UnderlyingCgrOfColorSet(gs))`,
+#! * <A>stab</A> to be a subgroup of the set-wise stabilizer of `AsSet(gs)` in <A>group</A>.
+#! These two expectations are not checked either. Otherwise it does the same like 
+#! `RegularSetOrbitNC`.
+#! @Arguments group,gs[,stab]
 DeclareGlobalFunction( "RegularSetOrbit" );   
+#! @Arguments group,gs[,stab]
 DeclareGlobalFunction( "RegularSetOrbitNC" );  
+#! @EndGroup
 
 
-DeclareOperation( "HomogeneousRegularSetOrbits", [IsColorGraph and IsRainbow and IsStableRainbow] );
+#! @BeginGroup RegularSetOrbits
+#! @Description
+#! Computes all orbits of regular sets of <A>cgr</A> under <A>grp</A>. The group
+#! <A>grp</A> is expected to be a subgroup of `RAut(cgr)`. If <A>grp</A> is not given, then 
+#! it is taken to be equal to `RAut(cgr)`. If the option `:sym` is given, then only 
+#! symmetric regular sets are computed.
+#! @Arguments cgr[,grp] :sym
+DeclareOperation( "RegularSetOrbits", [IsColorGraph and IsRainbow and IsStableRainbow] );
 
-DeclareAttribute( "HomogeneousSymRegularSetOrbits", IsColorGraph and IsRainbow and IsStableRainbow); 
+#! @Arguments cgr[,grp]
+DeclareAttribute( "SymmetricRegularSetOrbits", IsColorGraph and IsRainbow and IsStableRainbow); 
 
-DeclareAttribute( "HomogeneousAsymRegularSetOrbits", IsColorGraph and IsRainbow and IsStableRainbow ); 
+#! @Arguments cgr[,grp]
+DeclareAttribute( "AsymmetricRegularSetOrbits", IsColorGraph and IsRainbow and IsStableRainbow ); 
+#! @EndGroup

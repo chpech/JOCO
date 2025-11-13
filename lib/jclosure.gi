@@ -1,31 +1,13 @@
 #############################################################################
 ##
-##  jclosure.g4                  COCO package
+##  jclosure.g4                  JOCO package
 ##                                                              Mikhail Klin
 ##                                                            Christian Pech
-##                                                             Sven Reichard
 ##
-##  Implementation of the Jstabilisation that works inside
-##  a given coherent configuration
+##  Implementation of the Jordan stabilisation that works inside
+##  a given J-stable color graph
 ##
 #############################################################################
-
-
-# a partition is a record:
-#rec(
-#    fixed=[],              # list of colors not allowed to split during stabilization
-#    variable=[],           # list of colors allowd to split during stabilization
-#    classes=[],            # ordered partition of colors of the underlying CC
-#                           # numbers in fixed and variable refer to indices into this list
-#    instabil=FiFoNew(),
-#    instabilFlags=[],
-#    totest==FiFoNew(),
-#    totestFlags=[],
-#    colorNames,
-#    numberClasses
-#    );
-
-
 
 InstallGlobalFunction(JRepartition,
 function(T, part, u,v,min)
@@ -135,17 +117,17 @@ function(arg)
 end);
 
 
-InstallGlobalFunction(IsJStablePartition,
-function(T,p)
-    local part;
+# InstallGlobalFunction(IsJStablePartition,
+# function(T,p)
+#     local part;
 
-    part:=WLBuildFixedPartition(p);
-    if JStabil(T,part)<>fail then
-        return true;
-    else
-        return false;
-    fi;
-end);
+#     part:=WLBuildFixedPartition(p);
+#     if JStabil(T,part)<>fail then
+#         return true;
+#     else
+#         return false;
+#     fi;
+# end);
 
 
 

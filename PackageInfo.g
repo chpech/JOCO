@@ -41,7 +41,7 @@ Subtitle := "Computations in Jordan Configurations",
 Version := "0.1",
 ##  Release date of the current version in dd/mm/yyyy format.
 ##
-Date := "04/10/2025",
+Date := "10/11/2025",
 License := "GPL-3.0",
 ##  Optional: if the package manual uses GAPDoc, you may duplicate the
 ##  version and the release date as shown below to read them while building
@@ -245,9 +245,12 @@ PackageDoc := rec(
 AutoDoc := rec(
     entities := rec(
         VERSION := ~.Version,
-        DATE := ~.Date,
-        COCO := "<Package>coco2p</Package>",
-	JOCO := "<Package>joco</Package>",
+        DATE   := ~.Date,
+        COCO   := "<Package>coco2p</Package>",
+	JOCO   := "<Package>joco</Package>",
+	XGAP   := "<Package>xgap</Package>",
+	GAPAPP := "<Package>gap.app</Package>",
+        FRANCY := "<Package>francy</Package>",
     ),
 ),
 

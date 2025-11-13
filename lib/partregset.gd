@@ -18,7 +18,7 @@ DeclareCategory( "IsSymPartialRegularSet",  IsPartialRegularSet );
 #! @Section Constructors
 
 #! @Description
-#! This function createsreturns an empty asymmetric partial regular set of the color graph <A>cgr</A>.
+#! This function creates an empty asymmetric partial regular set of the color graph <A>cgr</A>.
 #! It this point &JOCO; implements asymmetric partial regular sets only for well-fibred rainbows 
 #! (see Chapter <Ref Sect='Chapter_Rainbows'/>).
 #! @Arguments cgr

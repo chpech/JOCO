@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  wlordanfus.gi                  JOCO package
+##  wlfusion.gi                  JOCO package
 ##                                                              Mikhail Klin
 ##                                                            Christian Pech
 ##
@@ -9,33 +9,73 @@
 #############################################################################
 
 
-InstallMethod( WLFusionsFamily,
-"for a color graph",
-[IsColorGraph],
-function(cgr)
-   local fam;
-   fam:=NewFamily("WLFusionsFam", IsWLFusion);
-   return fam;
+# InstallMethod( WLFusionsFamily,
+# "for a color graph",
+# [IsColorGraph],
+# function(cgr)
+#    local fam;
+#    fam:=NewFamily("WLFusionsFam", IsWLFusion);
+#    return fam;
+# end);
+
+InstallMethod(ColorPartition,
+"for WL-fusions",
+[ IsColorPartition and IsWLFusion, IsColorGraph, IsList ],
+function(filter, cgr, set)
+   local res;
+
+    res:=ColorPartition(IsColorPartition, cgr,set);
+    SetIsWLFusion(res,true);
+
+    return res;
+
+end);
+
+InstallMethod(OnColorPartitions,
+"for a WL-fusion and a permutation",
+[IsColorPartition and IsWLFusion, IsPerm],
+function(cpart, g)
+    local res;
+    
+    return ColorPartition(IsColorPartition and IsWLFusion, 
+                          UnderlyingCgrOfColorPartition(cpart),
+                          OnTuplesSets(UnderlyingPartitionOfColorPartition(cpart), g));
 end);
 
 InstallMethod( StablePartitionFromCompletePartialStablePartition,
 "for a partial WL-stable fusion in PartialWLFusionRep",
-[IsPartialWLFusion and IsPartialWLFusionRep],
+[IsPartialWLFusion and IsPartialColorPartitionRep],
 function(cpfus)
-    local obj;
+#    local obj;
     
     #   Assert(1, OnSetsSets(Set(cpfus!.part.classes),Mates(cpfus!.tensor))=Set(cpfus!.part.classes));
-    obj:=rec(
-   	      cgr := cpfus!.cgr,
-   	      partition := Immutable(ShortLexSorted(cpfus!.part.classes)));
-    return Objectify(NewType(WLFusionsFamily(cpfus!.cgr), IsWLFusion and IsColorPartitionRep), obj);
+    return ColorPartition(IsColorPartition and IsWLFusion, cpfus!.cgr, cpfus!.part.classes);
+    # obj:=rec(
+    #           cgr := cpfus!.cgr,
+    #           partition := Immutable(ShortLexSorted(cpfus!.part.classes)));
+    # return Objectify(NewType(WLFusionsFamily(cpfus!.cgr), IsWLFusion and IsColorPartitionRep), obj);
 end);
 
 InstallMethod(ViewString,
 "for a WL-stable fusion",
-[IsWLFusion],
+[IsColorPartition and IsWLFusion],
 function(x)
     return Concatenation("<WL-stable fusion of order ", String(Order(x)), " and rank ", String(Rank(x)), ">");
+end);
+
+InstallMethod(FusionColorGraph,
+"for WL-fusions",              
+[IsColorPartition and IsWLFusion],
+function(rfus)
+    local cgr;
+    
+    cgr:=ColorGraphByFusion(UnderlyingCgrOfColorPartition(rfus),
+                            UnderlyingPartitionOfColorPartition(rfus));
+    SetIsRainbow(cgr,true);
+    SetIsRegularColorGraph(cgr,true);
+    SetIsWLStableColorGraph(cgr,true);
+    
+    return cgr;
 end);
 
 InstallOtherMethod(HomogeneousWLFusionOrbits,
@@ -73,18 +113,18 @@ function(cgr,gsorbits)
 end);
 
 # <g> must be from AAut(<fusion!.cgr>)
-InstallMethod(OnWLFusions,
-"for a WL-stable fusion in ColorPartitionRep and a permutation",
-[IsWLFusion and IsColorPartitionRep, IsPerm],
-function(fusion, g)
-    local res;
-    res:=rec(
-             cgr:=fusion!.cgr,
-             partition:=MakeImmutable(ShortLexSorted(OnSetsSets(Set(fusion!.partition),g)))
-    );
+# InstallMethod(OnWLFusions,
+# "for a WL-stable fusion in ColorPartitionRep and a permutation",
+# [IsWLFusion and IsColorPartitionRep, IsPerm],
+# function(fusion, g)
+#     local res;
+#     res:=rec(
+#              cgr:=fusion!.cgr,
+#              partition:=MakeImmutable(ShortLexSorted(OnSetsSets(Set(fusion!.partition),g)))
+#     );
 
-    return Objectify(NewType(WLFusionsFamily(fusion!.cgr), IsWLFusion and IsColorPartitionRep), res);
-end);
+#     return Objectify(NewType(WLFusionsFamily(fusion!.cgr), IsWLFusion and IsColorPartitionRep), res);
+# end);
 
 InstallMethod(HomogeneousWLFusionOrbits,
 "for a WL-stable color graph",
@@ -109,16 +149,16 @@ function(cgr,grp)
 end);
 
 
-InstallMethod(ConstructorOfStablePartitionOrbit,
-"for a WL-stable fusion",
-[IsWLFusion],
-function(rfus)
-    return RegularFusionOrbit;
-end);
+# InstallMethod(ConstructorOfStablePartitionOrbit,
+# "for a WL-stable fusion",
+# [IsWLFusion],
+# function(rfus)
+#     return RegularFusionOrbit;
+# end);
 
-InstallMethod(ConstructorOfStablePartitionOrbitNC,
-"for a WL-stable fusion",
-[IsWLFusion],
-function(rfus)
-    return RegularFusionOrbitNC;
-end);
+# InstallMethod(ConstructorOfStablePartitionOrbitNC,
+# "for a WL-stable fusion",
+# [IsWLFusion],
+# function(rfus)
+#     return RegularFusionOrbitNC;
+# end);

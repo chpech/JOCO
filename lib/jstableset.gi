@@ -1,3 +1,4 @@
+#! @DoNotReadRestOfFile
 InstallMethod(RegularSet,
 "for J-stable sets",
 [ IsRegularSet and IsJStableSet, IsColorGraph, IsList ],
@@ -70,8 +71,8 @@ function(cgr)
     
     t:=JStructureConstantsOfColorGraph(cgr);
     
-    if HasHomogeneousSymJArcRegularSetOrbits(cgr) then
-        return Filtered(HomogeneousSymJArcRegularSetOrbits(cgr), x->IsJStableSet(Representative(x)));
+    if HasSymmetricJArcRegularSetOrbits(cgr) then
+        return Filtered(SymmetricJArcRegularSetOrbits(cgr), x->IsJStableSet(Representative(x)));
     else
         iter:=IteratorOfPartialStableSetOrbits(g, EmptySymPartialJArcRegularSet(cgr));
     fi;
@@ -108,7 +109,7 @@ function(cgr)
         fi;
     od;
     Info(InfoJOCO,1,"\nDone computing orbits of symmetric J-stable sets.\n");
-    SetHomogeneousSymJArcRegularSetOrbits(cgr,symarsets);
+    SetSymmetricJArcRegularSetOrbits(cgr,symarsets);
     
     return res;
 end);
@@ -124,8 +125,8 @@ function(cgr)
     
     t:=JStructureConstantsOfColorGraph(cgr);
     
-    if HasHomogeneousAsymJArcRegularSetOrbits(cgr) then
-        return Filtered(HomogeneousAsymJArcRegularSetOrbits(cgr), x->IsJStableSet(Representative(x)));
+    if HasAsymmetricJArcRegularSetOrbits(cgr) then
+        return Filtered(AsymmetricJArcRegularSetOrbits(cgr), x->IsJStableSet(Representative(x)));
     else
         iter:=IteratorOfPartialStableSetOrbits(g, EmptyAsymPartialJArcRegularSet(cgr));
     fi;
@@ -161,7 +162,7 @@ function(cgr)
         fi;
     od;
     Info(InfoJOCO,1,"\nDone computing orbits of asymmetric J-stable sets.\n");
-    SetHomogeneousAsymJArcRegularSetOrbits(cgr,asymarsets);
+    SetAsymmetricJArcRegularSetOrbits(cgr,asymarsets);
     
     return res;
 end);

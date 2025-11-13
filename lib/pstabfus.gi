@@ -10,6 +10,8 @@ function(cand)
 end);
 
 
+
+
 ##############################################################################
 #
 #  orbits of partial stable partition 

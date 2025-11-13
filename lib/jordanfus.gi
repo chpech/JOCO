@@ -9,31 +9,47 @@
 #############################################################################
 
 
-InstallMethod(JordanFusionsFamily,
-"for a color graph",
-[IsColorGraph],
-function(cgr)
-   local fam;
-   fam:=NewFamily("JordanFusionsFam", IsJordanFusion);
-   return fam;
+
+InstallMethod(ColorPartition,
+"for Jordan fusions",
+[ IsColorPartition and IsJordanFusion, IsColorGraph, IsList ],
+function(filter, cgr, cpart)
+   local res;
+
+    res:=ColorPartition(IsColorPartition, cgr,cpart);
+    SetIsJordanFusion(res,true);
+
+    return res;
+
 end);
 
-InstallMethod(  StablePartitionFromCompletePartialStablePartition,
+InstallMethod(OnColorPartitions,
+"for a Jordan fusion and a permutation",
+[IsColorPartition and IsJordanFusion, IsPerm],
+function(cpart, g)
+    local res;
+    
+    return ColorPartition(IsColorPartition and IsJordanFusion, 
+                          UnderlyingCgrOfColorPartition(cpart),
+                          OnTuplesSets(UnderlyingPartitionOfColorPartition(cpart), g));
+end);
+
+
+InstallMethod( StablePartitionFromCompletePartialStablePartition,
 "for a partial Jordan fusion in PartialJordanFusionRep",
-[IsPartialJordanFusion and IsPartialJordanFusionRep],
+[IsPartialJordanFusion and IsPartialColorPartitionRep],
 function(cpfus)
     local obj;
     
     #   Assert(1, OnSetsSets(Set(cpfus!.part.classes),Mates(cpfus!.tensor))=Set(cpfus!.part.classes));
-    obj:=rec(
-   	      cgr := cpfus!.cgr,
-   	      partition := Immutable(ShortLexSorted(cpfus!.part.classes)));
-    return Objectify(NewType(JordanFusionsFamily(cpfus!.cgr), IsJordanFusion and IsColorPartitionRep), obj);
+    
+    return ColorPartition(IsColorPartition and IsJordanFusion, cpfus!.cgr,
+   	      cpfus!.part.classes);
 end);
 
 InstallMethod(ViewString,
 "for a Jordan fusion",
-[IsJordanFusion],
+[IsColorPartition and IsJordanFusion],
 function(x)
     return Concatenation("<Jordan fusion of order ", String(Order(x)), " and rank ", String(Rank(x)), ">");
 end);
@@ -72,19 +88,6 @@ function(cgr,gsorbits)
     
 end);
 
-# <g> must be from JAut(<fusion!.cgr>)
-InstallMethod(OnJordanFusions,
-"for a Jordan fusion in ColorPartitionRep and a permutation",
-[IsJordanFusion and IsColorPartitionRep, IsPerm],
-function(fusion, g)
-    local res;
-    res:=rec(
-             cgr:=fusion!.cgr,
-             partition:=MakeImmutable(ShortLexSorted(OnSetsSets(Set(fusion!.partition),g)))
-    );
-
-    return Objectify(NewType(JordanFusionsFamily(fusion!.cgr), IsJordanFusion and IsColorPartitionRep), res);
-end);
 
 InstallMethod(HomogeneousJordanFusionOrbits,
 "for a J-stable color graph",
@@ -109,8 +112,8 @@ function(cgr,grp)
 end);
 
 InstallGlobalFunction(PosetOfFusionOrbits,
-function(cgr,lforb)
-    local  order, linorder, runtime, tstart, tensor, aaut, caut, 
+function(lforb)
+    local  cgr, order, linorder, runtime, tstart, tensor, aaut, caut, 
            aautfusorbs, cautfusorbs, ltwins, algebraicFusions, i, 
            suborbs, twins, forb, mrg, part, isAlgFus, j, poset, rt;
     
@@ -132,14 +135,16 @@ function(cgr,lforb)
         return fail;
     fi;
     
-    if not ForAll(lforb, IsRegularFusionOrbit) then
-        ErrorNoReturn("PosetOfFusionOrbits: expecting a list of regular fusion orbits");
+    
+    if not ForAll(lforb, IsColorPartitionOrbit) then
+        ErrorNoReturn("PosetOfFusionOrbits: expecting a list of color partition orbits");
     fi;
     
     if not ForAll(lforb, forb->IsIdenticalObj(FamilyObj(forb),FamilyObj(lforb[1]))) then
         ErrorNoReturn("PosetOfFusionOrbits: fusion orbits are incompatible");
     fi;
     
+    cgr:=UnderlyingCgrOfColorPartition(Representative(lforb[1]));
     if not IsIdenticalObj(cgr,UnderlyingCgrOfColorPartition(Representative(lforb[1]))) then
         ErrorNoReturn("PosetOfFusionOrbits: fusion orbits are incompatible");
     fi;
@@ -179,7 +184,9 @@ function(cgr,lforb)
         ErrorNoReturn("PosetOfFusionOrbits: Underlying group of fusion orbits is incompatible!");
     fi;
     if UnderlyingGroupOfCocoOrbit(lforb[1])<>aaut then # if it is a proper subgroup of aaut
+        Info(InfoJOCO,1,"rebasing orbits...\n");
         aautfusorbs:=Set(lforb, x->ConstructorOfCocoOrbit(x)(aaut,Representative(x)));
+        Info(InfoJOCO,1,"done.\n");
     else
         aautfusorbs:=Set(lforb);
     fi;
@@ -215,7 +222,8 @@ function(cgr,lforb)
     poset!.algTwins:=Immutable(List(poset!.elements, x->List(ltwins[x],y->Position(poset!.elements,y))));
     poset!.algebraicFusions:=Immutable(Filtered([1..Length(poset!.elements)], i->poset!.elements[i] in algebraicFusions));
     poset!.elements:=Immutable(List(poset!.elements, i->cautfusorbs[i]));
-    poset!.colorGraphs:=Immutable(List(poset!.elements, forb->ColorGraphByFusion(cgr, CanonicalRepresentativeOfCocoOrbit(forb))));
+    poset!.colorGraphs:=Immutable(List(poset!.elements, 
+                       forb->FusionColorGraph(CanonicalRepresentativeOfCocoOrbit(forb))));
     poset!.cgr:=cgr;
     
     
@@ -234,8 +242,8 @@ end);
 
 
 InstallOtherMethod(DisplayString,
-                   "for posets of fusion orbits",
-                   [IsPosetOfFusionOrbits and IsPosetOfFusionOrbitsRep, IsList],10,
+"for posets of fusion orbits",
+[IsPosetOfFusionOrbits and IsPosetOfFusionOrbitsRep, IsList],10,
 function(pos, indices)
     local  MapRepsPoset, jstable, wlstable, filt, proper, nonsch, long, 
            schfiss, fvc, onlyfvc, cisomap, date, runtime, strucexp, i, 
@@ -841,16 +849,3 @@ function(pos, indices)
 end);
 
 
-InstallMethod(ConstructorOfStablePartitionOrbit,
-"for a Jordan fusion",
-[IsJordanFusion],
-function(rfus)
-    return RegularFusionOrbit;
-end);
-
-InstallMethod(ConstructorOfStablePartitionOrbitNC,
-"for a Jordan fusion",
-[IsJordanFusion],
-function(rfus)
-    return RegularFusionOrbitNC;
-end);

@@ -1,10 +1,9 @@
+#! @DoNotReadRestOfFile
 DeclareRepresentation("IsColorSetRep",
         IsAttributeStoringRep,
         [ "cgr",                # the color graph over which the set "lives"
           "set"                 # a set of colors of <cgr>
         ]);
-
-
 
 
 InstallMethod(UnderlyingCgrOfColorSet,
@@ -64,9 +63,20 @@ function(x)
 end);
 
 
-InstallMethod(IsXHadamard,
+InstallMethod(IsHadamardSet,
 "for a color set",
 [IsColorSet],
 function(scs)
+    local  cgr, A, n, I, AA;
+    cgr:=UnderlyingCgrOfColorSet(scs);
+    A:=AdjacencyMatrix(cgr, AsSet(scs));
+    n:=Length(A);
+    A:=1-2*A;
     
+    AA:=A*TransposedMat(A);
+    if ForAll([1..Length(A)], i->AA[i][i]=n) and 
+       ForAll(Arrangements([1..n],2), p->AA[p[1]][p[2]] = 0) then
+        return true;
+    fi;
+    return false;
 end);
