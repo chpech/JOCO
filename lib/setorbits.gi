@@ -88,7 +88,7 @@ InstallMethod(IteratorOfSetOrbits,
     "for a permutation group, a positive integer, and a set of positive integers",
     [IsPermGroup, IsList, IsList],
 function(grp, domain, sizes)
-    local S,SM,state,act;
+    local S,SM,state,act,obj;
         
     
     if ForAny(GeneratorsOfGroup(grp), g->OnSets(domain,g)<>domain) then
@@ -108,12 +108,17 @@ function(grp, domain, sizes)
                 linkback:=fail
                );
     
-    return Objectify(NewType(SetOrbitIteratorsFamily,
-                   IsIteratorOfSetOrbits and IsSetOrbitIterRep and IsMutable),
-                     rec(G:=grp,
-                         domain:=domain,
-                         sizes:=Set(sizes),
-                         state:=state));
+    obj:=rec(G:=grp,
+             domain:=domain,
+             sizes:=Set(sizes),
+             state:=state);
+    
+    Objectify(NewType(SetOrbitIteratorsFamily,
+                   IsIteratorOfSetOrbits and IsSetOrbitIterRep and IsMutable),obj);
+    if not 0 in obj!.sizes then
+        NextIterator(obj);
+    fi;
+    return obj;
 end);
 
 InstallMethod( NextIterator,
@@ -164,16 +169,18 @@ function(iter)
     end;
     
     
-    while iter!.state<>fail and not Length(iter!.state.M) in iter!.sizes do
-        iter!.state:=NextState(iter!.state);
-    od;
     
     if iter!.state=fail then
         return fail;
     fi;
     
     res:=SetOrbitNC(iter!.G, iter!.state.M, StbcGroup(CopyStabChain(iter!.state.SM)));
-    iter!.state:=NextState(iter!.state);
+    #iter!.state:=NextState(iter!.state);
+    
+    repeat 
+        iter!.state:=NextState(iter!.state);
+    until iter!.state = fail or Length(iter!.state.M) in iter!.sizes;
+    
     
     return res;
 end);

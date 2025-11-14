@@ -1,7 +1,7 @@
-DeclareCategory( "IsPartitionOrbit", IsCocoPartitionOrbit );
-
 DeclareCategory( "IsCocoPartialPartition", IsObject );
 DeclareCategory( "IsPartialPartition", IsCocoPartialPartition );
+
+
 
 DeclareProperty( "IsIrredundantPartialPartition", IsCocoPartialPartition );
 DeclareProperty( "IsCompletePartialPartition", IsCocoPartialPartition );
@@ -19,7 +19,7 @@ DeclareAttribute( "RankOfPartialPartition", IsCocoPartialPartition );
 DeclareOperation( "AsSetsSet", [IsCocoPartialPartition] );
 # DeclareOperation( "DomainOfPartialPartition" ,[IsCocoPartialPartition] );
 
-
+DeclareCategory( "IsPartitionOrbit", IsCocoPartitionOrbit );
 DeclareAttribute( "PartialPartitionOrbitsFamily", IsPermGroup );
 
 DeclareAttribute( "PartitionOrbitsFamily",  IsPermGroup );

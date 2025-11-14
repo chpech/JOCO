@@ -41,11 +41,7 @@ function(pfusion,gs)
         
        return fail;
     fi;
-    #################
-    # if ForAny([1..i-1], j->Length(pfusion!.varpart[j]) <= Length(rset)) then
-    #     return fail;
-    # fi;
-    ###############3
+    
     # when new slice starts, then rset can be its first element only if it is smaller than
     # OnSets(rset, ColorMates(pfusion!.cgr))
     if Length(class) > Length(rset) and arset < rset then
@@ -124,12 +120,9 @@ function(pfusion,gs)
                   part:=npart,
                   varpart:=nvarpart,
                   maxclasssize:=pfusion!.maxclasssize);
-    # else
-    #     return fail;
     fi;
     npfusion:=ConstructorOfPartialColorPartition(pfusion)(obj);
     
-# Objectify(NewType(FamilyObj(pfusion), IsPartialColorPartition and IsPartialColorPartitionRep), obj);
     if Length(rset) < Length(class) then
         SetIsIrredundantPartialStablePartition(npfusion,true);
         SetPartialStablePartitionHasSmallerBase(npfusion,false);

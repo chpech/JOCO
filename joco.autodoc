@@ -60,5 +60,11 @@
 @Chapter pjarcregset
 @ChapterTitle Partial J-arc regular sets
 
+@Chapter pcolpart
+@ChapterTitle Partial color partitions
+
+@Chapter rpartfus
+@ChapterTitle Partial regular partitions
+
 @Chapter setorbits
 @ChapterTitle Set orbits
