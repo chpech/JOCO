@@ -25,14 +25,6 @@ function(domain)
     return ppart;
 end);
 
-# InstallMethod( DomainOfPartialPartition,
-#         "for a partial partition in PartialPartitionRep",
-#         [IsPartialPartition and IsPartialPartitionRep],
-# function(ppart)
-#     return ppart!.domain;
-# end);
-
-
 # <set> is a class to be added to ppart.
 # it must be greater than any class of <ppart> w.r.t. shortlex,
 # and it must be disjoint from any class of <ppart>.
@@ -123,20 +115,11 @@ function(ppartition, set)
     return true;
 end);
 
-
-
 InstallMethod( ViewString,
         "for a partial partition",
         [IsPartialPartition and IsPartialPartitionRep],
 function(ppartition)
     return Concatenation("<partial partition: ", String(ppartition!.ppart), ">");
-end);
-
-InstallMethod( AsSetsSet,
-        "for a partial partition in PartialPartitionRep",
-        [IsPartialPartition and IsPartialPartitionRep],
-function(ppartition)
-    return Set(ppartition!.ppart);
 end);
 
 InstallMethod( PartitionFromCompletePartialPartition,
@@ -156,11 +139,11 @@ InstallMethod(RankOfPartialPartition,
               [IsPartialPartition and IsPartialPartitionRep],
 function(ppart)
     local rnk;
-    return Length(ppart!.ppart);
-    # if ppart!.domain<>[] then
-    #     rnk:=rnk+1;
-    # fi;
-    # return rnk;
+    rnk:=Length(ppart!.ppart);
+    if ppart!.domain<>[] then
+        rnk:=rnk+1;
+    fi;
+    return rnk;
 end);
 
               
@@ -234,6 +217,13 @@ function(grp)
    return fam;
 end);
 
+InstallMethod( UnderlyingListOfSets,
+        "for a partial partition in PartialPartitionRep",
+        [IsPartialPartition and IsPartialPartitionRep],
+function(ppartition)
+    return ppartition!.ppart;
+end);
+
 
 DeclareRepresentation( "IsPPOrbitIterRep", IsComponentObjectRep, ["state"]);
 
@@ -269,7 +259,7 @@ function(domain, setorb)
         if orbitBounds<>fail then
             if not IsList(orbitBounds) or Length(orbitBounds)<> Length(setorb) 
                    or not ForAll(orbitBounds, x->IsInt(x) and x>=0) then
-                ErrorNoReturn("orbitsBound needs to be a list of non-negative integers of the same langth like <setorb>");
+                ErrorNoReturn("orbitsBound needs to be a list of non-negative integers of the same length like <setorb>");
             fi;
         else
             orbitBounds:=List(setorb, x->Length(domain));
@@ -509,45 +499,13 @@ function(iter)
                 Assert(1, not ForAny(norbits, o->IsOverlappingStabChains(Stbc(nH), o[1])));
                 
                 
-                #####################
-                # version with StabChains (problematic)
-                # Perform(norbits, function(o) 
-                #            Assert(1, IsConsistentStabChain(Stbc(nH)));
-                #            Assert(1, IsConsistentStabChain(o[1]));
-                #            Assert(1, IsReducedStabChain(o[1]));
-                #            tsto1:=CopyStabChain(o[1]);
-                #            tstnh:=CopyStabChain(Stbc(nH));
-                #            StbcAugmentByNewGenerators(tsto1,o[2]);
-                #            StbcAugmentByNewGenerators(o[1],o[2]);
-                #            Assert(1, IsConsistentStabChain(Stbc(nH)));
-                #            Assert(1, IsConsistentStabChain(o[1]));
-                #            Assert(1, IsReducedStabChain(o[1]));
-                #        end);
-                # Assert(1, IsConsistentStabChain(Stbc(nH)));
-
-                # norbits:=List(norbits, o->[o[3], 
-                #               SetOrbitNC(nH, Representative(o[3]), Group(o[1].generators,()))]);
-                #####################
-                
-                #####################
-                # alternative (works)    
                 norbits:=List(norbits, 
                               o->[o[3],SetOrbitNC(nH, Representative(o[3]), 
                                                   Group(Union(o[1].generators,o[2]),()))]);
-                #####################
                 
                 
                 Perform(norbits, function(x) x[2]!.type:=x[1]!.type;end);
                 norbits:=List(norbits, x->x[2]);
-                # test
-                
-                # norbits:=List(norbits, x->[x,SetOrbit(nH, 
-                #    CanonicalRepresentativeOfCocoOrbit(x),
-                #    ClosureGroup(StabilizerOfCanonicalRepresentative(x), 
-                #      Stabilizer(nH, AsSet(CanonicalRepresentativeOfCocoOrbit(x)),OnTuples)))]);
-                # Perform(norbits, function(x) x[2]!.type:=x[1]!.type;end);
-                # norbits:=Set(norbits, x->x[2]);
-                
                 
                 
                 nextstate:=rec( allsorb:=state.allsorb,

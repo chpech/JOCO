@@ -4,7 +4,6 @@ DeclareRepresentation( "IsPartialColorPartitionRep",
           "ppart",
           "part", 
           "varpart",
-          "maxclasssize",
         ]);
 
 
@@ -97,7 +96,7 @@ function(pfusion,gs)
                   ppart:=nppart,
                   part:=npart,
                   varpart:= pfusion!.varpart{Difference([1..Length(pfusion!.varpart)],[i])},
-                  maxclasssize:=pfusion!.maxclasssize);
+                );
     else # lif Length(gs)<Length(class) or (Length(gs)=Length(class) and AsSet(gs)<=class) then
         npart:=WLShallowCopyStablePartition(pfusion!.part);
         npart:=RefinedInternalPartition(npart,gs);
@@ -119,7 +118,7 @@ function(pfusion,gs)
                   ppart:=nppart,
                   part:=npart,
                   varpart:=nvarpart,
-                  maxclasssize:=pfusion!.maxclasssize);
+                );
     fi;
     npfusion:=ConstructorOfPartialColorPartition(pfusion)(obj);
     

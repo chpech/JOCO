@@ -20,9 +20,9 @@ end);
 
 
 InstallMethod(EmptyPartialRegularFusion,
-"for a stable rainbow and an integer and an integer",
-[IsColorGraph and IsRainbow and IsStableRainbow, IsInt],
-function(cgr,maxclasssize)
+"for a stable rainbow",
+[IsColorGraph and IsRainbow and IsStableRainbow],
+function(cgr)
     local  rclr, part, varpart, obj, prfus;
     
     rclr:=ReflexiveColors(cgr);
@@ -44,7 +44,6 @@ function(cgr,maxclasssize)
               ppart:=[],
               part:=part,
               varpart:=varpart,
-              maxclasssize:=maxclasssize
             );
     prfus:= Objectify(NewType(PartialRegularFusionsFamily(cgr), IsPartialRegularFusion and IsPartialColorPartitionRep), obj);
     SetIsIrredundantPartialStablePartition(prfus,true);

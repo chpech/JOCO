@@ -8,15 +8,6 @@
 ##
 #############################################################################
 
-# DeclareRepresentation( "IsPartialWLFusionRep",
-#          IsPartialStablePartitionRep,
-#         [ "cgr",
-#           "ppart",
-#           "part", 
-#           "varpart",
-#           "maxclasssize",
-#         ]);
-
 
 InstallMethod(PartialWLFusionsFamily,
 "for a color graph",
@@ -28,9 +19,9 @@ function(cgr)
 end);
 
 InstallMethod(EmptyPartialWLFusion,
-"for a WL-stable color graph and an integer",
-[IsColorGraph and IsWLStableColorGraph, IsInt],
-function(cgr,maxclasssize)
+"for a WL-stable color graph",
+[IsColorGraph and IsWLStableColorGraph],
+function(cgr)
     local  tensor, part, varpart, obj, pjfus;
     
     tensor:=StructureConstantsOfColorGraph(cgr);
@@ -43,7 +34,6 @@ function(cgr,maxclasssize)
               ppart:=[],
               part:=part,
               varpart:=varpart,
-              maxclasssize:=maxclasssize
               );
     pjfus:= PartialWLFusion(obj);
     
@@ -66,172 +56,6 @@ function(obj)
 end);
 
 
-# InstallMethod(ExtendedPartialStablePartition,
-# "for a partial WL stable fusion in  PartialWLFusionRep and a regular WL-stable set",
-# [IsPartialWLFusion and IsPartialStablePartitionRep, IsRegularSet and IsWLStableSet],
-# function(pfusion,gs)
-#     local  tensor, rset, arset, i, class, lclass, npart, pos, nppart, obj, 
-#            nvarpart, npfusion;
-    
-#     tensor:=StructureConstantsOfColorGraph(pfusion!.cgr);
-    
-#     rset:=AsSet(gs);
-#     arset:=OnSets(rset, ColorMates(pfusion!.cgr));
-    
-        
-
-#     # when new slice starts, then rset can be its first element only if it is smaller than
-#     # OnSets(rset, ColorMates(pfusion!.cgr))
-#     if pfusion!.ppart = [] or Length(rset) > Length(Last(pfusion!.ppart)) then 
-#         if arset < rset then 
-#             Info(InfoJOCO,1,"1");
-#             return fail;
-#         fi;
-#     fi;
-    
-            
-    
-#     i:=First([1..Length(pfusion!.varpart)], j->IsSubset(pfusion!.varpart[j],rset));
-#     if i = fail then
-#         Info(InfoJOCO,1,"2");
-#         return fail;
-#     fi;
-    
-    
-#     class:=pfusion!.varpart[i];
-#     if ForAny([1..i-1], j->Length(pfusion!.varpart[j]) < Length(rset) 
-#                         or Length(pfusion!.varpart[j]) = Length(rset) 
-#                         and pfusion!.varpart[j] < rset)  
-#     then
-        
-#         Info(InfoJOCO,1,"3");
-#        return fail;
-#     fi;
-    
-#     # when new slice starts, then rset can be its first element only if it is smaller than
-#     # OnSets(rset, ColorMates(pfusion!.cgr))
-#     if Length(class) > Length(rset) and arset < rset then
-#         Info(InfoJOCO,1,"4");
-#         return fail;
-#     fi;
-    
-    
-#     # if the mate of rset is smaller then its mate must come before in pfusion!.ppart
-#     # the two tests before for the situation that slice is new could be replaced by 
-#     # the following test, if it is placed n the beginning of the function
-#     # however, checking that arset is in pfusion!.ppart takes more time
-#     if arset < rset and not arset in pfusion!.ppart then
-#         Info(InfoJOCO,1,"5");
-#         return fail;
-#     fi;
-        
-#     if pfusion!.ppart<>[] then
-#         lclass:=Last(pfusion!.ppart);
-#         if Length(rset) < Length(lclass) then
-#             Info(InfoJOCO,1,"6");
-#             return fail;
-#         fi;
-#         if Length(rset) = Length(lclass) and rset < lclass then
-#             Info(InfoJOCO,1,"7");
-#             return fail;
-#         fi;
-#         if Length(class) <> Length(rset) then
-#             if Length(class)-Length(rset) < Length(lclass) then
-#                 Info(InfoJOCO,1,"8");
-#                 return fail;
-#             fi;
-#             if Length(class) - Length(rset) = Length(lclass) and
-#                Difference(class, rset) < lclass then
-#                 Info(InfoJOCO,1,"9");
-#                 return fail;
-#             fi;
-#         fi;
-#     fi;
-
-    
-#     if class = rset then
-#         npart:=WLShallowCopyStablePartition(pfusion!.part);
-#         pos:=Position(npart.classes,rset);
-#         AddSet(npart.fixed, pos);
-#         RemoveSet(npart.variable,pos);
-#         nppart:=ShallowCopy(pfusion!.ppart);
-#         Add(nppart,AsSet(gs));
-#         obj:=rec( cgr:=pfusion!.cgr,
-#                   ppart:=nppart,
-#                   part:=npart,
-#                   varpart:= pfusion!.varpart{Difference([1..Length(pfusion!.varpart)],[i])},
-#                   maxclasssize:=pfusion!.maxclasssize);
-#     else # lif Length(gs)<Length(class) or (Length(gs)=Length(class) and AsSet(gs)<=class) then
-#         npart:=WLShallowCopyStablePartition(pfusion!.part);
-#         npart:=WLRefinedPartition@JOCO(npart,gs);
-#         if npart=fail then
-#             Info(InfoJOCO,1,"A");
-#             return fail;
-#         fi;
-        
-#         npart:=WLStabil(tensor, npart, AsSet(gs));
-#         if npart=fail then
-#             Info(InfoJOCO,1,"B");
-#             return fail;
-#         fi;
-        
-#         nppart:=ShallowCopy(pfusion!.ppart);
-#         Add(nppart,rset);
-#         nvarpart:=ShortLexSorted(StructuralCopy(npart.classes{npart.variable}));
-#         nvarpart:=Filtered(nvarpart, x->not x[1] in ReflexiveColors(pfusion!.cgr));
-                
-#         obj:=rec( cgr:=pfusion!.cgr,
-#                   ppart:=nppart,
-#                   part:=npart,
-#                   varpart:=nvarpart,
-#                   maxclasssize:=pfusion!.maxclasssize);
-#     fi;
-#     npfusion:=Objectify(NewType(PartialWLFusionsFamily(pfusion!.cgr), IsPartialWLFusion and IsPartialStablePartitionRep), obj);
-#     if Length(rset) < Length(class) then
-#         SetIsIrredundantPartialStablePartition(npfusion,true);
-#         SetPartialStablePartitionHasSmallerBase(npfusion,false);
-#         if Length(class)-Length(rset) > Length(rset) then
-#             SetIsCompletePartialStablePartition(npfusion,true);
-#         else
-#             SetIsCompletePartialStablePartition(npfusion,false);
-#         fi;
-#     elif obj!.varpart = [] then 
-#         SetIsCompletePartialStablePartition(npfusion,true);
-#         SetIsIrredundantPartialStablePartition(npfusion,false);
-#         SetPartialStablePartitionHasSmallerBase(npfusion,
-#            IsCompletePartialStablePartition(pfusion) 
-#            or PartialStablePartitionHasSmallerBase(pfusion));
-#     elif Length(obj!.varpart[1]) = Length(rset) then 
-#         SetIsCompletePartialStablePartition(npfusion,false);
-#         SetIsIrredundantPartialStablePartition(npfusion,false);
-#         SetPartialStablePartitionHasSmallerBase(npfusion,
-#            IsCompletePartialStablePartition(pfusion) 
-#            or PartialStablePartitionHasSmallerBase(pfusion));
-#     else  
-#         SetIsCompletePartialStablePartition(npfusion,true);
-#         SetIsIrredundantPartialStablePartition(npfusion,false);
-#         SetPartialStablePartitionHasSmallerBase(npfusion,
-#            IsCompletePartialStablePartition(pfusion) 
-#            or PartialStablePartitionHasSmallerBase(pfusion));
-#     fi;
-        
-#     Assert(1, OnSetsSets(Set(npfusion!.part.classes),ColorMates(npfusion!.cgr))=Set(npfusion!.part.classes));
-#     return npfusion;
-# end);
-
-# InstallMethod(IsCompatibleWithPartialStablePartition,
-# "for a partial WL-stable fusion and a WL-stable regular set",
-# [IsPartialWLFusion and IsPartialStablePartitionRep, IsRegularSet and IsWLStableSet],
-# function(pfusion, gs)
-#     local class;
-    
-#     for class in pfusion!.varpart do
-#         if IsSubset(class, AsSet(gs)) then
-#             return true;
-#         fi;
-#     od;
-#     return false;
-# end);
 
 
 InstallMethod( ViewString,
@@ -240,24 +64,6 @@ InstallMethod( ViewString,
 function(pfus)
     return Concatenation("<partial WL-stable fusion: ", String(pfus!.ppart), ">");
 end);
-
-
-# InstallImmediateMethod( IsCompletePartialStablePartition,
-# "for a partial WL-stable fusions",
-# IsPartialWLFusion,
-# function(pfus)
-#     if pfus!.varpart = [] then
-#         return true;
-#     elif Length(pfus!.varpart[1]) > pfus!.maxclasssize then
-#         return true;
-#     else
-#         return false;
-#     fi;
-# end);
-
-
-
-
 
 ###################################################################################
 # Partial WL-fusion orbits
@@ -295,79 +101,6 @@ function(group,pfus,stab)
     fam:=GetPartialStablePartitionOrbitFamily(pfus,group);
     return Objectify(NewType(fam, IsPartialStablePartitionOrbit and IsPartialStablePartitionOrbitRep), res);
 end);
-
-
-# this is the same as JRefinedPartition
-# InstallGlobalFunction(WLRefinedPartition@JOCO,
-# function(newPart,gs)
-#     local  repart, M, iM, res;
-#     repart:=function(newPart,u,fix)
-#         local   i,  newclass;
-#         i:=1;
-#         while i<=Length(newPart.variable) and
-#           not IsSubset(WLPartitionClass(newPart,newPart.variable[i]),u) do
-#             i:=i+1;
-#         od;
-#         if i > Length(newPart.variable) then
-#             return fail;
-#         fi;
-
-#         i:=newPart.variable[i];
-#         if WLPartitionClass(newPart,i)=u then
-#             if fix then
-#                 RemoveSet(newPart.variable,i);
-#                 AddSet(newPart.fixed,i);
-#             fi;
-#             WLInstabilQueueAdd(newPart,i);
-
-#             return newPart;
-#         fi;
-#         newclass:=Difference(WLPartitionClass(newPart,i), u);
-#         if Length(newclass)<Length(u)  then
-#             return fail;
-#         fi;
-#         if fix and Length(newclass)=Length(u) and newclass<u then
-#             return fail;
-#         fi;
-
-#         newPart.classes[i]:=newclass;
-#         WLInstabilQueueAdd(newPart,i);
-#         Add(newPart.classes,u);
-#         if fix then
-#             AddSet(newPart.fixed, Length(newPart.classes));
-#         else
-#             AddSet(newPart.variable,Length(newPart.classes));
-#         fi;
-
-
-#         newPart.instabilFlags[Length(newPart.classes)]:=false;
-#         newPart.totestFlags[Length(newPart.classes)]:=false;
-#         WLInstabilQueueAdd(newPart, Length(newPart.classes));
-#         return newPart;
-#     end;
-    
-#     M:=AsSet(gs);
-#     iM:=OnSets(M,ColorMates(UnderlyingCgrOfColorSet(gs)));
-    
-#     res:=repart(newPart,M,true);
-#     if res=fail then
-#         return fail;
-#     fi;
-    
-    
-#     if iM>M then
-#         res:=repart(res,iM,false);
-#         if res=fail then
-#             return fail;
-#         fi;
-#     fi;
-    
-#     return res;
-    
-#     # M:=AsSet(gs);
-    
-#     # return repart(newPart,M,true);
-# end);
 
 InstallMethod(StabilizedInternalPartition,
 "for a partial WL-fusion, a WL-stable set and an internal partition",

@@ -184,7 +184,7 @@ DeclareOperation( "IteratorOfPartialStablePartitionOrbits", [IsCocoPartialStable
 
 
 #! @Description
-#! This function gets as input an iterator of orbits of partial stable partitionssets 
+#! This function gets as input an iterator of orbits of partial stable partitions 
 #! (not necessarily in initial state). It iterates the iterator till the end and returns 
 #! all orbits of stable partitions encountered on the way. As a side effect, the iterator 
 #! is spent (done) et the end.

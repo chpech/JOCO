@@ -46,3 +46,5 @@ DeclareAttribute( "PartialArcRegularSetsFamily",  IsColorGraph );
 #! different family is created.
 #! @Arguments cgr, G
 KeyDependentOperation( "PartialArcRegularSetOrbitFamily", IsColorGraph, IsPermGroup, ReturnTrue );
+
+

@@ -33,11 +33,18 @@ KeyDependentOperation( "PartialRegularFusionOrbitsFamily", IsColorGraph, IsPermG
 #! @Section Constructors
 
 #! @Description
-#! This function gets as input a stable rainbow <A>cgr</A> and an integer <A>max</A>. It
-#! creates an empty partial regular fusion for <A>cgr</A> which has storde the maximal 
-#! @Arguments cgr, max
-DeclareOperation( "EmptyPartialRegularFusion", [IsColorGraph,IsInt] );
+#! This function gets as input a stable rainbow <A>cgr</A>. It
+#! returns an empty partial regular fusion for <A>cgr</A>.
+#! @Arguments cgr
+DeclareOperation( "EmptyPartialRegularFusion", [IsColorGraph] );
 
+
+#! @Description
+#! An internal constructor. It recieves as input a record <A>obj</A> with all components of
+#! a partial regular fusion. It objectifies this record using the proper type and family and 
+#! returns the resulting object. This constructor is returned by the operation 
+#! `ConstructorOfPartialColorPartition` when invoking it with a partial regular fusion.
+#! @Arguments obj
 DeclareGlobalFunction("PartialRegularFusion");
 
 

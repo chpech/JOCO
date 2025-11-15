@@ -38,3 +38,5 @@ DeclareGlobalFunction( "RefinedInternalPartition" );     # undocumented
 #! changes the internal partition <A>ipart</A>  in place.
 #! @Arguments ppart, gs, ipart
 DeclareOperation("StabilizedInternalPartition", [IsPartialColorPartition, IsColorSet, IsRecord] );
+
+

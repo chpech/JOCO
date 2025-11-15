@@ -12,6 +12,8 @@ DeclareCategory( "IsSetOrbit", IsCocoSetOrbit );
 DeclareAttribute( "SetOrbitsFamily",  IsPermGroup );
 
 #! @Section Constructors
+
+
 #! @BeginGroup SOconstructors
 #! @Description
 #! `SetOrbitNC` expects as input a permutation group <A>grp</A>, a set <A>set</A>,
@@ -73,7 +75,7 @@ DeclareOperation( "AllSetOrbitsFromIterator", [IsIteratorOfSetOrbits] );
 
 #! @Description
 #! As they are implemented, iterators of set orbits know the next set orbit before
-#! `NextIterator` is invoked. The function NextSetOrbit returns the orbit of the empty 
+#! `NextIterator` is invoked. The function `NextSetOrbit` returns the orbit of the empty 
 #! set if <A>iter</A> is in the initial state (even if $0$ is not in `sizes`) or the 
 #! setorbit that is going to be returned by `NextIterator<A>(iter</A>)`.
 #! @Arguments iter

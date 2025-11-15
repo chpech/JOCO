@@ -36,6 +36,9 @@
 @Chapter CoreHadamardSets
 @ChapterTitle Core Hadamard sets 
 
+@Chapter phadamard
+@ChapterTitle Partial core Hadamard sets
+
 @Chapter pstabfus
 @ChapterTitle Partial stable partitions and stable partitions
 
@@ -64,7 +67,16 @@
 @ChapterTitle Partial color partitions
 
 @Chapter rpartfus
-@ChapterTitle Partial regular partitions
+@ChapterTitle Partial regular fusions
+
+@Chapter jpartfus
+@ChapterTitle Partial Jordan fusions
+
+@Chapter wlpartfus
+@ChapterTitle Partial WL-stable fusions
 
 @Chapter setorbits
 @ChapterTitle Set orbits
+
+@Chapter partorbits
+@ChapterTitle Partition orbits
