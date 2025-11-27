@@ -54,11 +54,26 @@ function(x)
     return Concatenation("<Jordan fusion of order ", String(Order(x)), " and rank ", String(Rank(x)), ">");
 end);
 
+InstallMethod(FusionColorGraph,
+"for WL-fusions",              
+[IsColorPartition and IsJordanFusion],
+function(rfus)
+    local cgr;
+    
+    cgr:=ColorGraphByFusion(UnderlyingCgrOfColorPartition(rfus),
+                            UnderlyingPartitionOfColorPartition(rfus));
+    SetIsRainbow(cgr,true);
+    SetIsRegularColorGraph(cgr,true);
+    SetIsJStableColorGraph(cgr,true);
+    
+    return cgr;
+end);
+
 InstallOtherMethod(HomogeneousJordanFusionOrbits,
 "for a J-stable color graph and a list of J-stable color sets",
 [IsColorGraph and IsJStableColorGraph, IsList],
 function(cgr,gsorbits)
-    local  max, pfus, iter;
+    local  pfus, iter;
 
     if not ForAll(gsorbits, IsRegularSetOrbit) then
         ErrorNoReturn("HomogeneousJordanFusionOrbits: expecting a list of regular set orbits");
@@ -70,17 +85,14 @@ function(cgr,gsorbits)
         ErrorNoReturn("HomogeneousJordanFusionOrbits: expecting a list of orbits of Jordan stable regular set orbits");
     fi;
     
-    if gsorbits=[] then
-        max:=0;
-    else
-        max:=Maximum(List(gsorbits, x->Size(Representative(x))));
+    if gsorbits<>[] then
         if not IsIdenticalObj(cgr,UnderlyingCgrOfColorSet(Representative(gsorbits[1]))) then
             ErrorNoReturn("HomogeneousJordanFusionOrbits: regular set orbits are incompatible");
         fi;
     fi;
     
    
-    pfus:=EmptyPartialJordanFusion(cgr,max);
+    pfus:=EmptyPartialJordanFusion(cgr);
     
     iter:=IteratorOfPartialStablePartitionOrbits(pfus,gsorbits);
     
@@ -414,28 +426,29 @@ function(pos, indices)
             if ForAll(ord, x->x<=strucexp) then
                 StructureDescription(AutomorphismGroup(cgrr):short);
             fi;
-        fi;
         
-        ord:=PrimePowersInt(Size(ColorAutomorphismGroupOnColors(cgrr)));
-        ord:=ord{[2,4..Length(ord)]};
-        if ForAll(ord, x->x<=strucexp) then
-            StructureDescription(ColorAutomorphismGroupOnColors(cgrr):short);
-        fi;
-        if IsJStableColorGraph(cgrr) then
-            ord:=PrimePowersInt(Size(JAlgebraicAutomorphismGroup(cgrr)));
+            ord:=PrimePowersInt(Size(ColorAutomorphismGroupOnColors(cgrr)));
             ord:=ord{[2,4..Length(ord)]};
             if ForAll(ord, x->x<=strucexp) then
-                StructureDescription(JAlgebraicAutomorphismGroup(cgrr):short);
+                StructureDescription(ColorAutomorphismGroupOnColors(cgrr):short);
             fi;
-                              
-            if IsWLStableColorGraph(cgrr) then 
-                ord:=PrimePowersInt(Size(AlgebraicAutomorphismGroup(cgrr)));
+            if IsJStableColorGraph(cgrr) then
+                ord:=PrimePowersInt(Size(JAlgebraicAutomorphismGroup(cgrr)));
                 ord:=ord{[2,4..Length(ord)]};
                 if ForAll(ord, x->x<=strucexp) then
-                    StructureDescription(AlgebraicAutomorphismGroup(cgrr):short);
+                    StructureDescription(JAlgebraicAutomorphismGroup(cgrr):short);
+                fi;
+                              
+                if IsWLStableColorGraph(cgrr) then 
+                    ord:=PrimePowersInt(Size(AlgebraicAutomorphismGroup(cgrr)));
+                    ord:=ord{[2,4..Length(ord)]};
+                    if ForAll(ord, x->x<=strucexp) then
+                        StructureDescription(AlgebraicAutomorphismGroup(cgrr):short);
+                    fi;
                 fi;
             fi;
         fi;
+        
 
         Info(InfoJOCO,1,".");
     od;
@@ -633,7 +646,7 @@ function(pos, indices)
         
 
         if IsJStableColorGraph(node!.cgr) then
-            isproper:=Rank(ColorGraphBySymmetrization(mcgr))<>Rank(node!.cgr);
+            isproper:=SymmetrizedRank(mcgr)<>Rank(node!.cgr);
         
             if proper then
                 if not isproper then

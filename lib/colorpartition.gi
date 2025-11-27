@@ -421,3 +421,9 @@ function(x)
     return Concatenation("<", "ColorPartition of order ", String(Order(x)), " and rank ", String(Rank(x)),">");
 end);
 
+InstallMethod( ViewString,
+        "for a color partition orbit",
+        [IsColorPartitionOrbit],
+function(pporb)
+    return Concatenation("<color partition orbit of length ", String(Size(pporb)), ">");
+end);

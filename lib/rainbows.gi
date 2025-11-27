@@ -153,7 +153,14 @@ function(cgr)
    return PermList(List([1..RankOfColorGraph(cgr)], x->ArcColorOfColorGraph(cgr, Reversed(ColorRepresentative(cgr,x)))));
 end);
 
+InstallMethod(SymmetrizedRank,
+"for a rainbow",              
+[IsColorGraph and IsRainbow],
+function(cgr)
+    return Length(Cycles(ColorMates(cgr), [1..RankOfColorGraph(cgr)]));
+end);
 
+            
 InstallOtherMethod(ColorGraphByFusion,
         "for a color graph and a J-stable fusion",
         [IsColorGraph, IsJordanFusion],
@@ -646,7 +653,7 @@ function(cgr)
     if not IsUndirectedColorGraph(cgr) then
         return true;
     fi;
-    return Rank(cgr) < Rank(ColorGraphBySymmetrization(ColorGraphByWLStabilization(cgr)));
+    return Rank(cgr) < SymmetrizedRank(ColorGraphByWLStabilization(cgr));
 end);
 
 

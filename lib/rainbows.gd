@@ -69,6 +69,15 @@ DeclareProperty("IsQuasithin", IsColorGraph and IsRainbow );
 #! @Section Inspection
 #! @SectionTitle Functions for the inspection of rainbows
 
+
+#! @Description
+#! Returns the rank of the symmetrization of the rainbow <A>cgr</A>.
+#! This is quicker than calling `Rank(ColorGraphBySymmetrization(<A>cgr</A>))`.
+#! @Arguments cgr
+DeclareAttribute( "SymmetrizedRank", IsColorGraph and IsRainbow );
+
+
+
 #! @Description
 #! Returns the vertex-partition (the partition into weak fibres) of the rainbow  <A>cgr</A>.
 #! @Arguments cgr
