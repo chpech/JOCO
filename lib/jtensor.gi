@@ -137,9 +137,10 @@ function(cgr,tor)
         tensor:=Objectify(NewType(TensorFam, IsBlockedTensorRep), tensor);
     else
         tensor := rec(
-                       entries:=List([1..RankOfColorGraph(cgr)],i->
-                                                                 List([1..RankOfColorGraph(cgr)], j->
-                                                                                                   List([1..RankOfColorGraph(cgr)],k->entries[1][1][1][k][i][j]))),
+                       entries:=List([1..RankOfColorGraph(cgr)],
+                                     i->List([1..RankOfColorGraph(cgr)], 
+                                             j->List([1..RankOfColorGraph(cgr)],
+                                                     k->entries[1][1][1][k][i][j]))),
                        knownAutGroup   := KnownGroupOfColorAutomorphismsOnColors(cgr),
                        vertexNames     := ColorNames(cgr)
                       );
@@ -147,9 +148,8 @@ function(cgr,tor)
         tensor:= Objectify(NewType(TensorFam, IsTensorRep), tensor);
     fi;
     
-    if HasMates(cgr) then
-        SetMates(tensor, Mates(cgr));
-    fi;
+    SetMates(tensor, ColorMates(cgr));
+    
     SetReflexiveColors(tensor, reflexiveColors);
     SetOrderOfCocoObject(tensor, RankOfColorGraph(cgr));
     
@@ -306,9 +306,39 @@ function(tensor)
   return IsHomogeneousTensor(tensor);
 end);
 
-InstallOtherMethod(Mates,
-   "for tensors of J-structure constants",
-   [IsTensor and IsTensorOfJC],
-function(tensor)
-    return (); # check this!
+InstallMethod(ComplexProduct,
+    "for tensors of Jordan structure constants in representation BlockedTensorRep",
+    [IsTensor and IsTensorOfJC and IsBlockedTensorRep, IsList, IsList],
+function(tensor, set1,set2)
+    local  product, m1, m2, blkIdx, blocks, ent, a, b, bbl, c, i, j;
+    
+    product := ListWithIdenticalEntries(Order(tensor),0);
+    m1:=BlockingMat(tensor, set1);
+    m2:=BlockingMat(tensor, set2);
+    blkIdx:=tensor!.blkIdx;
+    blocks:=tensor!.blocks;
+    ent:=tensor!.entries;
+
+    for a in [1..Length(m1)] do
+        for b in [1..Length(m1)] do
+            bbl:=blocks[a][b];
+            for c in [1..Length(m1)] do
+                for i in m1[a][c] do
+                    for j in m2[c][b] do
+                        product{bbl} := product{bbl} + ent[a][b][c][blkIdx[i]][blkIdx[j]];
+                    od;
+                od;
+                if a=b and b=c then
+                    continue;
+                fi;
+                for j in m2[a][c] do
+                    for i in m1[c][b] do
+                        product{bbl} := product{bbl} + ent[a][b][c][blkIdx[j]][blkIdx[i]];
+                    od;
+                od;
+            od;
+        od;
+    od;
+    
+    return product;
 end);

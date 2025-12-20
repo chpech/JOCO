@@ -24,7 +24,7 @@ DeclareProperty( "IsWLFusion", IsColorPartition );
 #! <A>grp</A> is expected to be a subgroup of `AAut(cgr)`. If <A>grp</A> is not given, then 
 #! it is taken to be equal to `AAut(cgr)`. If the option `:sym` is given, then only 
 #! those WL-fusions are computed whose classes are symmetric WL-stable sets.
-#! @Arguments cgr[,grp] :sym
+#! @Arguments cgr[,grp] :sym | [,gsorbits]
 DeclareAttribute( "HomogeneousWLFusionOrbits", IsColorGraph and IsWLStableColorGraph );
 
 

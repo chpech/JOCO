@@ -29,61 +29,12 @@ function(cand)
 end);
 
 
-# InstallMethod(UnderlyingCgrOfRegularSet,
-#         "for regular sets in RegularSetRep",
-#         [IsRegularSet and IsRegularSetRep],
-# function(gs)
-#    return gs!.cgr;
-# end);
-
-
-# InstallOtherMethod(AsSet,
-#         "for regular sets in RegularSetRep",
-#         [IsRegularSet and IsRegularSetRep],
-# function(gs)
-#   return gs!.set;
-# end);
-
-# InstallOtherMethod(Length,
-#         "for regular sets",
-#         [IsRegularSet],
-# function(gs)
-#     return Length(AsSet(gs));
-# end);
-
-# InstallOtherMethod(\<,
-#         "for regular sets",
-#         IsIdenticalObj,
-#         [IsRegularSet,IsRegularSet],
-# function(gs1,gs2)
-#     if Length(gs1)<>Length(gs2) then
-#         return Length(gs1)<Length(gs2);
-#     else
-#         return AsSet(gs1)<AsSet(gs2);
-#     fi;
-# end);
-
-# InstallOtherMethod(\=,
-#         "for regular sets",
-#         IsIdenticalObj,
-#         [IsRegularSet,IsRegularSet],
-# function(gs1,gs2)
-#     return AsSet(gs1)=AsSet(gs2);
-# end);
-
 InstallMethod(OnRegularSets,
         "for a regular set in RegularSetRep and a permutation",
         [IsRegularSet and IsColorSetRep, IsPerm],
 function(gs, g)
     return RegularSet(IsRegularSet, gs!.cgr, MakeImmutable(OnSets(gs!.set,g)));
 end);
-
-# InstallOtherMethod(Size,
-#         "for Regular sets in RegularSetRep",
-#         [IsRegularSet and IsRegularSetRep],
-# function(gs)
-#     return Size(gs!.set);
-# end);
 
 InstallMethod(ViewString,
         "for regular sets",

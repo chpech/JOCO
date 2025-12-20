@@ -510,7 +510,6 @@ function(cgr1,cgr2)
         inv:=List(obj.ST, y->row[y]);
         res:=Set(Set(inv), x->Filtered([1..Length(inv)], i->inv[i]=x));
         
-        
         Add(res, [obj.fvc[v]]);
         return res;
     end;
@@ -536,6 +535,19 @@ InstallMethod(ColorIsomorphismColorGraphs,
 function(o1,o2)
     local   iso,  kaut1,  kaut2, pbagobjs, ciso;
 
+    if HasIsRainbow(o1) and HasIsRainbow(o2) and IsRainbow(o1) <> IsRainbow(o2) then
+        return fail;
+    fi;
+    if HasIsJStableColorGraph(o1) and HasIsJStableColorGraph(o2) 
+       and IsJStableColorGraph(o1) <> IsJStableColorGraph(o2) then
+        return fail;
+    fi;
+    if HasIsWLStableColorGraph(o1) and HasIsWLStableColorGraph(o2)
+       and IsWLStableColorGraph(o1) <> IsWLStableColorGraph(o2) then
+        return fail;
+    fi;
+    
+    
     pbagobjs:=NewPbagObjects(o1,o2);
     iso:=IsomorphismPbagObjects(pbagobjs[1], pbagobjs[2], PbagColorInvariant(o1,o2));
     if iso=false then

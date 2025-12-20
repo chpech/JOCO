@@ -176,34 +176,11 @@ function(lforb)
         tstart:=NanosecondsSinceEpoch();
     fi;
     
-    # check this mechanism! It is weak.
-    if  IsJStableColorGraph(cgr) then
-        tensor:=JStructureConstantsOfColorGraph(cgr);
-        aaut:=AutomorphismGroup(tensor);
-        caut:=ColorAutomorphismGroupOnColors(cgr);
-    elif
-        IsWLStableColorGraph(cgr) then
-        tensor:=StructureConstantsOfColorGraph(cgr);
-        aaut:=AutomorphismGroup(tensor);
-        caut:=ColorAutomorphismGroupOnColors(cgr);
-    else
-        aaut:=ColorAutomorphismGroupOnColors(cgr);
-        caut:=ColorAutomorphismGroupOnColors(cgr);
-    fi;
+    aaut:=UnderlyingGroupOfCocoOrbit(lforb[1]);
+    caut:=ColorAutomorphismGroupOnColors(cgr);
     
     
-    if not IsSubgroup(aaut, UnderlyingGroupOfCocoOrbit(lforb[1])) then
-        ErrorNoReturn("PosetOfFusionOrbits: Underlying group of fusion orbits is incompatible!");
-    fi;
-    if UnderlyingGroupOfCocoOrbit(lforb[1])<>aaut then # if it is a proper subgroup of aaut
-        Info(InfoJOCO,1,"rebasing orbits...\n");
-        aautfusorbs:=Set(lforb, x->ConstructorOfCocoOrbit(x)(aaut,Representative(x)));
-        Info(InfoJOCO,1,"done.\n");
-    else
-        aautfusorbs:=Set(lforb);
-    fi;
-    
-    
+    aautfusorbs:=Set(lforb);
     cautfusorbs:=[];ltwins:=[];
     algebraicFusions:=[];
     Info(InfoJOCO,1,"Computing algebraic fusions and algebraic twins.\n");

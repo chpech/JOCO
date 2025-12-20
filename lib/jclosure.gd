@@ -17,12 +17,13 @@
 
 #! when &COCO; or &JOCO; need to compute WL-stable or J-stable partitions they make use of 
 #! an internal format of partitions. As it stands, this format is not the most efficient one 
-#! it has been doing good service now for decades. Also the code for WL-stabilization and for 
-#! is quite self-sufficient so that at some moment it can be replaced by something more modern. 
+#! but it has been doing good service now for decades. Also the code for WL-stabilization and for 
+#! J-stabilization is quite independent of the rest of &JOCO; and &COCO; so that at some moment 
+#! it can be replaced by something better without causing big problems. 
 #! To distinguish this type of partitions from the partition-datatypes used in &JOCO;, we are 
 #! going to refer to this old type of partitions as __internal partitions__.
 #!
-#! An internal partition is a record with the following components:
+#! An __internal partition__ is a record with the following components:
 #! * `classes`: an ordered partition of the colors of the underlying color graph $(V,C,f)$;
 #! * `fixed`: a list of indices into `classes` that are fobidden to split during the 
 #!   stabilization process;
@@ -32,14 +33,14 @@
 #!   still possible that they are going to split inthe further course of the stabilization;
 #! * `instabilFlags` a boolean list that records for eqch element of `classes` whether or not  
 #!   it is instabil;
-#! * `totest` a fifi-queue. Whenever the stabilization procedure takes in instabile class
+#! * `totest` a fifo-queue. Whenever the stabilization procedure takes in instabile class
 #!   and tries to stabilize it, it creates a queue of classes to test against this class.
 #!   For each of these classes a complex product is computed and the result of this is used 
 #!   for refining the partition. This refining takes place in `WLRepartition` and `JRepartition`,
 #!   respectively;
 #! * `totestflags` a bolean list coresponding to the queue `totest`
-#! * `colorNames` the a color graph gets refined the algorithms generates new names of the colors
-#!   of the refined color graph. 
+#! * `colorNames` as the a color graph gets refined the algorithms generates new names of the 
+#!   colors of the refined color graph. 
 #! * `numberClasses` an internal data-structure that is used for the generation of the `colorNames`
 
 

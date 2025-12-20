@@ -561,11 +561,11 @@ function(cand,pt)
                     return fail;
                 fi;
             fi;
-            Assert(1, List(List(BlockingMat(StructureConstantsOfColorGraph(cgr), 
+            Assert(1, List(List(BlockingMat@(StructureConstantsOfColorGraph(cgr), 
                                             OnSets(Union(npgs!.imap{npgs!.domain}),())),
                                 r->List(r,c->Sum(OutValencies(cgr){c}))),Sum)
                       =npgs.domrowdegs);
-            Assert(1, List(List(BlockingMat(StructureConstantsOfColorGraph(cgr), 
+            Assert(1, List(List(BlockingMat@(StructureConstantsOfColorGraph(cgr), 
                                             OnSets(Union(npgs!.imap{npgs!.domain}),
                                                    ColorMates(cgr))),
                                 r->List(r,c->Sum(OutValencies(cgr){c}))),Sum)
@@ -986,10 +986,6 @@ function(cand,pt)
             if ForAny([2..sb-1], x->cand!.degreelist[x]<>npgs.k) then
                 return nonextensible;
             fi;
-            
-            # if ForAny([sb..Length(cand!.blocks)], x->cand!.degreelist[x]>npgs.k) then
-            #     return nonextensible;
-            # fi;
             
             for i in [1..Length(npgs.fullrows)] do
                 a:=npgs.fullrows[i];

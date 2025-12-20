@@ -1,5 +1,6 @@
 DeclareGlobalFunction( "ColorGraphBySymmetrization" );
 DeclareGlobalFunction( "MapReps" );
+DeclareGlobalFunction( "BlockingMat@JOCO" );
 DeclareGlobalFunction( "StringCocoIndented" );
 DeclareGlobalFunction( "StringCocoColorReps" );
 DeclareGlobalFunction( "StringCocoTable" );

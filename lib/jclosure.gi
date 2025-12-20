@@ -11,37 +11,39 @@
 
 InstallGlobalFunction(JRepartition,
 function(T, part, u,v,min)
-    local sym,vec,ix,x,i,j,ii,jj,colour, classes;
+    local sym,vec,ix,x,i,j,ii,jj,colour, classes,map;
 
     sym:=ValueOption("sym");
     if sym=fail then
         sym:=false;
     fi;
     
-    vec := ComplexProduct(T, WLPartitionClass(part,u), WLPartitionClass(part,v));
-    if u <> v then 
-        vec := vec + ComplexProduct(T, WLPartitionClass(part,v), WLPartitionClass(part,u));
-    fi;
-    
+    vec := ComplexProduct(T, WLPartitionClass(part,u), WLPartitionClass(part,v));    
 
     for ix in part.fixed do
         x:=WLPartitionClass(part,ix);
         colour:=vec[x[1]];
-        for j in [2..Length(x)] do
-            if vec[x[j]]<>colour then
-                
-                return fail;
-            fi;
-        od;
+        if ForAny([2..Length(x)], j->vec[x[j]]<>colour) then
+            return fail;
+        fi;
     od;
 
     for ii in part.variable do
         x:=WLPartitionClass(part,ii);
         colour:=Set(x, y->vec[y]);
         if Length(colour)>1 then
-            classes:=List(colour, y->Filtered(x, z->vec[z]=y));
-            if ForAny(classes, x->Length(x)< Length(min) or (Length(x)=Length(min) and x< min)) then
-               return fail;
+            map:=[];
+            for i in [1..Length(colour)] do
+                map[colour[i]+1]:=i;
+            od;
+            classes:=List(colour, x->[]);
+            for v in x do
+                Add(classes[map[vec[v]+1]], v);
+            od;
+            
+            #            classes:=List(colour, y->Filtered(x, z->vec[z]=y));
+            if ForAny(classes, x->Length(x) < Length(min) or (Length(x)=Length(min) and x < min)) then
+                return fail;
             fi;
             if sym and ForAny(classes, x->not x[1]^Mates(T) in x) then
                 return fail;
@@ -117,17 +119,6 @@ function(arg)
 end);
 
 
-# InstallGlobalFunction(IsJStablePartition,
-# function(T,p)
-#     local part;
-
-#     part:=WLBuildFixedPartition(p);
-#     if JStabil(T,part)<>fail then
-#         return true;
-#     else
-#         return false;
-#     fi;
-# end);
 
 
 

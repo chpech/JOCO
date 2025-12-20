@@ -337,11 +337,11 @@ function(cand,pt)
                     return fail;
                 fi;
             fi;
-            Assert(1, List(List(BlockingMat(StructureConstantsOfColorGraph(cgr), 
+            Assert(1, List(List(BlockingMat@(StructureConstantsOfColorGraph(cgr), 
                                             OnSets(Union(npgs!.imap{npgs!.domain}),())),
                                 r->List(r,c->Sum(OutValencies(cgr){c}))),Sum)
                       =npgs.domrowdegs);
-            Assert(1, List(List(BlockingMat(StructureConstantsOfColorGraph(cgr), 
+            Assert(1, List(List(BlockingMat@(StructureConstantsOfColorGraph(cgr), 
                                             OnSets(Union(npgs!.imap{npgs!.domain}),
                                                    ColorMates(cgr))),
                                 r->List(r,c->Sum(OutValencies(cgr){c}))),Sum)

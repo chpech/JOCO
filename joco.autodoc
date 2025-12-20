@@ -1,82 +1,82 @@
-@Chapter Rainbows 
+@Chapter &JOCO;: Rainbows 
 
 @Chapter Jordan
-@ChapterTitle J-stable color graphs
+@ChapterTitle &JOCO;: J-stable color graphs
 
 @Chapter jtensor
-@ChapterTitle Tensors of intersection numbers of J-stable color graphs
+@ChapterTitle &JOCO;: Tensors of intersection numbers of J-stable color graphs
 
 @Chapter jclosure
-@ChapterTitle Jordan-closure of partitions
+@ChapterTitle &JOCO;: Jordan-closure of partitions
 
 @Chapter Databases
-@ChapterTitle Databases
+@ChapterTitle &JOCO;: Databases
 
 @Chapter PStabSet
-@ChapterTitle Partial stable sets and stable sets
+@ChapterTitle &JOCO;: Partial stable sets and stable sets
 
 @Chapter ColorSets
-@ChapterTitle Color sets
+@ChapterTitle &JOCO;: Color sets
 
 @Chapter regsets
-@ChapterTitle Regular sets
+@ChapterTitle &JOCO;: Regular sets
 
 @Chapter ArcRegSet
-@ChapterTitle Arc regular sets
+@ChapterTitle &JOCO;: Arc regular sets
 
 @Chapter WLStableSet
-@ChapterTitle WL-stable sets
+@ChapterTitle &JOCO;: WL-stable sets
 
 @Chapter JArcRegSet
-@ChapterTitle J-arc regular sets
+@ChapterTitle &JOCO;: J-arc regular sets
 
 @Chapter JStableSet
-@ChapterTitle J-stable sets
+@ChapterTitle &JOCO;: J-stable sets
 
 @Chapter CoreHadamardSets
-@ChapterTitle Core Hadamard sets 
+@ChapterTitle &JOCO;: Core Hadamard sets 
 
 @Chapter phadamard
-@ChapterTitle Partial core Hadamard sets
+@ChapterTitle &JOCO;: Partial core Hadamard sets
 
 @Chapter pstabfus
-@ChapterTitle Partial stable partitions and stable partitions
+@ChapterTitle &JOCO;: Partial stable partitions and stable partitions
 
 @Chapter colorpartition
-@ChapterTitle Color partitions
+@ChapterTitle &JOCO;: Color partitions
 
 @Chapter regfusion
-@ChapterTitle Regular fusions
+@ChapterTitle &JOCO;: Regular fusions
 
 @Chapter jordanfus
-@ChapterTitle Jordan fusions
+@ChapterTitle &JOCO;: Jordan fusions
 
 @Chapter wlfusion
-@ChapterTitle WL-stable fusions
+@ChapterTitle &JOCO;: WL-stable fusions
 
 @Chapter partregset
-@ChapterTitle Partial regular sets
+@ChapterTitle &JOCO;: Partial regular sets
 
 @Chapter parcregset
-@ChapterTitle Partial arc-regular sets
+@ChapterTitle &JOCO;: Partial arc-regular sets
 
 @Chapter pjarcregset
-@ChapterTitle Partial J-arc regular sets
+@ChapterTitle &JOCO;: Partial J-arc regular sets
 
 @Chapter pcolpart
-@ChapterTitle Partial color partitions
+@ChapterTitle &JOCO;: Partial color partitions
 
 @Chapter rpartfus
-@ChapterTitle Partial regular fusions
+@ChapterTitle &JOCO;: Partial regular fusions
 
 @Chapter jpartfus
-@ChapterTitle Partial Jordan fusions
+@ChapterTitle &JOCO;: Partial Jordan fusions
 
 @Chapter wlpartfus
-@ChapterTitle Partial WL-stable fusions
+@ChapterTitle &JOCO;: Partial WL-stable fusions
 
 @Chapter setorbits
-@ChapterTitle Set orbits
+@ChapterTitle &JOCO;: Set orbits
 
 @Chapter partorbits
-@ChapterTitle Partition orbits
+@ChapterTitle &JOCO;: Partition orbits

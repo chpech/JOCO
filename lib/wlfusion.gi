@@ -9,15 +9,6 @@
 #############################################################################
 
 
-# InstallMethod( WLFusionsFamily,
-# "for a color graph",
-# [IsColorGraph],
-# function(cgr)
-#    local fam;
-#    fam:=NewFamily("WLFusionsFam", IsWLFusion);
-#    return fam;
-# end);
-
 InstallMethod(ColorPartition,
 "for WL-fusions",
 [ IsColorPartition and IsWLFusion, IsColorGraph, IsList ],
@@ -46,14 +37,7 @@ InstallMethod( StablePartitionFromCompletePartialStablePartition,
 "for a partial WL-stable fusion in PartialWLFusionRep",
 [IsPartialWLFusion and IsPartialColorPartitionRep],
 function(cpfus)
-#    local obj;
-    
-    #   Assert(1, OnSetsSets(Set(cpfus!.part.classes),Mates(cpfus!.tensor))=Set(cpfus!.part.classes));
     return ColorPartition(IsColorPartition and IsWLFusion, cpfus!.cgr, cpfus!.part.classes);
-    # obj:=rec(
-    #           cgr := cpfus!.cgr,
-    #           partition := Immutable(ShortLexSorted(cpfus!.part.classes)));
-    # return Objectify(NewType(WLFusionsFamily(cpfus!.cgr), IsWLFusion and IsColorPartitionRep), obj);
 end);
 
 InstallMethod(ViewString,
@@ -104,7 +88,7 @@ function(cgr,gsorbits)
     fi;
     
    
-    pfus:=EmptyPartialWLFusion(cgr,max);
+    pfus:=EmptyPartialWLFusion(cgr);
     
     iter:=IteratorOfPartialStablePartitionOrbits(pfus,gsorbits);
     
@@ -112,19 +96,6 @@ function(cgr,gsorbits)
     
 end);
 
-# <g> must be from AAut(<fusion!.cgr>)
-# InstallMethod(OnWLFusions,
-# "for a WL-stable fusion in ColorPartitionRep and a permutation",
-# [IsWLFusion and IsColorPartitionRep, IsPerm],
-# function(fusion, g)
-#     local res;
-#     res:=rec(
-#              cgr:=fusion!.cgr,
-#              partition:=MakeImmutable(ShortLexSorted(OnSetsSets(Set(fusion!.partition),g)))
-#     );
-
-#     return Objectify(NewType(WLFusionsFamily(fusion!.cgr), IsWLFusion and IsColorPartitionRep), res);
-# end);
 
 InstallMethod(HomogeneousWLFusionOrbits,
 "for a WL-stable color graph",
@@ -148,17 +119,3 @@ function(cgr,grp)
     return gsorbs;
 end);
 
-
-# InstallMethod(ConstructorOfStablePartitionOrbit,
-# "for a WL-stable fusion",
-# [IsWLFusion],
-# function(rfus)
-#     return RegularFusionOrbit;
-# end);
-
-# InstallMethod(ConstructorOfStablePartitionOrbitNC,
-# "for a WL-stable fusion",
-# [IsWLFusion],
-# function(rfus)
-#     return RegularFusionOrbitNC;
-# end);

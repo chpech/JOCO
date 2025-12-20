@@ -44,6 +44,23 @@ function(list,fct)
     return map;
 end);
 
+InstallGlobalFunction(BlockingMat@JOCO,
+function ( T, M )
+    local nof, sb, fb, res, i;
+    nof := NumberOfFibres( T );
+    res := List( [ 1 .. nof ], function ( i )
+            return List( [ 1 .. nof ], function ( j )
+                    return [  ];
+                end );
+        end );
+    for i in M do
+        sb := StartBlock( T, i );
+        fb := FinishBlock( T, i );
+        AddSet( res[sb][fb], i );
+    od;
+    return res;
+end);
+
 
 InstallGlobalFunction(StringCocoIndented,
 function(s,i)
