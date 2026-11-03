@@ -134,7 +134,7 @@ InstallMethod(EmptySymPartialJArcRegularSet,
 "for a regular J-stable color graph",
 [IsColorGraph and IsJStableColorGraph and IsRegularColorGraph],
 function(cgr)
-    local aaut,rclr,clr,sclr,aclr,imap,map, i, j,act,cand;
+    local ml,aaut,rclr,clr,sclr,aclr,imap,map, i, j,act,cand;
    
     rclr:=ReflexiveColors(cgr);
     clr:=Difference([1..RankOfColorGraph(cgr)], rclr);
@@ -151,12 +151,17 @@ function(cgr)
         od;
     od;
     
+    ml:=ValueOption("maxlength");
+    if ml = fail then
+        ml:=Int((RankOfColorGraph(cgr)-1)/2);
+    fi;
+    
     cand:=rec(cgr:=cgr,
               map:=map,
               imap:=imap,
               domain:=[1..Length(imap)],
               set:=[],               
-              maxlength:=Int((RankOfColorGraph(cgr)-1)/2),
+              maxlength:=ml,
               square:=ListWithIdenticalEntries(RankOfColorGraph(cgr),0)
               );
    
@@ -220,7 +225,7 @@ InstallMethod(EmptyAsymPartialJArcRegularSet,
 "for a regular J-stable color graph",
 [IsColorGraph and IsJStableColorGraph and IsRegularColorGraph],
 function(cgr)
-    local imap,map,i,grp,act,cand;
+    local ml,imap,map,i,grp,act,cand;
     
     imap:=Filtered([1..RankOfColorGraph(cgr)], x->x^ColorMates(cgr)<>x);
     map:=[];
@@ -229,7 +234,12 @@ function(cgr)
     od;
 
     imap:=List(imap, x->[x]);
-      
+    
+    ml:=ValueOption("maxlength");
+    if ml = fail then
+        ml:=Int((RankOfColorGraph(cgr)-1)/2);
+    fi;
+  
     cand:=rec(cgr:=cgr,
               map:=map,
               imap:=imap,
