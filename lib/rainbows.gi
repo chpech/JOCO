@@ -78,7 +78,24 @@ InstallMethod( IsWellFibredRainbow,
 "for rainbows",
 [IsColorGraph and IsRainbow],
 function(cgr)
-    return Length(VertexPartitionOfRainbow(cgr)) = NumberOfFibres(cgr);
+    local  clr, clrpart;
+    if Length(VertexPartitionOfRainbow(cgr)) <> NumberOfFibres(cgr) then
+        return false;
+    fi;
+    if NumberOfFibres(cgr) = 1 then
+        return true;
+    fi;
+    
+    clr:=Union(List([1..Order(cgr)], 
+                    u->List([1..Order(cgr)], 
+                            v->[ArcColorOfColorGraph(cgr,u,u),
+                                ArcColorOfColorGraph(cgr,u,v),
+                                ArcColorOfColorGraph(cgr,v,v)])));
+    clrpart:=List([1..Rank(cgr)], i->Filtered(clr, x->x[2]=i));
+    if ForAny(clrpart, x->Length(x) > 1) then
+        return false;
+    fi;
+    return true;
 end);
 
 
@@ -134,9 +151,7 @@ InstallTrueMethod(IsStableRainbow, IsWLStableColorGraph);
 
 
 InstallTrueMethod(IsRegularColorGraph, IsWLStableColorGraph and IsHomogeneous);
-InstallTrueMethod(IsRegularColorGraph, IsJStableColorGraph and IsUndirectedColorGraph);
 
-InstallTrueMethod(IsHomogeneous, IsRainbow and IsRegularColorGraph);
 InstallTrueMethod(IsWellFibredRainbow, IsWLStableColorGraph);
 InstallTrueMethod(IsWellFibredRainbow, IsJStableColorGraph and IsRegularColorGraph);
 InstallTrueMethod(IsWellFibredRainbow, IsRainbow and IsRegularColorGraph);
@@ -147,7 +162,7 @@ InstallTrueMethod(IsJStableColorGraph, IsColorGraph and IsWLStableColorGraph);
                  
                  
 InstallOtherMethod(ColorMates,
-   "for WL-stable color graphs in SchurianCCRep",
+   "for rainbows",
    [IsColorGraph and IsRainbow],
 function(cgr)
    return PermList(List([1..RankOfColorGraph(cgr)], x->ArcColorOfColorGraph(cgr, Reversed(ColorRepresentative(cgr,x)))));
@@ -215,12 +230,6 @@ function(cgr)
       end);
 end);
 
-InstallOtherMethod(ColorMates,
-   "for Rainbows",
-   [IsColorGraph and IsRainbow],
-function(cgr)
-   return PermList(List([1..RankOfColorGraph(cgr)], x->ArcColorOfColorGraph(cgr, Reversed(ColorRepresentative(cgr,x)))));
-end);
 
 
 InstallMethod(NumberOfFibres,
@@ -566,23 +575,47 @@ function(o1,o2)
    return [iso,ciso];
 end);
 
+# InstallMethod(ColorAutomorphismGroup,
+# 		"for color graphs",
+# 		[IsColorGraph],
+# function(W)
+#     local  myact, aut, caut;
+    
+#     myact:=function(e,g)
+#         return ArcColorOfColorGraph(W, OnPairs(ColorRepresentative(W,e),g));
+#     end;
+    
+    
+#     aut:=AutGroupOfPbagObject(NewPbagObject(W),KnownGroupOfColorAutomorphisms(W), PbagColorInvariant(W,W));
+#     caut:=Action(aut,[1..Rank(W)], myact);
+#     SetColorAutomorphismGroupOnColors(W, caut);
+#     SetKnownGroupOfColorAutomorphismsNC(W,aut);
+#     SetKnownGroupOfColorAutomorphismsOnColorsNC(W,caut);
+#     return aut;
+# end);
+
 InstallMethod(ColorAutomorphismGroup,
 		"for color graphs",
 		[IsColorGraph],
-function(W)
-    local  myact, aut, caut;
+function(cgr)
+    local  tcgr,aut,  caut,cautc, o;
     
-    myact:=function(e,g)
-        return ArcColorOfColorGraph(W, OnPairs(ColorRepresentative(W,e),g));
-    end;
+    tcgr:=TripartiteColorGraphFromColorGraph@(cgr);
+    aut:=AutomorphismGroup(tcgr);
     
     
-    aut:=AutGroupOfPbagObject(NewPbagObject(W),KnownGroupOfColorAutomorphisms(W), PbagColorInvariant(W,W));
-    caut:=Action(aut,[1..Rank(W)], myact);
-    SetColorAutomorphismGroupOnColors(W, caut);
-    SetKnownGroupOfColorAutomorphismsNC(W,aut);
-    SetKnownGroupOfColorAutomorphismsOnColorsNC(W,caut);
-    return aut;
+    aut:=AutomorphismGroup(tcgr);
+    
+    caut:=Action (aut, [1..Order(cgr)],OnPoints);
+    
+    o:=Order(cgr);
+    
+    cautc:=Action (aut, [o+o^2+1..Order(tcgr)],OnPoints);
+    
+    SetColorAutomorphismGroupOnColors(cgr, cautc);
+    SetKnownGroupOfColorAutomorphismsNC(cgr,caut);
+    SetKnownGroupOfColorAutomorphismsOnColorsNC(cgr,cautc);
+    return caut;
 end);
 
 InstallMethod(ColorAutomorphismGroupOnColors,
@@ -598,10 +631,18 @@ InstallMethod(ColorGraphByJStabilization,
               "for color graphs",
               [IsColorGraph],
 function(cgr)
-    local   aut,  scgr,  tor,  part,  i,  c,  h,  spart,  npart,  acl,
+    local   hom, fixed,aut,  scgr,  tor,  part,  i,  c,  h,  spart,  npart,  acl,
             ccounter,  colors,rpart,scl,rcgr;
-
+    
+    hom:=ValueOption("homogeneous");
+    if hom=fail then
+        hom:=false;
+    fi;
+    
     if IsJStableColorGraph(cgr) then
+        if hom and not IsHomogeneous(cgr) then
+            return fail;
+        fi;
         return cgr;
     fi;
 
@@ -638,8 +679,18 @@ function(cgr)
             Add(npart,part[i]);
         fi;
     od;
-    part:=WLBuildPartition(npart);
-    part:=JStabil(StructureConstantsOfColorGraph(scgr),part);
+    
+    if hom then
+        fixed:=Filtered([1..Length(npart)], i->npart[i][1] in ReflexiveColors(scgr));
+        if Length(fixed)>1 then
+            return fail;
+        fi;
+    else
+        fixed:=[];
+    fi;
+    
+    part:=WLBuildPartition(npart:fixedclasses:=fixed);
+    part:=JStabil(JStructureConstantsOfColorGraph(scgr),part);
     if part=fail then
         return fail;
     fi;
@@ -909,6 +960,10 @@ function(node)
                                               tester:=node->HasJAlgebraicAutomorphismGroup(node!.cgr) and HasAlgebraicAutomorphismGroup(node!.cgr),
                                               getter:=node->Order(JAlgebraicAutomorphismGroup(node!.cgr))/Order(AlgebraicAutomorphismGroup(node!.cgr))));
             fi;
+            RegisterInfoCocoNode(node,rec(name:="order(jAut):",
+                                          toStr:=StringPP,
+                                          tester:=node->HasJAlgebraicAutomorphismGroup(node!.cgr),
+                                          getter:=node->Order(JAlgebraicAutomorphismGroup(node!.cgr))));
             RegisterInfoCocoNode(node,rec(name:="jAut:", 
                                           tester:=node->HasJAlgebraicAutomorphismGroup(node!.cgr) and HasStructureDescription(JAlgebraicAutomorphismGroup(node!.cgr)),
                                           getter:=node->StructureDescription(JAlgebraicAutomorphismGroup(node!.cgr):short)));
