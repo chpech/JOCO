@@ -362,6 +362,10 @@ function(pos, indices)
     if cisoreps=fail then
         cisoreps:=false;
     fi;
+    if cisoreps then
+        showidx:=true;
+    fi;
+    
     
     
     Perform(pos!.colorGraphs, IsRainbow);
@@ -530,6 +534,7 @@ function(pos, indices)
     PrintTo(res, "options: ");
     
     comma:=false;
+    
     if onlyfvc then 
         PrintTo(res, "onlyfvc");
         comma:=true;
