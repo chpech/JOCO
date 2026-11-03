@@ -11,7 +11,7 @@
 
 
 InstallMethod(ColorPartition,
-"for WL-fusions",
+"for a color graph and a list of lists of colors",
 [ IsColorPartition and IsRegularFusion, IsColorGraph, IsList ],
 function(filter, cgr, set)
    local res;
@@ -24,8 +24,8 @@ function(filter, cgr, set)
 end);
 
 InstallMethod(OnColorPartitions,
-"for a WL-fusion and a permutation",
-[IsColorPartition and IsWLFusion, IsPerm],
+"for a regular fusion and a permutation",
+[IsColorPartition and IsRegularFusion, IsPerm],
 function(cpart, g)
     local res;
     

@@ -68,6 +68,9 @@ function(arg)
             group:=group,
             rep:=gs,
             stab:=stab);
+    
+    Assert(1, res.stab = Stabilizer(res.group, AsSet(res.rep),OnSets));
+    
    return Objectify(NewType(RegularSetOrbitsFamily(UnderlyingCgrOfColorSet(gs),group), IsRegularSetOrbit and IsCocoOrbitRep), res);
 end);
 
@@ -149,6 +152,9 @@ function(cgr)
     
     agsorbs:=AllStableSetOrbits(IteratorOfPartialStableSetOrbits(tg,EmptyAsymPartialRegularSet(cgr)));
     agsorbs:=Filtered(agsorbs, orb->AsSet(Representative(orb))<>[]);
+    
+#    Error("brk");
+    
     
     return Union(List(agsorbs, orb->SubOrbitsOfCocoOrbit(g,orb)));    
 end);
