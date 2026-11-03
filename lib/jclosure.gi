@@ -103,14 +103,14 @@ function(arg)
             if JRepartition(T, part, u, v,min)=fail then
                 return fail;
             fi;
-            if u<>v and
-               not IsCommutativeTensor(T) and
-               (WLIsAntiSymmetricSet(T,part,v) or
-                WLIsAntiSymmetricSet(T,part,u)) then
-                if JRepartition(T, part, v, u,min)=fail then
-                    return fail;
-                fi;
-            fi;
+            # if u<>v and
+            #    not IsCommutativeTensor(T) and
+            #    (WLIsAntiSymmetricSet(T,part,v) or
+            #     WLIsAntiSymmetricSet(T,part,u)) then
+            #     if JRepartition(T, part, v, u,min)=fail then
+            #         return fail;
+            #     fi;
+            # fi;
             v:=WLToTestQueueRemove(part);
         od;
         u:=WLInstabilQueueRemove(part);
