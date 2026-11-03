@@ -435,13 +435,13 @@ function(cgr)
         aclr:=Filtered(blocks[a][a], x->x<x^Mates(tensor));
         imap[a]:=List(sclr, x->[x]);
         Append(imap[a], List(aclr, x->[x,x^Mates(tensor)]));
-        SortBy(imap[a], x->-Sum(List(x,i->-OutValencies(tensor)[i])));
+        SortBy(imap[a], x->-Sum(List(x,i->-OutValencies(cgr)[i])));
     od;
 
     for a in [1..nof] do
         for b in [a+1..nof] do
             bclr:=ShallowCopy(blocks[a][b]);
-            SortBy(bclr, i->-OutValencies(tensor)[i]);
+            SortBy(bclr, i->-OutValencies(cgr)[i]);
             Append(imap[a], List(bclr, x->Set([x,x^Mates(tensor)])));
         od;
     od;
@@ -456,7 +456,7 @@ function(cgr)
     domdegreelist:=ListWithIdenticalEntries(nof,0);
     for i in clr do
        sb:=startBlock[i];
-       domdegreelist[sb]:=domdegreelist[sb]+OutValencies(tensor)[i];
+       domdegreelist[sb]:=domdegreelist[sb]+OutValencies(cgr)[i];
     od;
     
     cand:=rec(cgr:=cgr,
@@ -612,7 +612,7 @@ function(cand,pt)
     npgs.ridx:=Union(cand!.ridx,[sb]);
     npgs.cidx:=Union(cand!.cidx,[fb]);
     
-    sd:=OutValencies(t);
+    sd:=OutValencies(cand!.cgr);
     
     npgs.blockingmat:=ShallowCopy(cand!.blockingmat);
     npgs.blockingmat[sb]:=ShallowCopy(npgs.blockingmat[sb]);
@@ -699,11 +699,11 @@ function(cgr)
         for b in [1..nof] do 
             if a=b then
                 clr:=Filtered(blocks[a][a], x->x^Mates(tensor)<>x);
-                SortBy(clr, i->-OutValencies(tensor)[i]);
+                SortBy(clr, i->-OutValencies(cgr)[i]);
                 Append(imap, clr);
             else
                 clr:=ShallowCopy(blocks[a][b]);
-                SortBy(clr, i->-OutValencies(tensor)[i]);
+                SortBy(clr, i->-OutValencies(cgr)[i]);
                 Append(imap, clr);
             fi;
         od;
@@ -721,8 +721,8 @@ function(cgr)
     for i in clr do
         sb:=startBlock[i];
         fb:=finishBlock[i];
-        domrowdegs[sb]:=domrowdegs[sb]+OutValencies(tensor)[i];
-        domcoldegs[fb]:=domcoldegs[fb]+OutValencies(tensor)[i^Mates(tensor)];
+        domrowdegs[sb]:=domrowdegs[sb]+OutValencies(cgr)[i];
+        domcoldegs[fb]:=domcoldegs[fb]+OutValencies(cgr)[i^Mates(tensor)];
     od;
     
     
