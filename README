@@ -1,0 +1,23 @@
+    ===========================================
+      README file for the `JOCO' GAP4 package 
+     ===========================================
+
+JOCO is a GAP 4 package for computing with rainbows and Jordan configurations.
+It is an extension of the COCO2P package and JOCO requires that COCO2P is installed.
+
+The following persons contributed in various ways in the creation of
+JOCO:
+	Mikhail Klin,
+	Christian Pech (maintainer),
+
+
+The newest verion of JOCO is available from github.
+
+From whithin gap4 you can load coco2p by issuing the command:
+     LoadPackage("joco");
+
+Help about JOCO can be obtained from inside gap 4 using the command
+     ?joco
+     
+
+
