@@ -35,14 +35,28 @@ InstallMethod(IsWLStableSet,
 "for a color set",
 [IsColorSet],
 function(cset)
-    local  cgr, t, set, iset, part;
-    cgr:=UnderlyingCgrOfColorSet(cset);
-    if not IsWLStableColorGraph(cgr) then
-        Error("only implemented for color sets of WL-stable color graphs");
-        return fail;
+    local  ucgr, cgr, t, set, iset, part;
+    ucgr:=UnderlyingCgrOfColorSet(cset);
+    
+    # if not IsWLStableColorGraph(cgr) then
+    #     Error("only implemented for color sets of WL-stable color graphs");
+    #     return fail;
+    # fi;
+    
+    if not IsWLStableColorGraph(ucgr) then
+        cgr:=ColorGraphByWLStabilization(ucgr);
+        t:=StructureConstantsOfColorGraph(cgr);
+        set:=AsSet(cset);
+    
+        set:=Filtered([1..Rank(cgr)], i-> ArcColorOfColorGraph(ucgr, ColorRepresentative(cgr,i)) in set);
+    else
+        cgr:=ucgr;
+        t:=StructureConstantsOfColorGraph(cgr);
+        set:=AsSet(cset);
     fi;
-    t:=StructureConstantsOfColorGraph(cgr);
-    set:=AsSet(cset);
+
+    # t:=StructureConstantsOfColorGraph(cgr);
+    # set:=AsSet(cset);
     iset:=OnSets(set,ColorMates(cgr));
     
     if iset = set then
