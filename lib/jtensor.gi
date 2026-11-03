@@ -7,12 +7,15 @@
 #
 # cgr must be a rainbow (otherwise it can not be J-stable and hence 
 # it cannot have a tensor of J-structure constants)
-# for rainbows the colors of cgr may be blocked according to the reflexive colors of cgr
+# for well-fibred rainbows the colors of cgr may be blocked according to the reflexive 
+# colors of cgr
 # if there is just one reflexive color then a tensor in IsTensorRep is returned
 # otherwise a tensor in IsBlockedTensorRep is returned
 # note that the partition of vertices into fibres is not necessarily equitable for cgr
 # as there are, e.g.,  homogeneous J-stable cgrs that are not regular
-InstallGlobalFunction(JTensorFromColorReps,
+InstallMethod(JTensorFromColorReps,
+"for a well-fibred rainbow",              
+[IsColorGraph and IsRainbow and IsWellFibredRainbow, IsList],
 function(cgr,tor)
     local o,r,k,i,j,tensor,mat,submat,
           row,column,pos,
@@ -92,7 +95,6 @@ function(cgr,tor)
             submat:=List(mat{blocks[a][c]}, x->x{blocks[c][b]});
             if IsBound(entries[a][b][c][blockIndices[k]]) then
                 if submat<>entries[a][b][c][blockIndices[k]] then
-                    
                     return fail;
                 fi;
             else
@@ -156,8 +158,81 @@ function(cgr,tor)
     return tensor;
 end);
 
+
+InstallMethod(JTensorFromColorReps,
+"for a colo graph",              
+[IsColorGraph, IsList],
+function(cgr,tor)
+    local o,r,k,i,j,tensor,mat,submat,
+          row,column,pos,
+          part,
+          refl,irrefl,
+          reflexiveColors, rowBlk, colBlk,
+          blocks, blockIndices,
+          entries,a,b,c,
+          rb,cb,
+          bltensor;
+    
+    if not IsRainbow(cgr) then
+        return fail;
+    fi;
+    
+    part := List([1..RankOfColorGraph(cgr)], x->[]);
+    refl:=List([1..RankOfColorGraph(cgr)], x->false);
+    irrefl:=List([1..RankOfColorGraph(cgr)], x->false);
+    for i in [1..Length(tor)] do
+        j:=ArcColorOfColorGraph(cgr,tor[i]);
+        Add(part[j], i);
+        if tor[i][1]=tor[i][2] then
+            refl[j]:=true;
+        else
+            irrefl[j]:=true;
+        fi;
+        if irrefl[j] and refl[j] then
+            return fail;
+        fi;
+    od;
+    
+    reflexiveColors:=ListBlist([1..RankOfColorGraph(cgr)], refl);
+    
+    entries:=[];
+    
+    for r in tor do
+        k:=ArcColorOfColorGraph(cgr,r);
+        mat:=LocalIntersectionArray(cgr,r);
+        mat:=mat + TransposedMat(mat);   # note that we do not divide by two anymore because 
+                                         # of the changed definition os JStructureConstants
+        if IsBound(entries[k]) then
+            if entries[k] <> mat then
+                return fail;
+            fi;
+        else
+            entries[k]:=mat;
+        fi;
+    od;
+    
+    tensor := rec(
+                   entries:=List([1..RankOfColorGraph(cgr)],
+                                 i->List([1..RankOfColorGraph(cgr)], 
+                                         j->List([1..RankOfColorGraph(cgr)],
+                                                 k->entries[k][i][j]))),
+                   knownAutGroup   := KnownGroupOfColorAutomorphismsOnColors(cgr),
+                   vertexNames     := ColorNames(cgr)
+                  );
+        
+    tensor:= Objectify(NewType(TensorFam, IsTensorRep), tensor);
+    
+    SetMates(tensor, ColorMates(cgr));
+    
+    SetReflexiveColors(tensor, reflexiveColors);
+    SetOrderOfCocoObject(tensor, RankOfColorGraph(cgr));
+    
+    return tensor;
+end);
+
+
 InstallMethod(EntryOfTensor,
-     "for blocked tensors",
+     "for blocked tensors from J-stable color graphs",
         [IsTensor and IsBlockedTensorRep and IsTensorOfJC,
          IsPosInt,
          IsPosInt,

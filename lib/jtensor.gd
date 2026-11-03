@@ -26,13 +26,13 @@ DeclareProperty( "IsTensorOfJC", IsTensor );
 #!
 #! <A>cgr</A> must be a rainbow (otherwise it can not be J-stable and hence 
 #! it cannot have a tensor of J-structure constants).
-#! For rainbows the colors of <A>cgr</A> may be blocked according to the reflexive colors 
-#! of <A>cgr</A> if there is just one reflexive color then a tensor in `IsTensorRep` 
-#! is returned. Otherwise a tensor in `IsBlockedTensorRep` is returned.
+#! For well-fibred rainbows the colors of <A>cgr</A> may be blocked according to the 
+#! reflexive colors  of <A>cgr</A> if there is just one reflexive color then a tensor 
+#! in `IsTensorRep` is returned. Otherwise a tensor in `IsBlockedTensorRep` is returned.
 #! Note that the partition of vertices into fibres is not necessarily equitable for <A>cgr</A>
 #! as there are, e.g.,  homogeneous J-stable cgrs that are not regular
 #! @Arguments cgr,creps
-DeclareGlobalFunction( "JTensorFromColorReps" );
+DeclareOperation( "JTensorFromColorReps", [IsColorGraph, IsList ] );
 
 
 
