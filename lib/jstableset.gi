@@ -33,14 +33,25 @@ InstallMethod(IsJStableSet,
 "for a color set",
 [IsColorSet],
 function(cset)
-    local  cgr, t, set, iset, part;
-    cgr:=UnderlyingCgrOfColorSet(cset);
-    if not IsJStableColorGraph(cgr) then
-        Error("only implemented for color sets of J-stable color graphs");
-        return fail;
+    local  ucgr, cgr, t, set, iset, part;
+    ucgr:=UnderlyingCgrOfColorSet(cset);
+    
+    if not IsJStableColorGraph(ucgr) then
+        cgr:=ColorGraphByJStabilization(ucgr);
+        t:=JStructureConstantsOfColorGraph(cgr);
+        set:=AsSet(cset);
+    
+        set:=Filtered([1..Rank(cgr)], i-> ArcColorOfColorGraph(ucgr, ColorRepresentative(cgr,i)) in set);
+    else
+        cgr:=ucgr;
+        t:=JStructureConstantsOfColorGraph(cgr);
+        set:=AsSet(cset);
     fi;
-    t:=JStructureConstantsOfColorGraph(cgr);
-    set:=AsSet(cset);
+    
+    # if not IsJStableColorGraph(ucgr) then
+    #     Error("only implemented for color sets of J-stable color graphs");
+    #     return fail;
+    # fi;
     iset:=OnSets(set,ColorMates(cgr));
     
     if iset = set then
