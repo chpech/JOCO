@@ -297,3 +297,85 @@ function(s)
     CloseStream(str);
     return res;
 end);
+InstallGlobalFunction(TripartiteColorGraphFromColorGraph@,
+function(cgr)
+        local v1,v2,v3,grp,vrt,act,adj,tcgr;
+    
+    v1:=List([1..Order(cgr)],i->[i,1]);
+    v2:=List(Tuples([1..Order(cgr)], 2), t->[t,2]);
+    v3:=List([1..Rank(cgr)],i->[i,3]);
+    grp:=KnownGroupOfAutomorphisms(cgr);
+    vrt:=Concatenation(v1,v2,v3);
+    act:= function(u,g)
+        if u[2]=1 then
+            return [u[1]^g,1];
+        elif u[2] = 2 then
+            return [OnPairs(u[1],g),2];
+        else
+            return u;
+        fi;
+    end;
+    
+    adj:=function(u,v)
+        local clr;
+        
+        if u[2] = 1 and v[2] = 1 then
+            if u[1] = v[1] then
+                return "vertex eq";
+            else
+                return "vertex";
+            fi;
+        elif u[2] = 1 and v[2] = 2 then
+            if v[1][1]= v[1][2] then
+                if u[1] = v[1][1] then
+                    return "both";
+                else
+                    return false;
+                fi;
+            fi;
+                                          
+            if u[1] = v[1][1] then 
+                return "left1";
+            elif u[1] = v[1][2] then
+                return "right";
+            else
+                return false;
+            fi;
+        elif u[2] = 1 and v[2] = 3 then
+            return "vrt->clr";
+        elif u[2] = 2 and v[2] = 2 then
+            if u[1] = v[1] then
+                return  "arc eq";
+            elif u[1][1] = v[1][1] then
+                return "arc 11";
+            elif u[1][1] = v[1][2] then
+                return "arc 12";
+            elif u[1][2] = v[1][1] then
+                return "arc 21";
+            elif u[1][2] = v[1][2] then
+                return "arc 22";
+            else
+                return "arc";
+            fi;
+        elif u[2] = 2 and v[2] = 3 then
+            if ArcColorOfColorGraph(cgr, u[1]) = v[1] then
+                return "arc has this color";
+            else
+                return "arc has other color";
+            fi;
+        elif
+            u[2] = 3 and v[2] = 3 then
+            if u[1] = v[1] then
+                return "colors are equal";
+            else
+                return "colors are different";
+            fi;
+        else
+            clr:=adj(v,u);
+            return [clr,"reversed"];
+        fi;
+    end;
+    tcgr:=ColorGraph(grp,vrt,act,true,adj);
+    return tcgr;
+end);
+
