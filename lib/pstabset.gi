@@ -162,6 +162,8 @@ function(iter)
                        orbreps:=StbcMinimalOrbitReps(SC,DomainOfPartialStableSet(ncand)),
                        orbidx:=1,
                        linkback:=state);
+        Assert(1, Stabilizer(StbcGroup(nextstate.S),nextstate.M, OnSets) = StbcGroup(nextstate.SM));
+        
         return nextstate;
     end;
     
@@ -170,6 +172,8 @@ function(iter)
     fi;
     
     res:=PartialStableSetOrbitNC(Image(iter!.state.act), iter!.state.cand, StbcGroup(iter!.state.SM));
+    # Error("brk2");
+    
     iter!.state:=NextState(iter!.state);
     return res;
 end);
@@ -232,8 +236,9 @@ function(iter)
                 gens:=ShallowCopy(iter!.state.SM.generators);
                 act:=iter!.state.act;
                 ker:=GeneratorsOfGroup(Kernel(act));
-                stab:=Union(List(gens,g->PreImagesRepresentative(act,g)*ker));
+                stab:=Concatenation(List(gens,g->PreImagesRepresentative(act,g)), ker);
                 stab:=Group(stab,());
+                Assert(1, stab = Stabilizer( grp, AsSet(gs), OnSets));
 #                stab:=Group(PreImagesSet(iter!.state.act,gens),());            
                 Add(res, ConstructorOfStableSetOrbit(gs)(grp,gs, stab));
                 Info(InfoJOCO,1,"*");
