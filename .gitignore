@@ -21,6 +21,7 @@
 /doc/*.pdf
 /doc/*.six
 /doc/*.ind
+cleanup.zsh
 
 
 
